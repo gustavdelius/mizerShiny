@@ -954,181 +954,11 @@ ui <- fluidPage(
           style = "vertical-align: middle; margin-right: 15px; margin-bottom: 5px; margin-top: 5px;"),
       "mizerShiny"
     ),
-    selected    = "Single Species",
+    selected    = "Fishery Strategy",
     navbar_options = bslib::navbar_options(collapsible = TRUE),
     theme       = bs_theme(bootswatch = "cerulean"),
 
-    tabPanel(
-      title = "Single Species",
-
-      grid_container(
-        layout    = c("area1 area0"),
-        row_sizes = c("1fr"),
-        col_sizes = c("0.3fr", "1.7fr"),
-        gap_size  = "10px",
-
-        grid_card(
-          area = "area1",
-          card_body(
-            sliderInput(
-              inputId = "species",
-              label   = HTML(
-                "Starting Biomass <button id='infoButtonSpecies' class='btn btn-info btn-xs' type='button' \
-                data-bs-toggle='popover' title='' \
-                data-bs-content='Slider value indicates the starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 1.2. To decrease by 20%, set value to 0.8.'>\
-                <strong>?</strong></button>"
-              ),
-              min   = 0,
-              max   = 2,
-              value = 1,
-              step  = 0.01,
-              width = "100%"
-            ) %>% tagAppendAttributes(id = "species_slider"),
-            sliderInput(
-              inputId = "mortspecies",
-              label   = HTML(
-                "Mortality Change <button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
-                data-bs-toggle='popover' title='' \
-                data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 1%, set the value of the slider to 0.01. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -0.01'>\
-                <strong>?</strong></button>"
-              ),
-              min   = -0.25,
-              max   = 0.25,
-              value = 0,
-              step  = 0.001,
-              width = "100%"
-            ) %>% tagAppendAttributes(id = "mort_slider"),
-            sliderInput(
-              inputId = "year",
-              label   = "Time Range",
-              min     = 1,
-              max     = sp_max_year,
-              value   = 5,
-              step    = 1,
-              width   = "100%"
-            ) %>% tagAppendAttributes(id = "yearspecies_slider"),
-            shinyjs::hidden(
-              div(id   = "yearAdjustButtons_bio",
-                  style = "display:flex; justify-content:center; gap:10px;",
-                  actionButton("decYear_bio", "-1 year", class = "btn-small"),
-                  actionButton("incYear_bio", "+1 year", class = "btn-small")
-              )
-            ),
-            selectInput(
-              inputId = "species_name_select",
-              label   = "Select a Species:",
-              choices = NULL
-            ) %>% tagAppendAttributes(id = "species_chose"),
-            shinyjs::hidden(
-              actionButton("resetTimeYear_bio", "Reset Time",
-                           class = "btn-small",
-                           style = "color:#2FA4E7;")
-            ),
-            actionButton(inputId = "goButton1",   label = "Run Simulation")
-          )
-        ),
-
-        grid_card(
-          area = "area0",
-
-          card_body(                       # added class
-            class = "plot-card",
-            style = "flex: 4; overflow: hidden; margin-top: -0.5rem",
-            tabsetPanel(
-              id = "plotTabs",
-              tabPanel(title = "Species", plotlyOutput("speciesPlot", height = "55vh")),
-              tabPanel(title = "Size",     plotlyOutput("sizePlot",     height = "55vh")),
-              if (app_exists("Including", "guilds_information", "checkGuilds",
-                             "guildparams_preprocessed.Rdata")) {
-                tabPanel(title = "Guilds",   plotlyOutput("guildPlot",    height = "55vh"))},
-              tabPanel(title = "Diet",
-                       div(style = "height:50vh; display:flex;",
-                           plotlyOutput("dietplot", height = "100%", width = "100%")
-                       ))
-            )
-          ),
-
-          card_body(
-            style = "flex: 1.46;",
-
-            conditionalPanel(
-              condition = "input.plotTabs == 'Species'",
-              legendUI("infoButtonOrder", legends$biomass_species),
-              br(),
-              # h4(
-              tagList(
-                HTML("<span style='position: relative; top:-0.2em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
-                HTML(
-                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Unordered, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'>
-                    <strong>?</strong>
-                  </button>"
-                ),
-                actionButton(
-                  "customOrderInfo_bio",
-                  label = HTML("<strong>Custom</strong>"),
-                  class = "btn btn-info btn-xs no-focus-outline",
-                  style = "display:inline-block; position:relative; top:-0.25em; margin-left: 5px;"
-                )
-
-              )
-              #)
-              ,
-              div(id = "species_order_bio_box",
-                  selectInput(
-                    inputId = "species_order_bio",
-                    label   = NULL,
-                    choices = c("Unordered", "Size", "Guild", "Chosen")
-                  )),
-              div( id = "triMode",
-                   materialSwitch(
-                     inputId = "triplotToggle",
-                     label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
-                     value   = FALSE,
-                     status  = "info"
-                   )
-              )
-            ),
-
-            conditionalPanel(
-              condition = "input.plotTabs == 'Size'",
-              legendUI("infoButtonOrder", legends$biomass_size),
-              br(),
-              materialSwitch(
-                inputId = "logToggle",
-                label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
-                value   = TRUE,
-                status  = "info"
-              )
-            ),
-
-            conditionalPanel(
-              condition = "input.plotTabs == 'Guilds'",
-              legendUI("infoButtonOrder", legends$biomass_guild),
-              br(),
-              materialSwitch(
-                inputId = "triguildToggle",
-                label   = HTML("<span style='margin-top:0; margin-bottom:0.5rem;
-                               font-weight:500; color: var(--bs-heading-color);
-                               line-height:1.2;'>Chosen Only</span>"),
-                value   = FALSE,
-                status  = "info"
-              )
-            ),
-            conditionalPanel(
-              condition = "input.plotTabs == 'Diet'",
-              legendUI("infoButtonDietBio", legends$fishery_diet_single),
-              br(),
-              HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species to Plot</span>"),
-              selectInput(
-                inputId = "diet_species_select",
-                label   = NULL,
-                choices = NULL
-              )
-            )
-          )
-        )
-      )
-    ),
+    # Fishery Strategy tab ----
     tabPanel(
       title = "Fishery Strategy",
       grid_container(
@@ -1365,6 +1195,181 @@ ui <- fluidPage(
         )
       )
     ),
+
+    # Species Role tab ----
+    tabPanel(
+      title = "Species Role",
+
+      grid_container(
+        layout    = c("area1 area0"),
+        row_sizes = c("1fr"),
+        col_sizes = c("0.3fr", "1.7fr"),
+        gap_size  = "10px",
+
+        grid_card(
+          area = "area1",
+          card_body(
+            sliderInput(
+              inputId = "species",
+              label   = HTML(
+                "Starting Biomass <button id='infoButtonSpecies' class='btn btn-info btn-xs' type='button' \
+                data-bs-toggle='popover' title='' \
+                data-bs-content='Slider value indicates the starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 1.2. To decrease by 20%, set value to 0.8.'>\
+                <strong>?</strong></button>"
+              ),
+              min   = 0,
+              max   = 2,
+              value = 1,
+              step  = 0.01,
+              width = "100%"
+            ) %>% tagAppendAttributes(id = "species_slider"),
+            sliderInput(
+              inputId = "mortspecies",
+              label   = HTML(
+                "Mortality Change <button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
+                data-bs-toggle='popover' title='' \
+                data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 1%, set the value of the slider to 0.01. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -0.01'>\
+                <strong>?</strong></button>"
+              ),
+              min   = -0.25,
+              max   = 0.25,
+              value = 0,
+              step  = 0.001,
+              width = "100%"
+            ) %>% tagAppendAttributes(id = "mort_slider"),
+            sliderInput(
+              inputId = "year",
+              label   = "Time Range",
+              min     = 1,
+              max     = sp_max_year,
+              value   = 5,
+              step    = 1,
+              width   = "100%"
+            ) %>% tagAppendAttributes(id = "yearspecies_slider"),
+            shinyjs::hidden(
+              div(id   = "yearAdjustButtons_bio",
+                  style = "display:flex; justify-content:center; gap:10px;",
+                  actionButton("decYear_bio", "-1 year", class = "btn-small"),
+                  actionButton("incYear_bio", "+1 year", class = "btn-small")
+              )
+            ),
+            selectInput(
+              inputId = "species_name_select",
+              label   = "Select a Species:",
+              choices = NULL
+            ) %>% tagAppendAttributes(id = "species_chose"),
+            shinyjs::hidden(
+              actionButton("resetTimeYear_bio", "Reset Time",
+                           class = "btn-small",
+                           style = "color:#2FA4E7;")
+            ),
+            actionButton(inputId = "goButton1",   label = "Run Simulation")
+          )
+        ),
+
+        grid_card(
+          area = "area0",
+
+          card_body(                       # added class
+            class = "plot-card",
+            style = "flex: 4; overflow: hidden; margin-top: -0.5rem",
+            tabsetPanel(
+              id = "plotTabs",
+              tabPanel(title = "Species", plotlyOutput("speciesPlot", height = "55vh")),
+              tabPanel(title = "Size",     plotlyOutput("sizePlot",     height = "55vh")),
+              if (app_exists("Including", "guilds_information", "checkGuilds",
+                             "guildparams_preprocessed.Rdata")) {
+                tabPanel(title = "Guilds",   plotlyOutput("guildPlot",    height = "55vh"))},
+              tabPanel(title = "Diet",
+                       div(style = "height:50vh; display:flex;",
+                           plotlyOutput("dietplot", height = "100%", width = "100%")
+                       ))
+            )
+          ),
+
+          card_body(
+            style = "flex: 1.46;",
+
+            conditionalPanel(
+              condition = "input.plotTabs == 'Species'",
+              legendUI("infoButtonOrder", legends$biomass_species),
+              br(),
+              # h4(
+              tagList(
+                HTML("<span style='position: relative; top:-0.2em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
+                HTML(
+                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Unordered, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'>
+                    <strong>?</strong>
+                  </button>"
+                ),
+                actionButton(
+                  "customOrderInfo_bio",
+                  label = HTML("<strong>Custom</strong>"),
+                  class = "btn btn-info btn-xs no-focus-outline",
+                  style = "display:inline-block; position:relative; top:-0.25em; margin-left: 5px;"
+                )
+
+              )
+              #)
+              ,
+              div(id = "species_order_bio_box",
+                  selectInput(
+                    inputId = "species_order_bio",
+                    label   = NULL,
+                    choices = c("Unordered", "Size", "Guild", "Chosen")
+                  )),
+              div( id = "triMode",
+                   materialSwitch(
+                     inputId = "triplotToggle",
+                     label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
+                     value   = FALSE,
+                     status  = "info"
+                   )
+              )
+            ),
+
+            conditionalPanel(
+              condition = "input.plotTabs == 'Size'",
+              legendUI("infoButtonOrder", legends$biomass_size),
+              br(),
+              materialSwitch(
+                inputId = "logToggle",
+                label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
+                value   = TRUE,
+                status  = "info"
+              )
+            ),
+
+            conditionalPanel(
+              condition = "input.plotTabs == 'Guilds'",
+              legendUI("infoButtonOrder", legends$biomass_guild),
+              br(),
+              materialSwitch(
+                inputId = "triguildToggle",
+                label   = HTML("<span style='margin-top:0; margin-bottom:0.5rem;
+                               font-weight:500; color: var(--bs-heading-color);
+                               line-height:1.2;'>Chosen Only</span>"),
+                value   = FALSE,
+                status  = "info"
+              )
+            ),
+            conditionalPanel(
+              condition = "input.plotTabs == 'Diet'",
+              legendUI("infoButtonDietBio", legends$fishery_diet_single),
+              br(),
+              HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species to Plot</span>"),
+              selectInput(
+                inputId = "diet_species_select",
+                label   = NULL,
+                choices = NULL
+              )
+            )
+          )
+        )
+      )
+    ),
+
+    # Page guide ----
     bslib::nav_spacer(),
     bslib::nav_item(
       actionButton("start_tutorial", "Page Guide", class = "btn btn-primary",
