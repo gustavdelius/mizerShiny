@@ -1156,104 +1156,117 @@ ui <- fluidPage(
               div(style = "margin-bottom:1.5rem;",
                   legendUI("infoButtonOrder", legends$fishery_yield)
               ),
-              tags$div(
-                style = "display: flex; align-items: center;",
-
-                HTML("<span style='margin-top:0px; margin-bottom:0.5rem; margin-right: 0.7em;font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Yield Time Range</span>"),
-                style = "margin: 0 15px 0 0;"
-                ,
-                sliderInput(
-                  inputId = "fishyear2_yield",
-                  label   = NULL,
-                  min     = 1,
-                  max     = fish_max_year,
-                  value   = c(1, 10),
-                  step    = 1,
-                  width   = "25%"
-                ) %>% tagAppendAttributes(id = "fishyyear_yield", style = "margin-top: 20px;")
+              div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                  HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Yield Time Range</span>"),
+                  sliderInput(
+                    inputId = "fishyear2_yield",
+                    label   = NULL,
+                    min     = 1,
+                    max     = fish_max_year,
+                    value   = c(1, 10),
+                    step    = 1,
+                    width   = "200px"
+                  ) %>% tagAppendAttributes(id = "fishyyear_yield")
               )
             ),
             conditionalPanel(
               condition = "input.fishy_plots == 'Species'",
-              legendUI("infoButtonOrder", legends$fishery_species),
-              br(),
-              tagList(
-                HTML("<span style='display:inline-block; position:relative; top:-0.25em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
-                HTML(
-                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
-                ),
-                actionButton(
-                  "customOrderInfo_fish",
-                  label = HTML("<strong>customise</strong>"),
-                  class = "btn btn-info btn-xs no-focus-outline",
-                  style = "display:inline-block; position:relative; top:-0.25em; margin-left: 5px;"
-                )
-              ),
-              div(id="species_order_fish_box",
-                  selectInput(
-                    inputId = "species_order_fish",
-                    label   = NULL,
-                    choices = c("Custom", "Size", "Guild")
-                  )),
-              div( id = "triMode_fish",
-                   materialSwitch(
-                     inputId = "triplotToggleFish",
-                     label   = HTML(
-                       "<span style='margin-top:0; margin-bottom:0.5rem;
-     font-weight:500; color: var(--bs-heading-color);
-     line-height:1.2;'>Chosen Only</span>"
-                     ),
-                     value   = FALSE,
-                     status  = "info"
-                   )
+              div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$fishery_species)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
+                      selectInput(
+                        inputId = "species_order_fish",
+                        label   = NULL,
+                        choices = c("Custom", "Size", "Guild"),
+                        width = "120px"
+                      ),
+                      HTML(
+                        "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
+                      ),
+                      actionButton(
+                        "customOrderInfo_fish",
+                        label = HTML("<strong>customise</strong>"),
+                        class = "btn btn-info btn-xs no-focus-outline"
+                      )
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
+                      materialSwitch(
+                        inputId = "triplotToggleFish",
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
+                        value   = FALSE,
+                        status  = "info"
+                      )
+                  )
               )
             ),
             conditionalPanel(
               condition = "input.fishy_plots == 'Size'",
-              legendUI("infoButtonOrder", legends$fishery_size),
-              br(),
-              materialSwitch(
-                inputId = "logToggle4",
-                label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
-                value   = TRUE,
-                status  = "info"
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$fishery_size)
+                  ),
+                  div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
+                      materialSwitch(
+                        inputId = "logToggle4",
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
+                        value   = TRUE,
+                        status  = "info"
+                      )
+                  )
               )
             ),
             conditionalPanel(
               condition = "input.fishy_plots == 'Guild'",
-              legendUI("infoButtonOrder", legends$fishery_guild),
-              br(),
-              materialSwitch(
-                inputId = "triguildToggleFish",
-                label   = HTML("<span style='margin-top:0; margin-bottom:0.5rem;
-        font-weight:500; color: var(--bs-heading-color);
-        line-height:1.2;'>Chosen Only</span>"),
-                value   = FALSE,
-                status  = "info"
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$fishery_guild)
+                  ),
+                  div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
+                      materialSwitch(
+                        inputId = "triguildToggleFish",
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
+                        value   = FALSE,
+                        status  = "info"
+                      )
+                  )
               )
             ),
             conditionalPanel(
               condition = "input.fishy_plots == 'Spectra'",
-              legendUI("infoButtonOrder", legends$fishery_spectra),
-              br(),
-              materialSwitch(
-                inputId = "logToggle5",
-                label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
-                value   = TRUE,
-                status  = "info"
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$fishery_spectra)
+                  ),
+                  div(style = "padding: 10px; background-color: #fce4ec; border-radius: 5px; border: 1px solid #f8bbd9;",
+                      materialSwitch(
+                        inputId = "logToggle5",
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
+                        value   = TRUE,
+                        status  = "info"
+                      )
+                  )
               )
             ),
             conditionalPanel(
               condition = "input.fishy_plots == 'Diet'",
-              legendUI("infoButtonOrder", legends$fishery_diet_single),
-              br(),
-              HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species to Plot</span>"),
-              selectInput(
-                inputId = "fish_name_select",
-                label   = NULL,
-                choices = NULL
-
-              )),
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$fishery_diet_single)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
+                      selectInput(
+                        inputId = "fish_name_select",
+                        label   = NULL,
+                        choices = NULL,
+                        width = "200px"
+                      )
+                  )
+              )
+            ),
             conditionalPanel(
               condition = "input.fishy_plots == 'Nutrition'",
               legendUI("infoButtonOrder", legends$nutrition)
@@ -1351,74 +1364,86 @@ ui <- fluidPage(
 
             conditionalPanel(
               condition = "input.plotTabs == 'Species'",
-              legendUI("infoButtonOrder", legends$biomass_species),
-              br(),
-              # h4(
-              tagList(
-                HTML("<span style='position: relative; top:-0.2em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
-                HTML(
-                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
-                ),
-                actionButton(
-                  "customOrderInfo_bio",
-                  label = HTML("<strong>customise</strong>"),
-                  class = "btn btn-info btn-xs no-focus-outline",
-                  style = "display:inline-block; position:relative; top:-0.25em; margin-left: 5px;"
-                )
-
-              )
-              #)
-              ,
-              div(id = "species_order_bio_box",
-                  selectInput(
-                    inputId = "species_order_bio",
-                    label   = NULL,
-                    choices = c("Custom", "Size", "Guild")
-                  )),
-              div( id = "triMode",
-                   materialSwitch(
-                     inputId = "triplotToggle",
-                     label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
-                     value   = FALSE,
-                     status  = "info"
-                   )
+              div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$biomass_species)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
+                      selectInput(
+                        inputId = "species_order_bio",
+                        label   = NULL,
+                        choices = c("Custom", "Size", "Guild"),
+                        width = "120px"
+                      ),
+                      HTML(
+                        "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
+                      ),
+                      actionButton(
+                        "customOrderInfo_bio",
+                        label = HTML("<strong>customise</strong>"),
+                        class = "btn btn-info btn-xs no-focus-outline"
+                      )
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
+                      materialSwitch(
+                        inputId = "triplotToggle",
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
+                        value   = FALSE,
+                        status  = "info"
+                      )
+                  )
               )
             ),
 
             conditionalPanel(
               condition = "input.plotTabs == 'Size'",
-              legendUI("infoButtonOrder", legends$biomass_size),
-              br(),
-              materialSwitch(
-                inputId = "logToggle",
-                label   = HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
-                value   = TRUE,
-                status  = "info"
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$biomass_size)
+                  ),
+                  div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
+                      materialSwitch(
+                        inputId = "logToggle",
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
+                        value   = TRUE,
+                        status  = "info"
+                      )
+                  )
               )
             ),
 
             conditionalPanel(
               condition = "input.plotTabs == 'Guilds'",
-              legendUI("infoButtonOrder", legends$biomass_guild),
-              br(),
-              materialSwitch(
-                inputId = "triguildToggle",
-                label   = HTML("<span style='margin-top:0; margin-bottom:0.5rem;
-                               font-weight:500; color: var(--bs-heading-color);
-                               line-height:1.2;'>Chosen Only</span>"),
-                value   = FALSE,
-                status  = "info"
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$biomass_guild)
+                  ),
+                  div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
+                      materialSwitch(
+                        inputId = "triguildToggle",
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
+                        value   = FALSE,
+                        status  = "info"
+                      )
+                  )
               )
             ),
             conditionalPanel(
               condition = "input.plotTabs == 'Diet'",
-              legendUI("infoButtonDietBio", legends$fishery_diet_single),
-              br(),
-              HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species to Plot</span>"),
-              selectInput(
-                inputId = "diet_species_select",
-                label   = NULL,
-                choices = NULL
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonDietBio", legends$fishery_diet_single)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
+                      selectInput(
+                        inputId = "diet_species_select",
+                        label   = NULL,
+                        choices = NULL,
+                        width = "200px"
+                      )
+                  )
               )
             )
           )
