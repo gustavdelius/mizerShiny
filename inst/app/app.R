@@ -22,11 +22,14 @@ default_params <- getShinyOption("default_params")
 if (is.null(default_params)) default_params <- mizerShiny::default_params
 
 unharvestedprojection <- project(default_params, t_max = 12)
-unfishedprojection <- unharvestedprojection
+unfishedprojection <- project(default_params, t_max = 12)
 
 #Find years for the Time Range
 sp_max_year   <- max(16, floor((dim(unharvestedprojection@n)[1] - 2) / 2))
 fish_max_year <- max(16, floor((dim(unfishedprojection@n)[1] - 2) / 2))
+
+
+# Load guild & nutrition data ----
 
 # Functions to help load in files
 app_path <- function(...) {
@@ -36,7 +39,6 @@ app_path <- function(...) {
 }
 app_exists <- function(...) file.exists(app_path(...))
 
-# guild & nutrition data ----------------------------------------
 guild_file <- app_path("Including", "guilds_information", "checkGuilds",
                        "guildparams_preprocessed.Rdata")
 have_guild_file <- file.exists(guild_file)
@@ -48,9 +50,18 @@ have_nutrition_file <- file.exists(nut_file)
 source(app_path("www", "legendsTXT.R"), local = TRUE)
 source(app_path("Functions", "legendUI.R"), local = TRUE)
 
+# Server ----
 server <- function(input, output, session) {
 
-  #loading the introduction/guide
+  # Global error handler for debugging
+  options(error = function() {
+    message("DEBUG: Global error caught!")
+    message("DEBUG: Error message: ", geterrmessage())
+    message("DEBUG: Call stack:")
+    print(sys.calls())
+  })
+
+  # loading the introduction/guide ----
   source("tutorial_steps/get_intro_steps.R")
   observeEvent(input$start_tutorial, {
     steps <- get_intro_steps(input)
@@ -62,19 +73,27 @@ server <- function(input, output, session) {
 
   #changing the species options to dynamically change depending on the model
   species_list <- reactive({
-    setdiff(unique(default_params@species_params$species),
+    species <- setdiff(unique(default_params@species_params$species),
             ("Resource"))
+    species
   })
   species_input_ids <- c(
-    "species_name_select", "name_select",
+    "species_name_select",
     "fish_name_select",
-    "diet_species_select",
-    "diet_species_select_mort"
+    "diet_species_select"
   )
   observe({
     lapply(species_input_ids, function(id) {
       updateSelectInput(session, id, choices = species_list())
     })
+  })
+
+  # Initialize species selection when app starts
+  observe({
+    req(species_list())
+    if (length(species_list()) > 0 && (is.null(input$species_name_select) || input$species_name_select == "")) {
+      updateSelectInput(session, "species_name_select", selected = species_list()[1])
+    }
   })
 
   #changing the fishery options to dynamically change depending on the model
@@ -221,7 +240,7 @@ server <- function(input, output, session) {
   setupYearControls(
     input, session,
     sliderId = "year",
-    runBtnId = "goButton1",
+    runBtnId = "dummy_run_button",  # Dummy ID since we no longer have a run button
     boxId    = "yearAdjustButtons_bio",
     resetId  = "resetTimeYear_bio",
     minusId  = "decYear_bio",
@@ -230,39 +249,58 @@ server <- function(input, output, session) {
   )
 
 
-# Single species
+# Species role  ----
 
-  bioSimData <- eventReactive(input$goButton1, {
-    speciessim <- default_params
+  # Initialize bioSimData as a reactive value
+  bioSimData <- reactiveVal(list(
+      harvested = unharvestedprojection,
+      unharvested = unharvestedprojection
+  ))
 
-    time1 <- max(input$year - 1, 1)
-    time2 <- input$year + 1
+  # Reactive observer that runs simulation when inputs change
+  observe({
+    req(input$species_name_select)
+    # Trigger on changes to these inputs
+    input$species
+    input$mortspecies
+    input$year
+    input$species_name_select
+
+    # Run the simulation
+    changed_params <- default_params
 
     pb <- shiny::Progress$new(); on.exit(pb$close())
     total_steps <- 4
     pb$set(message = "Running simulation …", value = 0)
 
     pb$inc(1/total_steps, "Adjusting biomass …")
-    speciessim@initial_n[input$species_name_select, ] <-
-      speciessim@initial_n[input$species_name_select, ] * input$species
+
+    changed_params@initial_n[input$species_name_select, ] <-
+      default_params@initial_n[input$species_name_select, ] * input$species
 
     pb$inc(1/total_steps, "Updating mortality …")
-    extmort   <- getExtMort(speciessim)
-    totalmort <- getMort(speciessim)
-    extmort[input$name_select, ] <- extmort[input$name_select, ] +
-      (input$mortspecies * totalmort[input$name_select, ])
-    ext_mort(speciessim) <- extmort
+    extmort   <- getExtMort(default_params)
+    totalmort <- getMort(default_params)
+
+    extmort[input$species_name_select, ] <-
+      extmort[input$species_name_select, ] +
+      input$mortspecies * totalmort[input$species_name_select, ]
+
+    ext_mort(changed_params) <- extmort
 
     pb$inc(1/total_steps, "Projecting …")
     harvested <- project(
-      speciessim,
-      effort = unharvestedprojection@params@initial_effort,
-      t_max  = time2 * 2
+      changed_params,
+      # We run the simulation for an extra 5 years so that the +1 button
+      # does not immediately trigger a re-run.
+      t_max  = input$year + 5
     )
 
     pb$inc(1/total_steps, "Done")
-    list(harvested = harvested,
-         unharvested = unharvestedprojection)
+
+    # Update the reactive value
+    bioSimData(list(harvested = harvested,
+                    unharvested = unharvestedprojection))
   })
 
   #so if something breaks an error wont pop up, it will load the previous
@@ -344,11 +382,27 @@ server <- function(input, output, session) {
     sims <- list(bioSimData()$harvested, bioSimData()$unharvested)
 
     p <- tryCatch({
+      # Add bounds checking for time range
+      sim_dims <- dim(bioSimData()$harvested@n)
+      if (win$start > sim_dims[1] || win$end > sim_dims[1]) {
+        message("DEBUG: Time range out of bounds")
+        message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
+        message("DEBUG: sim_dims[1] = ", sim_dims[1])
+        return(lastDietPlot())
+      }
+
     harvest_sub <- lapply(sims, function(p) {
-      p@n       <- p@n      [win$start:win$end, , , drop = FALSE]
-      p@n_pp    <- p@n_pp   [win$start:win$end, ,      drop = FALSE]
-      p@n_other <- p@n_other[win$start:win$end, ,      drop = FALSE]
-      p
+      tryCatch({
+        p@n       <- p@n      [win$start:win$end, , , drop = FALSE]
+        p@n_pp    <- p@n_pp   [win$start:win$end, ,      drop = FALSE]
+        p@n_other <- p@n_other[win$start:win$end, ,      drop = FALSE]
+        p
+      }, error = function(e) {
+        message("DEBUG: Error in diet plot subsetting: ", e$message)
+        message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
+        message("DEBUG: p@n dims = ", paste(dim(p@n), collapse = "x"))
+        stop(e)
+      })
     })
 
 
@@ -360,6 +414,7 @@ server <- function(input, output, session) {
       },
       error = function(e) {
         # on error, return the last successful diet plot
+        message("DEBUG: Diet plot error: ", e$message)
         lastDietPlot()
       }
     )
@@ -645,9 +700,8 @@ server <- function(input, output, session) {
     built(FALSE)
   }, ignoreInit = TRUE)
 
-  #SO that it saves the last plot, and remembers that the plot is already built (so just change data not plot object)
-  built            <- reactiveVal(FALSE)
-  lastSpectrumPlot <- reactiveVal(NULL)
+  # So that it saves the last plot, and remembers that the plot is already built (so just change data not plot object)
+  built <- reactiveVal(FALSE)
 
   #helper to get the data
   getSpectraData <- function(sim, win) {
@@ -873,11 +927,27 @@ server <- function(input, output, session) {
       c("Sim 1", "Sim 2")
 
     p <- tryCatch({
+      # Add bounds checking for time range
+      sim_dims <- dim(fishSimData()$sim1@n)
+      if (win$start > sim_dims[1] || win$end > sim_dims[1]) {
+        message("DEBUG: Fishery time range out of bounds")
+        message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
+        message("DEBUG: sim_dims[1] = ", sim_dims[1])
+        return(lastFishDietSinglePlot())
+      }
+
       harvest_sub <- lapply(sims, function(p) {
-        p@n       <- p@n      [win$start:win$end, , , drop = FALSE]
-        p@n_pp    <- p@n_pp   [win$start:win$end, ,      drop = FALSE]
-        p@n_other <- p@n_other[win$start:win$end, ,      drop = FALSE]
-        p
+        tryCatch({
+          p@n       <- p@n      [win$start:win$end, , , drop = FALSE]
+          p@n_pp    <- p@n_pp   [win$start:win$end, ,      drop = FALSE]
+          p@n_other <- p@n_other[win$start:win$end, ,      drop = FALSE]
+          p
+        }, error = function(e) {
+          message("DEBUG: Error in fishery diet plot subsetting: ", e$message)
+          message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
+          message("DEBUG: p@n dims = ", paste(dim(p@n), collapse = "x"))
+          stop(e)
+        })
       })
 
 
@@ -887,6 +957,7 @@ server <- function(input, output, session) {
 
     },
     error = function(e) {
+      message("DEBUG: Fishery diet plot error: ", e$message)
       lastFishDietSinglePlot()
     })
 
@@ -954,7 +1025,7 @@ ui <- fluidPage(
           style = "vertical-align: middle; margin-right: 15px; margin-bottom: 5px; margin-top: 5px;"),
       "mizerShiny"
     ),
-    selected    = "Fishery Strategy",
+    selected    = "Species Role",
     navbar_options = bslib::navbar_options(collapsible = TRUE),
     theme       = bs_theme(bootswatch = "cerulean"),
 
@@ -1262,8 +1333,7 @@ ui <- fluidPage(
               actionButton("resetTimeYear_bio", "Reset Time",
                            class = "btn-small",
                            style = "color:#2FA4E7;")
-            ),
-            actionButton(inputId = "goButton1",   label = "Run Simulation")
+            )
           )
         ),
 
