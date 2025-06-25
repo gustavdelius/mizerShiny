@@ -1,18 +1,20 @@
 intro_steps <- list(
+  list(element = "#species_chose", title = "Species Selector",
+       intro = "Here is where you choose the species you want to investigate."),
   list(element = "#species_slider", title = "Biomass Slider",
        intro = "This slider will change the starting biomass of the
                  species in the model. Changing the starting biomass intends to
                  show the trophic role of different species within the ecosystem,
                  as the knock on effect of a biomass change should be in seen
                  in the plots. Hover over the information button to learn more."),
+  list(element = "#mort_slider", title = "Mortality Slider",
+       intro = "The Mortality slider changes the mortality rate of a given species,
+                across their entire size range."),
   list(element = "#yearspecies_slider", title = "Time Range Slider",
        intro = "Changing the value of this slider will change the
                  year that is plotted. It is useful to look at different time scales,
                  as the impact of the imposed change may differ and it will show the
                  oscillatory change in fish populations."),
-  list(element = "#species_chose", title = "Species Selector",
-       intro = "Here is where you choose the species you want to investigate.
-                 It is possible to change all the species within the model."),
   list(element = "#goButton1", title = "Run Simulation",
        intro = "Once you have chosen your settings, press this button to run the simulation.
        Now, the 'Time Range' slider can be used to change the time plotted, as well as the +1/-1 buttons.
@@ -28,16 +30,16 @@ intro_steps <- list(
        more specific values and save the plot by using the picture icon in the top right of the plot."),
   list(element = "#plotTabs .nav-link[data-value='Species']", title = "Species",
        intro = "The first plot presents the percentage change in each of the species. This percentage change is relative to an equal ecosystem,
-      except without your imposed change on the species. Each species has 3 bars, which indicate the species percentage change on
-      across a shorter timescale (a half of the chosen time), the chosen timescale and a longer timescale (double the chosen time)...
+      except without your imposed change on the species. Each species has 3 bars, which indicate the species percentage change at
+      specific time points: quarter of the selected year, half of the selected year, and the full selected year...
       " ),
   list(element = "#plotTabs .nav-link[data-value='Species']",title = "Species continued",
-       intro = "Plotting all 3 timescales
-      aids in understanding the oscillatory nature of fish populations, but also gives a greater resolution of the effect of the imposed change.
+       intro = "Plotting all 3 time points
+      aids in understanding how the ecosystem changes evolve over time, showing the progression from early to late stages of the simulation.
       " ),
   list(element = "#triMode",title = "Change Time Plotted",
-       intro = "When changing the time with the +1/-1 buttons, it is difficult to observe changes when 3 timeranges are plotted. Use this toggle to change
-       from 3 times plotted to only the chosen time plotted.
+       intro = "When changing the time with the +1/-1 buttons, it is difficult to observe changes when 3 time points are plotted. Use this toggle to change
+       from 3 time points plotted to only the selected year plotted.
       " ),
   list(element = "#plotTabs .nav-link[data-value='Size']",title = "Size",
        intro = "The next plot shows the relative change in the size spectrum on a community level. Plotting the size spectrum informs
@@ -46,7 +48,7 @@ intro_steps <- list(
   list(element = "#plotTabs .nav-link[data-value='Guilds']",title = "Guilds",
        intro = "The plot here showcases the change in the guilds within the species, which are fish in the ecosystem that share a distinct
        feeding pattern in relation to other fish. Observing this plot helps to understand how the trophic dynamics of the ecosystem are changing.
-      Additionally, the guilds are plotted as 3 bars of a short, chosen and long timescale."
+      Additionally, the guilds are plotted as 3 bars representing biomass at quarter, half and full of the selected year."
   ),
   list(element = "#plotTabs .nav-link[data-value='Diet']",title = "Diet",
        intro = "This plot shows what a species of fish is eating across its size range. The majority of
