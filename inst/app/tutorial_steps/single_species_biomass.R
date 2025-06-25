@@ -1,37 +1,36 @@
 intro_steps <- list(
   list(element = "#species_chose", title = "Species Selector",
-       intro = "Here is where you choose the species you want to investigate."),
+       intro = "Here is where you choose the species you want to modify."),
   list(element = "#species_slider", title = "Biomass Slider",
        intro = "This slider will change the starting biomass of the
                  species in the model. Changing the starting biomass intends to
                  show the trophic role of different species within the ecosystem,
-                 as the knock on effect of a biomass change should be in seen
+                 as the knock on effect on the other species can be seen
                  in the plots. Hover over the information button to learn more."),
   list(element = "#mort_slider", title = "Mortality Slider",
-       intro = "The Mortality slider changes the mortality rate of a given species,
-                across their entire size range."),
+       intro = "The Mortality slider changes the fitness of the species by
+                changing the mortality rate of a given species across their
+                entire size range."),
   list(element = "#yearspecies_slider", title = "Time Range Slider",
        intro = "Changing the value of this slider will change the
                  year that is plotted. It is useful to look at different time scales,
                  as the impact of the imposed change may differ and it will show the
                  oscillatory change in fish populations."),
-  list(element = "#goButton1", title = "Run Simulation",
-       intro = "Once you have chosen your settings, press this button to run the simulation.
-       Now, the 'Time Range' slider can be used to change the time plotted, as well as the +1/-1 buttons.
-       It will not rerun the simulation so it is considerably faster. Use 'Reset Time' to return to normal when running another simulation.
-                 "),
+  list(element = "#yearAdjustButtons_bio", title = "Time Controls",
+       intro = "Use the +1/-1 buttons to quickly adjust the time range."),
   list(element = "#species_order_bio_box", title = "Species Order",
-       intro = "As some of the graphs show changes in each of the species within the model,
-            the order that these species are presented may allow for easier observation of
+       intro = "On graphs that show changes in each of the species within the model,
+            changing the order that these species are presented may allow for easier observation of
             any general patterns. You can change and customise the order using the options here."),
-  list(element = "#plotTabs", title="Plots", intro = "Here is where you can navigate between different aspects of the ecosystem.
-       Remember that each plot uses plotly, so you can look at specific areas of the plot by selecting with your mouse (then double click to reset),
+  list(element = "#plotTabs", title="Plots", intro = "Here is where you can navigate between different plots.
+       The plots are interactive. You can look at specific areas of the plot by selecting with your mouse (then double click to reset),
        remove plot items by clicking them on the legend (double click to remove everything but that one), hover over plot information to get
        more specific values and save the plot by using the picture icon in the top right of the plot."),
   list(element = "#plotTabs .nav-link[data-value='Species']", title = "Species",
-       intro = "The first plot presents the percentage change in each of the species. This percentage change is relative to an equal ecosystem,
-      except without your imposed change on the species. Each species has 3 bars, which indicate the species percentage change at
-      specific time points: quarter of the selected year, half of the selected year, and the full selected year...
+       intro = "The first plot presents the percentage change in the biomass of each species.
+       This percentage change is relative to the original steady state.
+       Each species has 3 bars that indicate the percentage change at
+       specific time points: quarter of the selected year, half of the selected year, and the selected year.
       " ),
   list(element = "#plotTabs .nav-link[data-value='Species']",title = "Species continued",
        intro = "Plotting all 3 time points
