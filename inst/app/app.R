@@ -157,7 +157,7 @@ server <- function(input, output, session) {
   #Having a custom order on the X axis
   contexts <- c("bio", "fish")
   custom_species_order <- reactiveVal(NULL)
-  species_order_choice <- reactiveVal("Default")
+  species_order_choice <- reactiveVal("Custom")
 
   #add the ui to load when custom is pressed
   lapply(contexts, function(ctx) {
@@ -177,12 +177,12 @@ server <- function(input, output, session) {
       ))
     })
   })
-  #save this order and change the menu so Chosen is first
+  #save this order and change the menu so Custom is first
   lapply(contexts, function(ctx) {
     observeEvent(input[[paste0("save_custom_order_", ctx)]], {
       custom_species_order(input[[paste0("custom_order_rank_", ctx)]])
       for (x in contexts) {
-        updateSelectInput(session, paste0("species_order_", x), selected = "Chosen")
+        updateSelectInput(session, paste0("species_order_", x), selected = "Custom")
       }
       removeModal()
     })
@@ -197,11 +197,7 @@ server <- function(input, output, session) {
   ordered_species <- reactive({
     choice <- species_order_choice()
 
-    if (choice == "Default") {
-      as.data.frame(default_params@species_params$species) %>%
-        setNames("sp") %>% filter(sp != "Resource") %>% pull(sp) %>% sample()
-
-    } else if (choice == "Guild") {
+    if (choice == "Guild") {
       if (exists("guildparams", inherits = FALSE)) {
         guild_order <- guildparams |>
           ## keep only the size-class with the largest maxw for each species
@@ -229,6 +225,7 @@ server <- function(input, output, session) {
         arrange(w_mat) %>% pull(species)
 
     } else {
+      # This handles "Custom" case - either use custom order or fall back to default order
       ord <- custom_species_order()
       if (length(ord)) ord else
         as.data.frame(default_params@species_params$species) %>%
@@ -1162,11 +1159,11 @@ ui <- fluidPage(
               tagList(
                 HTML("<span style='display:inline-block; position:relative; top:-0.25em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
                 HTML(
-                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Default, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'><strong>?</strong></button>"
+                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
                 ),
                 actionButton(
                   "customOrderInfo_fish",
-                  label = HTML("<strong>Custom</strong>"),
+                  label = HTML("<strong>customise</strong>"),
                   class = "btn btn-info btn-xs no-focus-outline",
                   style = "display:inline-block; position:relative; top:-0.25em; margin-left: 5px;"
                 )
@@ -1175,7 +1172,7 @@ ui <- fluidPage(
                   selectInput(
                     inputId = "species_order_fish",
                     label   = NULL,
-                    choices = c("Default", "Size", "Guild", "Chosen")
+                    choices = c("Custom", "Size", "Guild")
                   )),
               div( id = "triMode_fish",
                    materialSwitch(
@@ -1339,13 +1336,11 @@ ui <- fluidPage(
               tagList(
                 HTML("<span style='position: relative; top:-0.2em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
                 HTML(
-                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Default, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'>
-                    <strong>?</strong>
-                  </button>"
+                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
                 ),
                 actionButton(
                   "customOrderInfo_bio",
-                  label = HTML("<strong>Custom</strong>"),
+                  label = HTML("<strong>customise</strong>"),
                   class = "btn btn-info btn-xs no-focus-outline",
                   style = "display:inline-block; position:relative; top:-0.25em; margin-left: 5px;"
                 )
@@ -1357,7 +1352,7 @@ ui <- fluidPage(
                   selectInput(
                     inputId = "species_order_bio",
                     label   = NULL,
-                    choices = c("Default", "Size", "Guild", "Chosen")
+                    choices = c("Custom", "Size", "Guild")
                   )),
               div( id = "triMode",
                    materialSwitch(
