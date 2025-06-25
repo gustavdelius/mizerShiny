@@ -250,16 +250,39 @@ server <- function(input, output, session) {
       unharvested = unharvestedprojection
   ))
 
+  # Reactive observer that runs when time range changes
+  # It checks whether the simulation needs to be extended
+  observe({
+    sims <- isolate(bioSimData())
+    max_year <- dim(sims$harvested@n)[1] - 1
+    if (input$year <= max_year) return()  # No need to re-run if within bounds
+
+    pb <- shiny::Progress$new(); on.exit(pb$close())
+    total_steps <- 3
+    pb$set(message = "Running simulation …", value = 0)
+
+    t_max <- input$year - max_year + 5  # Extend by 5 years
+    pb$inc(1/total_steps, "Projecting …")
+    unharvested <- project(sims$unharvested, t_max = t_max)
+
+    pb$inc(1/total_steps, "Projecting …")
+    harvested <- project(sims$harvested, t_max = t_max)
+
+    pb$inc(1/total_steps, "Done")
+
+    # Update the reactive value
+    bioSimData(list(harvested = harvested,
+                    unharvested = unharvestedprojection))
+  })
+
   # Reactive observer that runs simulation when inputs change
   observe({
     req(input$species_name_select)
     # Trigger on changes to these inputs
     input$species
     input$mortspecies
-    input$year
     input$species_name_select
 
-    # Run the simulation
     changed_params <- default_params
 
     pb <- shiny::Progress$new(); on.exit(pb$close())
@@ -286,7 +309,7 @@ server <- function(input, output, session) {
       changed_params,
       # We run the simulation for an extra 5 years so that the +1 button
       # does not immediately trigger a re-run.
-      t_max  = input$year + 5
+      t_max  = isolate(input$year) + 5
     )
 
     pb$inc(1/total_steps, "Done")
