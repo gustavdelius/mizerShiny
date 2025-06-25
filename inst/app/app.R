@@ -240,12 +240,8 @@ server <- function(input, output, session) {
   setupYearControls(
     input, session,
     sliderId = "year",
-    runBtnId = "dummy_run_button",  # Dummy ID since we no longer have a run button
-    boxId    = "yearAdjustButtons_bio",
-    resetId  = "resetTimeYear_bio",
     minusId  = "decYear_bio",
-    plusId   = "incYear_bio",
-    rvName   = "rvBio"
+    plusId   = "incYear_bio"
   )
 
 
@@ -459,24 +455,16 @@ server <- function(input, output, session) {
   setupYearControls(
     input, session,
     sliderId  = "fishyear",
-    runBtnId  = "goButton2",
-    boxId     = "yearAdjustButtons_fish1",
-    resetId   = "resetTimeYear_fish1",
     minusId   = "decYear_fish1",
-    plusId    = "incYear_fish1",
-    rvName    = "rvFish1"
+    plusId    = "incYear_fish1"
   )
 
   #Sim 2
   setupYearControls(
     input, session,
     sliderId  = "fishyear2",
-    runBtnId  = "goButton22",
-    boxId     = "yearAdjustButtons_fish2",
-    resetId   = "resetTimeYear_fish2",
     minusId   = "decYear_fish2",
-    plusId    = "incYear_fish2",
-    rvName    = "rvFish2"
+    plusId    = "incYear_fish2"
   )
 
 
@@ -1054,15 +1042,10 @@ ui <- fluidPage(
                   step    = 1,
                   width   = "100%"
                 ) %>% tagAppendAttributes(id = "fishyyear"),
-                shinyjs::hidden(
-                  div(id   = "yearAdjustButtons_fish1",
-                      style = "display:flex; justify-content:center; gap:10px;",
-                      actionButton("decYear_fish1", "-1 year", class = "btn-small"),
-                      actionButton("incYear_fish1", "+1 year", class = "btn-small"),
-                      actionButton("resetTimeYear_fish1", "Reset Time",
-                                   class = "btn-small",
-                                   style = "color:#2FA4E7;")
-                  )
+                div(id   = "yearAdjustButtons_fish1",
+                    style = "display:flex; justify-content:center; gap:10px;",
+                    actionButton("decYear_fish1", "-1 year", class = "btn-small"),
+                    actionButton("incYear_fish1", "+1 year", class = "btn-small")
                 ),
                 div(id = "fishery_sliders", uiOutput("fishery_sliders_ui")),
                 actionButton(inputId = "goButton2",        label = "Run Simulation")
@@ -1078,15 +1061,10 @@ ui <- fluidPage(
                   step    = 1,
                   width   = "100%"
                 ) %>% tagAppendAttributes(id = "fishyyear"),
-                shinyjs::hidden(
-                  div(id   = "yearAdjustButtons_fish2",
-                      style = "display:flex; justify-content:center; gap:10px;",
-                      actionButton("decYear_fish2", "-1 year", class = "btn-small"),
-                      actionButton("incYear_fish2", "+1 year", class = "btn-small"),
-                      actionButton("resetTimeYear_fish2", "Reset Time",
-                                   class = "btn-small",
-                                   style = "color:#2FA4E7;")
-                  )
+                div(id   = "yearAdjustButtons_fish2",
+                    style = "display:flex; justify-content:center; gap:10px;",
+                    actionButton("decYear_fish2", "-1 year", class = "btn-small"),
+                    actionButton("incYear_fish2", "+1 year", class = "btn-small")
                 ),
                 div(id = "fishery_sliders", uiOutput("fishery_sliders_ui2")),
                 actionButton(inputId = "goButton22",        label = "Compare")
@@ -1317,23 +1295,16 @@ ui <- fluidPage(
               step    = 1,
               width   = "100%"
             ) %>% tagAppendAttributes(id = "yearspecies_slider"),
-            shinyjs::hidden(
-              div(id   = "yearAdjustButtons_bio",
-                  style = "display:flex; justify-content:center; gap:10px;",
-                  actionButton("decYear_bio", "-1 year", class = "btn-small"),
-                  actionButton("incYear_bio", "+1 year", class = "btn-small")
-              )
+            div(id   = "yearAdjustButtons_bio",
+                style = "display:flex; justify-content:center; gap:10px;",
+                actionButton("decYear_bio", "-1 year", class = "btn-small"),
+                actionButton("incYear_bio", "+1 year", class = "btn-small")
             ),
             selectInput(
               inputId = "species_name_select",
               label   = "Select a Species:",
               choices = NULL
-            ) %>% tagAppendAttributes(id = "species_chose"),
-            shinyjs::hidden(
-              actionButton("resetTimeYear_bio", "Reset Time",
-                           class = "btn-small",
-                           style = "color:#2FA4E7;")
-            )
+            ) %>% tagAppendAttributes(id = "species_chose")
           )
         ),
 
