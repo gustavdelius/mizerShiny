@@ -1,3 +1,4 @@
+library(mizerShiny)
 library(shiny)
 library(mizer)
 library(ggplot2)
@@ -17,78 +18,23 @@ library(shinyjs)
 library(shinyWidgets)
 library(dplyr)
 
-#Functions to help load in files
-app_path <- function(...) {
-  p <- system.file("app", ..., package = "mizerShiny")
-  if (p == "") p <- file.path("inst", "app", ...); p
-}
-app_exists <- function(...) file.exists(app_path(...))
+default_params <- getShinyOption("default_params")
+if (is.null(default_params)) default_params <- mizerShiny::default_params
 
-# Load mizerParams directly - this makes the app runnable without the launcher
-params_path <- app_path("Including", "mizerParam", "params.rds")
-if (file.exists(params_path)) {
-  celticsim <- readRDS(params_path)
-} else {
-  # Fallback to default if no params file exists
-  celticsim <- mizer::NS_params
-}
-
-sim_path <- function(name) app_path(
-  "Including", "mizerSim", name,
-  paste0(tolower(name), "projection.RData")
-)
-
-#Functions to help with running new mizer models
-sim_species <- function(sim) dimnames(sim@n)$sp
-new_projection <- function()
-  project(celticsim, t_max = 202, effort = celticsim@initial_effort)
-
-## main loader - loads in mizer objects from folders
-load_or_project <- function(subdir, varname) {
-
-  ## 0. already supplied by mizerShiny() ?  -------------------------------
-  if (exists(varname, envir = .GlobalEnv) &&
-      inherits(get(varname, .GlobalEnv), "MizerSim")) {
-
-    sim <- get(varname, .GlobalEnv)
-
-    if (!setequal(sim_species(sim), celticsim@species_params$species)) {
-      sim <- new_projection()
-      message("Species mismatch – regenerated ", varname)
-    }
-
-    assign(varname, sim, envir = .GlobalEnv)
-    return(invisible())
-  }
-
-  ##try to load it from disk ------------------------------------------
-  f <- sim_path(subdir)
-  if (file.exists(f)) {
-    tmp <- new.env()
-    obj <- load(f, envir = tmp)[1]
-    sim <- tmp[[obj]]
-
-    if (!setequal(sim_species(sim), celticsim@species_params$species)) {
-      sim <- new_projection()
-      message("Species mismatch in ", basename(f), " – regenerated")
-    }
-
-  } else {                                     #Fall back to projection
-    sim <- new_projection()
-    message("No saved ", subdir,
-            " projection – generated a fresh one")
-  }
-
-  assign(varname, sim, envir = .GlobalEnv)
-  invisible()
-}
-
-load_or_project("Unharvested", "unharvestedprojection")
-load_or_project("Unfished",    "unfishedprojection")
+unharvestedprojection <- project(default_params, t_max = 12)
+unfishedprojection <- unharvestedprojection
 
 #Find years for the Time Range
 sp_max_year   <- max(16, floor((dim(unharvestedprojection@n)[1] - 2) / 2))
-fish_max_year <- max(16, floor((dim(unfishedprojection  @n)[1] - 2) / 2))
+fish_max_year <- max(16, floor((dim(unfishedprojection@n)[1] - 2) / 2))
+
+# Functions to help load in files
+app_path <- function(...) {
+  p <- system.file("app", ..., package = "mizerShiny")
+  if (p == "") p <- file.path("inst", "app", ...)
+  p
+}
+app_exists <- function(...) file.exists(app_path(...))
 
 # guild & nutrition data ----------------------------------------
 guild_file <- app_path("Including", "guilds_information", "checkGuilds",
@@ -116,7 +62,7 @@ server <- function(input, output, session) {
 
   #changing the species options to dynamically change depending on the model
   species_list <- reactive({
-    setdiff(unique(celticsim@species_params$species),
+    setdiff(unique(default_params@species_params$species),
             ("Resource"))
   })
   species_input_ids <- c(
@@ -133,18 +79,18 @@ server <- function(input, output, session) {
 
   #changing the fishery options to dynamically change depending on the model
   output$fishery_sliders_ui <- renderUI({
-    effort <- celticsim@initial_effort
-    gears <- unique(celticsim@gear_params$gear)
+    effort <- default_params@initial_effort
+    gears <- unique(default_params@gear_params$gear)
     slider_list <- lapply(gears, function(gear) {
       sliderInput(
         inputId = paste0("effort_", gear),  # e.g., "effort_total"
         label = paste("Effort for", gear),
         min = 0,
         #if its 0, it needs a different way.
-        max = if(celticsim@initial_effort[gear]==0){
+        max = if(default_params@initial_effort[gear]==0){
           2
-        }else(celticsim@initial_effort[gear]*2),
-        value = celticsim@initial_effort[gear],
+        }else(default_params@initial_effort[gear]*2),
+        value = default_params@initial_effort[gear],
         step = 0.05,
         width = "100%"
       )
@@ -153,17 +99,17 @@ server <- function(input, output, session) {
   })
   # for both sections
   output$fishery_sliders_ui2 <- renderUI({
-    effort <- celticsim@initial_effort
-    gears <- unique(celticsim@gear_params$gear)
+    effort <- default_params@initial_effort
+    gears <- unique(default_params@gear_params$gear)
     slider_list <- lapply(gears, function(gear) {
       sliderInput(
         inputId = paste0("effort2_", gear),  # e.g., "effort_total"
         label = paste("Effort for", gear),
         min = 0,
-        max = if(celticsim@initial_effort[gear]==0){
+        max = if(default_params@initial_effort[gear]==0){
           2
-        }else(celticsim@initial_effort[gear]*2),
-        value = celticsim@initial_effort[gear],
+        }else(default_params@initial_effort[gear]*2),
+        value = default_params@initial_effort[gear],
         step = 0.05,
         width = "100%"
       )
@@ -232,7 +178,7 @@ server <- function(input, output, session) {
     choice <- species_order_choice()
 
     if (choice == "Unordered") {
-      as.data.frame(celticsim@species_params$species) %>%
+      as.data.frame(default_params@species_params$species) %>%
         setNames("sp") %>% filter(sp != "Resource") %>% pull(sp) %>% sample()
 
     } else if (choice == "Guild") {
@@ -249,23 +195,23 @@ server <- function(input, output, session) {
           unique()
 
         ## return just the species that are actually in the current model
-        intersect(guild_order, celticsim@species_params$species)
+        intersect(guild_order, default_params@species_params$species)
 
       } else { #if theres no guild infomration, this is the order if they choose guild
-        as.data.frame(celticsim@species_params$species) |>
+        as.data.frame(default_params@species_params$species) |>
           setNames("sp") |>
           filter(sp != "Resource") |>
           pull(sp)
 }
     } else if (choice == "Size") {
-      celticsim@species_params %>%
+      default_params@species_params %>%
         filter(species != "Resource") %>%
         arrange(w_mat) %>% pull(species)
 
     } else {
       ord <- custom_species_order()
       if (length(ord)) ord else
-        as.data.frame(celticsim@species_params$species) %>%
+        as.data.frame(default_params@species_params$species) %>%
         setNames("sp") %>% filter(sp != "Resource") %>% pull(sp)
     }
   })
@@ -286,7 +232,7 @@ server <- function(input, output, session) {
 # Single species - Biomass ------------------------------------------------
 
   bioSimData <- eventReactive(input$goButton1, {
-    speciessim <- celticsim
+    speciessim <- default_params
 
     time1 <- max(input$year - 1, 1)
     time2 <- input$year + 1
@@ -373,7 +319,7 @@ server <- function(input, output, session) {
         guildplot(
           bioSimData()$harvested, bioSimData()$unharvested,
           t1, t2,
-          guildparams, celticsim,
+          guildparams, default_params,
           mode = modeGuild
         )
       )
@@ -432,7 +378,7 @@ server <- function(input, output, session) {
 
   #Single Species - Mortality code.
   mortSimData <- eventReactive(input$goButton3, {
-    speciessim <- celticsim
+    speciessim <- default_params
     time1 <- max(input$mortyear - 1, 1)
     time2 <- input$mortyear + 1
 
@@ -527,7 +473,7 @@ server <- function(input, output, session) {
         guildplot(
           mortSimData()$harvested, mortSimData()$unharvested,
           t1, t2,
-          guildparams, celticsim,
+          guildparams, default_params,
           mode = modeGuild
         )
       )
@@ -637,10 +583,10 @@ server <- function(input, output, session) {
   #Area to run fishery sim code
   fishSimData <- eventReactive(triggered_button(), {
 
-    gears <- unique(celticsim@gear_params$gear)
+    gears <- unique(default_params@gear_params$gear)
 
-    effort1 <- makeEffort("effort_" , gears, celticsim@initial_effort)
-    effort2 <- makeEffort("effort2_", gears, celticsim@initial_effort)
+    effort1 <- makeEffort("effort_" , gears, default_params@initial_effort)
+    effort2 <- makeEffort("effort2_", gears, default_params@initial_effort)
 
     # long enough for *either* slider
     max_year <- max(input$fishyear, input$fishyear2)          # ≥ 0
@@ -649,7 +595,7 @@ server <- function(input, output, session) {
     pb$set(message = "Running fishery simulation …", value = 0)
 
     sim1 <- project(
-      celticsim, effort = effort1,
+      default_params, effort = effort1,
       t_max   = max_year * 2 + 2
     )
 
@@ -658,7 +604,7 @@ server <- function(input, output, session) {
     btn  <- triggered_button()
     sim2 <- if (startsWith(btn, "goButton22_"))
       project(
-        celticsim, effort = effort2,
+        default_params, effort = effort2,
         t_max   = max_year * 2 + 2
       ) else NULL
     pb$inc(0.5)
@@ -815,7 +761,7 @@ server <- function(input, output, session) {
           guildplot(
             fishSimData()$sim1, fishSimData()$unharv,
               win$start, win$end,
-            guildparams, celticsim,
+            guildparams, default_params,
             mode = modeGuild
           )
         )
@@ -824,7 +770,7 @@ server <- function(input, output, session) {
           guildplot_both(
             fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
             win$start, win$end,
-            guildparams, celticsim,
+            guildparams, default_params,
             mode = modeGuild
           )
         )
