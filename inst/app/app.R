@@ -1102,13 +1102,6 @@ ui <- fluidPage(rintrojs::introjsUI(), shinyjs::useShinyjs(),
                   tabPanel(
                     title = "Single Species",
 
-                    tabsetPanel(
-                      id       = "mortnsp_tab",
-                      selected = "Biomass",
-
-                      tabPanel(
-                        title = "Biomass",
-
                         grid_container(
                           layout    = c("area1 area0"),
                           row_sizes = c("1fr"),
