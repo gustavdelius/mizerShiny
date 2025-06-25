@@ -923,8 +923,9 @@ server <- function(input, output, session) {
 
 
 
-# NOTE - FOR UI, all of the code has tagAppendAttributes, which makes it confusing, but it is necessary
-#as you have to label the sections of the code to be able to put it into the tutorial of the app.
+# NOTE - FOR UI, all of the code has tagAppendAttributes, which makes it
+# confusing, but it is necessary as you have to label the sections of the code to
+# be able to put it into the tutorial of the app.
 
 ui <- fluidPage(
   rintrojs::introjsUI(),
@@ -983,6 +984,20 @@ ui <- fluidPage(
               step  = 0.01,
               width = "100%"
             ) %>% tagAppendAttributes(id = "species_slider"),
+            sliderInput(
+              inputId = "mortspecies",
+              label   = HTML(
+                "Mortality Change <button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
+                data-bs-toggle='popover' title='' \
+                data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 1%, set the value of the slider to 0.01. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -0.01'>\
+                <strong>?</strong></button>"
+              ),
+              min   = -0.25,
+              max   = 0.25,
+              value = 0,
+              step  = 0.001,
+              width = "100%"
+            ) %>% tagAppendAttributes(id = "mort_slider"),
             sliderInput(
               inputId = "year",
               label   = "Time Range",
