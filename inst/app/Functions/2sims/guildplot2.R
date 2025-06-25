@@ -1,10 +1,15 @@
 guildplot_both <- function(harvestedprojection1, harvestedprojection2,
                            unharvestedprojection,
-                           year1, year2,
+                           chosenyear,
                            guildparams, celticsim,
                            mode = c("chosen", "triple")) {
 
   mode <- match.arg(mode)
+
+  # Calculate three specific time points
+  quarter_year <- max(1, ceiling(chosenyear * 0.25))
+  half_year <- max(1, ceiling(chosenyear * 0.5))
+  full_year <- chosenyear
 
   process_guilds <- function(mizerprojection) {
 
@@ -38,23 +43,23 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
   }
 
   if (mode == "chosen") {
-    harvestedchosen1 <- plotSpectra(harvestedprojection1,
-                                    time_range = year1:year2,
+    harvested_full1 <- plotSpectra(harvestedprojection1,
+                                    time_range = full_year,
                                     return_data = TRUE)
-    harvestedchosen2 <- plotSpectra(harvestedprojection2,
-                                    time_range = year1:year2,
+    harvested_full2 <- plotSpectra(harvestedprojection2,
+                                    time_range = full_year,
                                     return_data = TRUE)
-    unharvestedchosen <- plotSpectra(unharvestedprojection,
-                                     time_range = year1:year2,
+    unharvested_full <- plotSpectra(unharvestedprojection,
+                                     time_range = full_year,
                                      return_data = TRUE)
 
-    guilds_chosen1  <- process_guilds(harvestedchosen1)  |> dplyr::mutate(time = "chosen")
-    guilds_chosen2  <- process_guilds(harvestedchosen2)  |> dplyr::mutate(time = "chosen")
-    unguilds_chosen <- process_guilds(unharvestedchosen) |> dplyr::mutate(time = "chosen")
+    guilds_full1  <- process_guilds(harvested_full1)  |> dplyr::mutate(time = "full")
+    guilds_full2  <- process_guilds(harvested_full2)  |> dplyr::mutate(time = "full")
+    unguilds_full <- process_guilds(unharvested_full) |> dplyr::mutate(time = "full")
 
-    harv1_all <- guilds_chosen1
-    harv2_all <- guilds_chosen2
-    unharv_all <- unguilds_chosen
+    harv1_all <- guilds_full1
+    harv2_all <- guilds_full2
+    unharv_all <- unguilds_full
 
     sim1_final <- harv1_all |>
       dplyr::full_join(unharv_all, by = c("Guild", "time")) |>
@@ -72,57 +77,58 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
 
   } else {  # mode == "triple"
 
-    hs_short1   <- plotSpectra(harvestedprojection1,
-                               time_range = max(1, round(year1 * 0.5)) : max(1, round(year2 * 0.5)),
+    # Get spectra data at all three time points for both simulations
+    hs_quarter1   <- plotSpectra(harvestedprojection1,
+                               time_range = quarter_year,
                                return_data = TRUE)
-    hs_chosen1  <- plotSpectra(harvestedprojection1,
-                               time_range = year1:year2,
+    hs_half1      <- plotSpectra(harvestedprojection1,
+                               time_range = half_year,
                                return_data = TRUE)
-    hs_long1    <- plotSpectra(harvestedprojection1,
-                               time_range = (year1 * 2):(year2 * 2),
-                               return_data = TRUE)
-
-    hs_short2   <- plotSpectra(harvestedprojection2,
-                               time_range = max(1, round(year1 * 0.5)) : max(1, round(year2 * 0.5)),
-                               return_data = TRUE)
-    hs_chosen2  <- plotSpectra(harvestedprojection2,
-                               time_range = year1:year2,
-                               return_data = TRUE)
-    hs_long2    <- plotSpectra(harvestedprojection2,
-                               time_range = (year1 * 2):(year2 * 2),
+    hs_full1      <- plotSpectra(harvestedprojection1,
+                               time_range = full_year,
                                return_data = TRUE)
 
-    us_short    <- plotSpectra(unharvestedprojection,
-                               time_range = max(1, round(year1 * 0.5)) : max(1, round(year2 * 0.5)),
+    hs_quarter2   <- plotSpectra(harvestedprojection2,
+                               time_range = quarter_year,
                                return_data = TRUE)
-    us_chosen   <- plotSpectra(unharvestedprojection,
-                               time_range = year1:year2,
+    hs_half2      <- plotSpectra(harvestedprojection2,
+                               time_range = half_year,
                                return_data = TRUE)
-    us_long     <- plotSpectra(unharvestedprojection,
-                               time_range = (year1 * 2):(year2 * 2),
+    hs_full2      <- plotSpectra(harvestedprojection2,
+                               time_range = full_year,
                                return_data = TRUE)
 
-    guilds_short1   <- process_guilds(hs_short1)   |> dplyr::mutate(time = "short")
-    guilds_chosen1  <- process_guilds(hs_chosen1)  |> dplyr::mutate(time = "chosen")
-    guilds_long1    <- process_guilds(hs_long1)    |> dplyr::mutate(time = "long")
+    us_quarter    <- plotSpectra(unharvestedprojection,
+                               time_range = quarter_year,
+                               return_data = TRUE)
+    us_half       <- plotSpectra(unharvestedprojection,
+                               time_range = half_year,
+                               return_data = TRUE)
+    us_full       <- plotSpectra(unharvestedprojection,
+                               time_range = full_year,
+                               return_data = TRUE)
 
-    guilds_short2   <- process_guilds(hs_short2)   |> dplyr::mutate(time = "short")
-    guilds_chosen2  <- process_guilds(hs_chosen2)  |> dplyr::mutate(time = "chosen")
-    guilds_long2    <- process_guilds(hs_long2)    |> dplyr::mutate(time = "long")
+    guilds_quarter1   <- process_guilds(hs_quarter1)   |> dplyr::mutate(time = "quarter")
+    guilds_half1      <- process_guilds(hs_half1)      |> dplyr::mutate(time = "half")
+    guilds_full1      <- process_guilds(hs_full1)      |> dplyr::mutate(time = "full")
 
-    unguilds_short  <- process_guilds(us_short)    |> dplyr::mutate(time = "short")
-    unguilds_chosen <- process_guilds(us_chosen)   |> dplyr::mutate(time = "chosen")
-    unguilds_long   <- process_guilds(us_long)     |> dplyr::mutate(time = "long")
+    guilds_quarter2   <- process_guilds(hs_quarter2)   |> dplyr::mutate(time = "quarter")
+    guilds_half2      <- process_guilds(hs_half2)      |> dplyr::mutate(time = "half")
+    guilds_full2      <- process_guilds(hs_full2)      |> dplyr::mutate(time = "full")
 
-    harv1_all <- dplyr::bind_rows(guilds_short1, guilds_chosen1, guilds_long1) |>
+    unguilds_quarter  <- process_guilds(us_quarter)    |> dplyr::mutate(time = "quarter")
+    unguilds_half     <- process_guilds(us_half)       |> dplyr::mutate(time = "half")
+    unguilds_full     <- process_guilds(us_full)       |> dplyr::mutate(time = "full")
+
+    harv1_all <- dplyr::bind_rows(guilds_quarter1, guilds_half1, guilds_full1) |>
       dplyr::group_by(Guild, time) |>
       dplyr::summarise(value = sum(value), .groups = "drop")
 
-    harv2_all <- dplyr::bind_rows(guilds_short2, guilds_chosen2, guilds_long2) |>
+    harv2_all <- dplyr::bind_rows(guilds_quarter2, guilds_half2, guilds_full2) |>
       dplyr::group_by(Guild, time) |>
       dplyr::summarise(value = sum(value), .groups = "drop")
 
-    unharv_all <- dplyr::bind_rows(unguilds_short, unguilds_chosen, unguilds_long) |>
+    unharv_all <- dplyr::bind_rows(unguilds_quarter, unguilds_half, unguilds_full) |>
       dplyr::group_by(Guild, time) |>
       dplyr::summarise(value = sum(value), .groups = "drop")
 
@@ -144,15 +150,15 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
 
   joinedguilds$time <- factor(
     joinedguilds$time,
-    levels = c("short", "chosen", "long")
+    levels = c("quarter", "half", "full")
   )
   joinedguilds$fill_group <- interaction(joinedguilds$percentage_diff >= 0,
                                          joinedguilds$time)
 
   joinedguilds$Class <- factor(
     joinedguilds$fill_group,
-    levels = c("FALSE.short", "TRUE.short", "FALSE.chosen", "TRUE.chosen", "FALSE.long", "TRUE.long"),
-    labels = c("Short, Negative", "Short, Positive", "Chosen, Negative", "Chosen, Positive", "Long, Negative", "Long, Positive")
+    levels = c("FALSE.quarter", "TRUE.quarter", "FALSE.half", "TRUE.half", "FALSE.full", "TRUE.full"),
+    labels = c("Quarter, Negative", "Quarter, Positive", "Half, Negative", "Half, Positive", "Full, Negative", "Full, Positive")
   )
 
   joinedguilds$Percentage <- joinedguilds$percentage_diff
@@ -162,12 +168,12 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
     geom_hline(yintercept = 0, colour = "grey", linetype = "dashed", linewidth = 0.5) +
     scale_fill_manual(
       values = c(
-        "Short, Negative"  = "#F2A488",
-        "Short, Positive"  = "#2FA4E799",
-        "Chosen, Negative" = "#E98C6B",
-        "Chosen, Positive" = "#2FA4E7cc",
-        "Long, Negative"   = "#E76F51",
-        "Long, Positive"   = "#2FA4E7"
+        "Quarter, Negative"  = "#F2A488",
+        "Quarter, Positive"  = "#2FA4E799",
+        "Half, Negative" = "#E98C6B",
+        "Half, Positive" = "#2FA4E7cc",
+        "Full, Negative"   = "#E76F51",
+        "Full, Positive"   = "#2FA4E7"
       ),
       drop = FALSE
     ) +

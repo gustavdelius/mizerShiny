@@ -1,11 +1,10 @@
-
 legends <- list(
   biomass_species =
-    "Change in biomass of each species across a time range. The X axis shows \
+    "Change in biomass of each species at specific time points. The X axis shows \
 the species and the Y axis is the percentage change in its biomass compared \
-with the base simulation.Each species has three bars (&frac12;&times; time range, chosen, \
-2&times; timerange). Red/blue indicate direction; dark &rarr; bright shows \
-short/chosen/long time plotted.",
+with the base simulation. Each species has three bars representing biomass at \
+quarter, half and full of the selected year. Red/blue indicate direction; bright &rarr; dark shows \
+quarter/half/full time points.",
   biomass_size =
     "Change in the community size spectrum in comparison to the base \
 simulation. The community size spectrum is the biomass of all species in the \
@@ -15,15 +14,15 @@ X&nbsp;axis from log-scale to linear.",
   biomass_guild =
     "Change in feeding guilds across the entire community compared with the \
 base model. X axis is the guild, Y is the % change. Each group of three\
-bars represents &frac12;&times;, chosen and 2&times; of the selected time \
-range (dark &rarr; bright). Feeding guilds \
+bars represents biomass at quarter, half and full of the selected year \
+(bright &rarr; dark). Feeding guilds \
 group fish by diet and life stage.",
   mortality_species =
-    "Change in biomass of each species across a time range. The X axis shows \
+    "Change in biomass of each species at specific time points. The X axis shows \
 the species and the Y axis is the percentage change in its biomass compared \
-with the base simulation.Each species has three bars (&frac12;&times; time range, chosen, \
-2&times; timerange). Red/blue indicate direction; dark &rarr; bright shows \
-short/chosen/long time plotted.",
+with the base simulation. Each species has three bars representing biomass at \
+quarter, half and full of the selected year. Red/blue indicate direction; bright &rarr; dark shows \
+quarter/half/full time points.",
   fishery_yield =
     "Dashboard of yield for the chosen fishery strategy within the \
 selected time range. <strong>Species Change</strong> – yield of individual \

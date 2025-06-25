@@ -307,8 +307,7 @@ server <- function(input, output, session) {
   output$speciesPlot <- renderPlotly({
     #make sure we have model data and set the years
     req(bioSimData())
-    t1 <- max(input$year - 1, 1)
-    t2 <- input$year + 1
+    chosen_year <- input$year
     #does user want 3 times plotted or one
     modeChoice <- if (isTRUE(input$triplotToggle)) "chosen" else "triple"
 
@@ -318,7 +317,7 @@ server <- function(input, output, session) {
         plotSpeciesWithTimeRange(
           bioSimData()$harvested,
           bioSimData()$unharvested,
-          t1, t2,
+          chosen_year,
           mode = modeChoice
         ) +
           scale_x_discrete(limits = ordered_species())
@@ -350,7 +349,7 @@ server <- function(input, output, session) {
 
   output$guildPlot <- renderPlotly({
     req(bioSimData())
-    t1 <- max(input$year - 1, 1); t2 <- input$year + 1
+    chosen_year <- input$year
 
     modeGuild <- if (isTRUE(input$triguildToggle)) "chosen" else "triple"
 
@@ -358,7 +357,7 @@ server <- function(input, output, session) {
       ggplotly(
         guildplot(
           bioSimData()$harvested, bioSimData()$unharvested,
-          t1, t2,
+          chosen_year,
           guildparams, default_params,
           mode = modeGuild
         )
@@ -521,8 +520,7 @@ server <- function(input, output, session) {
   })
   fish_win1 <- reactive({
     y <- if (lastChange() == "fishyear")  input$fishyear  else  input$fishyear2
-    list(start = max(y - 1, 1),
-         end   = y + 1)
+    y
   })
 
  #
@@ -562,7 +560,7 @@ server <- function(input, output, session) {
 
   output$fishspeciesPlot <- renderPlotly({
     req(fishSimData())
-    win <- fish_win1()
+    chosen_year <- fish_win1()
 
     modeFish <- if (isTRUE(input$triplotToggleFish)) "chosen" else "triple"
 
@@ -571,7 +569,7 @@ server <- function(input, output, session) {
         plotSpeciesWithTimeRange(
           fishSimData()$sim1,
           fishSimData()$unharv,
-          win$start, win$end,
+          chosen_year,
           mode = modeFish
         ) +
           scale_x_discrete(limits = ordered_species())
@@ -588,7 +586,7 @@ server <- function(input, output, session) {
   observe({
     if (!is.null(fishSimData()$sim2))
       output$fishspeciesPlot <- renderPlotly({
-        win <- fish_win1()
+        chosen_year <- fish_win1()
 
         p <- tryCatch({
           ggplotly(
@@ -596,7 +594,7 @@ server <- function(input, output, session) {
               fishSimData()$sim1,
               fishSimData()$sim2,
               fishSimData()$unharv,
-              win$start, win$end
+              chosen_year
             ) + scale_x_discrete(limits = ordered_species())
           )
         },
@@ -617,8 +615,8 @@ server <- function(input, output, session) {
         g <- plotSpectraRelative(
           fishSimData()$sim1,
           fishSimData()$unharv,
-          fish_win1()$start,
-          fish_win1()$end
+          fish_win1(),
+          fish_win1()
         )
         if (!isTRUE(input$logToggle4)) {
           g <- g + scale_x_continuous()
@@ -629,8 +627,8 @@ server <- function(input, output, session) {
           fishSimData()$sim1,
           fishSimData()$unharv,
           fishSimData()$sim2,
-          fish_win1()$start,
-          fish_win1()$end
+          fish_win1(),
+          fish_win1()
         )
         if (!isTRUE(input$logToggle4)) {
           g <- g + scale_x_continuous()
@@ -647,7 +645,7 @@ server <- function(input, output, session) {
 
   output$fishguildPlot <- renderPlotly({
     req(fishSimData())
-    win <- fish_win1()
+    chosen_year <- fish_win1()
 
     modeGuild <- if (isTRUE(input$triguildToggleFish)) "chosen" else "triple"
 
@@ -656,7 +654,7 @@ server <- function(input, output, session) {
         ggplotly(
           guildplot(
             fishSimData()$sim1, fishSimData()$unharv,
-              win$start, win$end,
+            chosen_year,
             guildparams, default_params,
             mode = modeGuild
           )
@@ -665,7 +663,7 @@ server <- function(input, output, session) {
         ggplotly(
           guildplot_both(
             fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
-            win$start, win$end,
+            chosen_year,
             guildparams, default_params,
             mode = modeGuild
           )
@@ -914,22 +912,22 @@ server <- function(input, output, session) {
     p <- tryCatch({
       # Add bounds checking for time range
       sim_dims <- dim(fishSimData()$sim1@n)
-      if (win$start > sim_dims[1] || win$end > sim_dims[1]) {
+      if (win > sim_dims[1]) {
         message("DEBUG: Fishery time range out of bounds")
-        message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
+        message("DEBUG: win = ", win)
         message("DEBUG: sim_dims[1] = ", sim_dims[1])
         return(lastFishDietSinglePlot())
       }
 
       harvest_sub <- lapply(sims, function(p) {
         tryCatch({
-          p@n       <- p@n      [win$start:win$end, , , drop = FALSE]
-          p@n_pp    <- p@n_pp   [win$start:win$end, ,      drop = FALSE]
-          p@n_other <- p@n_other[win$start:win$end, ,      drop = FALSE]
+          p@n       <- p@n      [win, , , drop = FALSE]
+          p@n_pp    <- p@n_pp   [win, ,      drop = FALSE]
+          p@n_other <- p@n_other[win, ,      drop = FALSE]
           p
         }, error = function(e) {
           message("DEBUG: Error in fishery diet plot subsetting: ", e$message)
-          message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
+          message("DEBUG: win = ", win)
           message("DEBUG: p@n dims = ", paste(dim(p@n), collapse = "x"))
           stop(e)
         })
@@ -963,7 +961,7 @@ server <- function(input, output, session) {
 
     p <- tryCatch({
       ggplotly(
-        plotNutrition(sims, fishSimData()$unharv ,win$start:win$end)
+        plotNutrition(sims, fishSimData()$unharv ,win)
       )
     },
     error = function(e) {

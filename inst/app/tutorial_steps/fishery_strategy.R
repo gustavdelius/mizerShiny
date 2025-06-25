@@ -21,17 +21,18 @@ intro_steps <- list(
        fish similar species and with similar size selectivity."
   ),
   list(element = "#fishy_plots .nav-link[data-value='Species']", title = "Species Plot",
-       intro = "The plot presents the percentage change in each of the species. This percentage change is relative to the current fishing strategy. Each species has 3 bars, which indicate the species percentage change across a shorter timescale (a half of the chosen time), the chosen timescale and a longer timescale (double the chosen time)...
+       intro = "The plot presents the percentage change in each of the species. This percentage change is relative to the current fishing strategy. Each species has 3 bars, which indicate the species percentage change at
+specific time points: quarter of the selected year, half of the selected year, and the full selected year...
       "
   ),
   list(element = "#fishy_plots .nav-link[data-value='Species']", title = "Species continued",
-       intro = "Plotting all 3 timescales
-aids in understanding the oscillatory nature of fish populations, but also gives a greater resolution of the effect of the imposed change.
+       intro = "Plotting all 3 time points
+aids in understanding how the ecosystem changes evolve over time, showing the progression from early to late stages of the simulation.
 "
   ),
   list(element = "#triMode_fish", title = "Change Time Plotted",
-       intro = "When changing the time with the +1/-1 buttons, it is difficult to observe changes when 3 timeranges are plotted. Use this toggle to change
-from 3 times plotted to only the chosen time plotted."
+       intro = "When changing the time with the +1/-1 buttons, it is difficult to observe changes when 3 time points are plotted. Use this toggle to change
+from 3 time points plotted to only the selected year plotted."
        # Added step
   ),
   list(element = "#species_order_fish_box", title = "Order of Species",
@@ -53,7 +54,7 @@ from 3 times plotted to only the chosen time plotted."
   list(element = "#fishy_plots .nav-link[data-value='Guild']", title = "Guild Plot",
        intro = "The plot here showcases the change in the guilds within the species, which are fish in the ecosystem that share a distinct
        feeding pattern in relation to other fish. Observing this plot helps to understand how the trophic dynamics of the ecosystem are changing.
-      Additionally, the guilds are plotted as 3 bars of a short, chosen and long timescale."
+      Additionally, the guilds are plotted as 3 bars representing biomass at quarter, half and full of the selected year."
   ),
   list(element = "#fishy_plots .nav-link[data-value='Spectra']", title = "Size Spectrum Plot",
        intro = "This plot is the size spectrum (the biomass distribution across sizes of fish) of each
