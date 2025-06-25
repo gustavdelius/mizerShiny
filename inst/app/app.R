@@ -1258,6 +1258,11 @@ ui <- fluidPage(
         grid_card(
           area = "area1",
           card_body(
+            selectInput(
+              inputId = "species_name_select",
+              label   = "Select a Species:",
+              choices = NULL
+            ) %>% tagAppendAttributes(id = "species_chose"),
             sliderInput(
               inputId = "species",
               label   = HTML(
@@ -1299,12 +1304,7 @@ ui <- fluidPage(
                 style = "display:flex; justify-content:center; gap:10px;",
                 actionButton("decYear_bio", "-1 year", class = "btn-small"),
                 actionButton("incYear_bio", "+1 year", class = "btn-small")
-            ),
-            selectInput(
-              inputId = "species_name_select",
-              label   = "Select a Species:",
-              choices = NULL
-            ) %>% tagAppendAttributes(id = "species_chose")
+            )
           )
         ),
 
