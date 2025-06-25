@@ -79,7 +79,7 @@ Navigate between the plots pressing the tabs at the top. Each plot uses [plotly]
 
 The 'Species' plot visualises the change in species biomass between the base mizer simulation and the changed mizer simulation at the time point chosen. The colour indicates if the change was negative or positive. Three time points are plotted, the chosen time point, a time 1/2 of the chosen, and 2x the chosen. The shade indicates the time point, from darkest to lightest indicating 1/2 of the time point, the chosen time point and 2x the time point. Plotting multiples point in time across the simulation helps to understand the oscillatory nature of trophic interactions. Use the `Chosen Only` button to only plot the chosen time range, useful in conjunction with the `Time Range` behaviour highlighted in 'Change Time' later.
 
-It is possible on this plot to change the order of species on the X axis, done so using the choice box below the plot. Clicking custom allows the user to decide the order, but the user can also choose Unordered, Guild, Size. Changing the order allows for easier analysis of trophic interactions between species.
+It is possible on this plot to change the order of species on the X axis, done so using the choice box below the plot. Clicking custom allows the user to decide the order, but the user can also choose Default, Guild, Size. Changing the order allows for easier analysis of trophic interactions between species.
 
 ![](images/species.png){width=50%}
 

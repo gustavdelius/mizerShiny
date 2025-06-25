@@ -136,9 +136,9 @@ server <- function(input, output, session) {
   source("Functions/2sims/plotSpectra2.R")
 
   #Having a custom order on the X axis
-  contexts <- c("bio", "mort", "fish")
+  contexts <- c("bio", "fish")
   custom_species_order <- reactiveVal(NULL)
-  species_order_choice <- reactiveVal("Unordered")
+  species_order_choice <- reactiveVal("Default")
 
   #add the ui to load when custom is pressed
   lapply(contexts, function(ctx) {
@@ -178,7 +178,7 @@ server <- function(input, output, session) {
   ordered_species <- reactive({
     choice <- species_order_choice()
 
-    if (choice == "Unordered") {
+    if (choice == "Default") {
       as.data.frame(default_params@species_params$species) %>%
         setNames("sp") %>% filter(sp != "Resource") %>% pull(sp) %>% sample()
 
@@ -1113,7 +1113,7 @@ ui <- fluidPage(
               tagList(
                 HTML("<span style='display:inline-block; position:relative; top:-0.25em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
                 HTML(
-                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Unordered, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'><strong>?</strong></button>"
+                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Default, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'><strong>?</strong></button>"
                 ),
                 actionButton(
                   "customOrderInfo_fish",
@@ -1126,7 +1126,7 @@ ui <- fluidPage(
                   selectInput(
                     inputId = "species_order_fish",
                     label   = NULL,
-                    choices = c("Unordered", "Size", "Guild", "Chosen")
+                    choices = c("Default", "Size", "Guild", "Chosen")
                   )),
               div( id = "triMode_fish",
                    materialSwitch(
@@ -1298,7 +1298,7 @@ ui <- fluidPage(
               tagList(
                 HTML("<span style='position: relative; top:-0.2em; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order on Axis</span>"),
                 HTML(
-                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Unordered, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'>
+                  "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' style='position:relative; top:-0.25em;' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include Default, Size, and Guild. Click &quot;Custom&quot; to choose an order, it will be saved as &quot;Chosen&quot; in the list.'>
                     <strong>?</strong>
                   </button>"
                 ),
@@ -1316,7 +1316,7 @@ ui <- fluidPage(
                   selectInput(
                     inputId = "species_order_bio",
                     label   = NULL,
-                    choices = c("Unordered", "Size", "Guild", "Chosen")
+                    choices = c("Default", "Size", "Guild", "Chosen")
                   )),
               div( id = "triMode",
                    materialSwitch(
