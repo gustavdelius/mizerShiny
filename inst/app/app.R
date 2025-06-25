@@ -440,15 +440,6 @@ server <- function(input, output, session) {
 
 # Fishery Strategy --------------------------------------------------------
 
-# Run code if either Run Simulation or Compare button pressed.
-  triggered_button <- reactiveVal(NULL)
-  observeEvent(input$goButton2, {
-    triggered_button(paste0("goButton2_", Sys.time()))
-  })
-  observeEvent(input$goButton22, {
-    triggered_button(paste0("goButton22_", Sys.time()))
-  })
-
   #changing the timerange to subset on the plot  for yield
   observe({
     time1  <- input$fishyear  + 1
@@ -498,11 +489,47 @@ server <- function(input, output, session) {
     ef
   }
 
-  #Area to run fishery sim code
-  fishSimData <- eventReactive(triggered_button(), {
+  # Initialize fishSimData as a reactive value
+  fishSimData <- reactiveVal(list(
+    sim1 = unfishedprojection,
+    sim2 = NULL,
+    unharv = unfishedprojection
+  ))
 
+  # Reactive observer that runs when time range changes
+  # It checks whether the simulation needs to be extended
+  observe({
+    sims <- isolate(fishSimData())
+    max_year <- dim(sims$sim1@n)[1] - 1
+    if (max(input$fishyear, input$fishyear2) <= max_year) return()  # No need to re-run if within bounds
+
+    pb <- shiny::Progress$new(); on.exit(pb$close())
+    total_steps <- 3
+    pb$set(message = "Running simulation …", value = 0)
+
+    t_max <- max(input$fishyear, input$fishyear2) - max_year + 5  # Extend by 5 years
+    pb$inc(1/total_steps, "Projecting …")
+    sim1 <- project(sims$sim1, t_max = t_max)
+
+    pb$inc(1/total_steps, "Projecting …")
+    sim2 <- if (!is.null(sims$sim2)) project(sims$sim2, t_max = t_max) else NULL
+
+    pb$inc(1/total_steps, "Done")
+
+    # Update the reactive value
+    fishSimData(list(sim1 = sim1,
+                    sim2 = sim2,
+                    unharv = unfishedprojection))
+  })
+
+  # Reactive observer that runs simulation when inputs change
+  observe({
+    # Trigger on changes to these inputs
+    input$fishyear
+    input$fishyear2
+    
+    # Get all effort sliders for both simulations
     gears <- unique(default_params@gear_params$gear)
-
     effort1 <- makeEffort("effort_" , gears, default_params@initial_effort)
     effort2 <- makeEffort("effort2_", gears, default_params@initial_effort)
 
@@ -510,28 +537,28 @@ server <- function(input, output, session) {
     max_year <- max(input$fishyear, input$fishyear2)          # ≥ 0
 
     pb <- shiny::Progress$new(); on.exit(pb$close())
+    total_steps <- 3
     pb$set(message = "Running fishery simulation …", value = 0)
 
+    pb$inc(1/total_steps, "Projecting Sim 1 …")
     sim1 <- project(
       default_params, effort = effort1,
       t_max   = max_year * 2 + 2
     )
 
-    pb$inc(0.5)
+    pb$inc(1/total_steps, "Projecting Sim 2 …")
+    sim2 <- project(
+      default_params, effort = effort2,
+      t_max   = max_year * 2 + 2
+    )
 
-    btn  <- triggered_button()
-    sim2 <- if (startsWith(btn, "goButton22_"))
-      project(
-        default_params, effort = effort2,
-        t_max   = max_year * 2 + 2
-      ) else NULL
-    pb$inc(0.5)
+    pb$inc(1/total_steps, "Done")
 
-    list(sim1   = sim1,
-         sim2   = sim2,
-         unharv = unfishedprojection)
+    # Update the reactive value
+    fishSimData(list(sim1   = sim1,
+                    sim2   = sim2,
+                    unharv = unfishedprojection))
   })
-
 
   #Change time plotted if either sim1 / sim2 panels time range changes.
   lastChange <- reactiveVal("fishyear")
@@ -561,11 +588,8 @@ server <- function(input, output, session) {
   output$yieldPlot <- renderPlotly({
     req(fishSimData())
 
-    sims <- if (is.null(fishSimData()$sim2))
-      list(fishSimData()$sim1)               # run-simulation
-    else
-      list(fishSimData()$sim1,
-           fishSimData()$sim2)               # compare
+    sims <- list(fishSimData()$sim1,
+                 fishSimData()$sim2)
 
     p <- tryCatch({
       generateYieldDashboard(
@@ -585,17 +609,14 @@ server <- function(input, output, session) {
     req(fishSimData())
     chosen_year <- fish_win1()
 
-    modeFish <- if (isTRUE(input$triplotToggleFish)) "chosen" else "triple"
-
     p <- tryCatch({
       ggplotly(
-        plotSpeciesWithTimeRange(
+        plotSpeciesWithTimeRange2(
           fishSimData()$sim1,
+          fishSimData()$sim2,
           fishSimData()$unharv,
-          chosen_year,
-          mode = modeFish
-        ) +
-          scale_x_discrete(limits = ordered_species())
+          chosen_year
+        ) + scale_x_discrete(limits = ordered_species())
       )
     },
     error = function(e) {
@@ -606,58 +627,21 @@ server <- function(input, output, session) {
     p
   })
 
-  observe({
-    if (!is.null(fishSimData()$sim2))
-      output$fishspeciesPlot <- renderPlotly({
-        chosen_year <- fish_win1()
-
-        p <- tryCatch({
-          ggplotly(
-            plotSpeciesWithTimeRange2(
-              fishSimData()$sim1,
-              fishSimData()$sim2,
-              fishSimData()$unharv,
-              chosen_year
-            ) + scale_x_discrete(limits = ordered_species())
-          )
-        },
-        error = function(e) {
-          lastFishSpeciesPlot()
-        })
-
-        lastFishSpeciesPlot(p)
-        p
-      })
-  })
-
   output$fishsizePlot <- renderPlotly({
     req(fishSimData())
 
     p <- tryCatch({
-      if (is.null(fishSimData()$sim2)) {
-        g <- plotSpectraRelative(
-          fishSimData()$sim1,
-          fishSimData()$unharv,
-          fish_win1(),
-          fish_win1()
-        )
-        if (!isTRUE(input$logToggle4)) {
-          g <- g + scale_x_continuous()
-        }
-        ggplotly(g)
-      } else {
-        g <- plotSpectraRelative2(
-          fishSimData()$sim1,
-          fishSimData()$unharv,
-          fishSimData()$sim2,
-          fish_win1(),
-          fish_win1()
-        )
-        if (!isTRUE(input$logToggle4)) {
-          g <- g + scale_x_continuous()
-        }
-        ggplotly(g)
+      g <- plotSpectraRelative2(
+        fishSimData()$sim1,
+        fishSimData()$unharv,
+        fishSimData()$sim2,
+        fish_win1(),
+        fish_win1()
+      )
+      if (!isTRUE(input$logToggle4)) {
+        g <- g + scale_x_continuous()
       }
+      ggplotly(g)
     }, error = function(e) {
       lastFishSizePlot()
     })
@@ -673,25 +657,14 @@ server <- function(input, output, session) {
     modeGuild <- if (isTRUE(input$triguildToggleFish)) "chosen" else "triple"
 
     p <- tryCatch({
-      if (is.null(fishSimData()$sim2)) {
-        ggplotly(
-          guildplot(
-            fishSimData()$sim1, fishSimData()$unharv,
-            chosen_year,
-            guildparams, default_params,
-            mode = modeGuild
-          )
+      ggplotly(
+        guildplot_both(
+          fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
+          chosen_year,
+          guildparams, default_params,
+          mode = modeGuild
         )
-      } else {
-        ggplotly(
-          guildplot_both(
-            fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
-            chosen_year,
-            guildparams, default_params,
-            mode = modeGuild
-          )
-        )
-      }
+      )
     },
     error = function(e) {
       lastFishGuildPlot()
@@ -709,6 +682,12 @@ server <- function(input, output, session) {
   # So that it saves the last plot, and remembers that the plot is already built (so just change data not plot object)
   built <- reactiveVal(FALSE)
 
+  # Reset built when simulation data changes
+  observe({
+    fishSimData()
+    built(FALSE)
+  })
+
   #helper to get the data
   getSpectraData <- function(sim, win) {
     df <- plotSpectra(sim$sim1,
@@ -718,119 +697,71 @@ server <- function(input, output, session) {
   }
 
   output$spectrumPlot <- renderPlotly({
-
-    input$goButton2; input$goButton22
-
     p <- tryCatch({
 
       sim <- isolate(fishSimData()); req(sim)
       win <- isolate(fish_win1())
-      if (!is.null(sim$sim2)) {
-        df1 <- plotSpectra(sim$sim1,
-                           time_range  = win$start:win$end,
-                           return_data = TRUE) %>%
-          mutate(sim = "Sim 1")
-        df2 <- plotSpectra(sim$sim2,
-                           time_range  = win$start:win$end,
-                           return_data = TRUE) %>%
-          mutate(sim = "Sim 2")
+      
+      df1 <- plotSpectra(sim$sim1,
+                         time_range  = win$start:win$end,
+                         return_data = TRUE) %>%
+        mutate(sim = "Sim 1")
+      df2 <- plotSpectra(sim$sim2,
+                         time_range  = win$start:win$end,
+                         return_data = TRUE) %>%
+        mutate(sim = "Sim 2")
 
-        species <- sort(unique(c(df1$Species, df2$Species)))
-        maxn <- RColorBrewer::brewer.pal.info["Set3", "maxcolors"]
-        if (length(species) <= maxn) {
-          colors <- RColorBrewer::brewer.pal(length(species), "Set3")
-        } else {
-          colors <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(maxn, "Set3"))(length(species))
-        }
-
-        tmp <- plot_ly(source = "spec")
-        for (sp in species) {
-          i <- which(species == sp)
-          sub1 <- df1 %>% filter(Species == sp)
-          tmp <- add_lines(
-            tmp,
-            data        = sub1,
-            x           = ~w,
-            y           = ~value,
-            name        = sp,
-            legendgroup = sp,
-            line        = list(color = colors[i], dash = "solid"),
-            inherit     = FALSE
-          )
-          sub2 <- df2 %>% filter(Species == sp)
-          tmp <- add_lines(
-            tmp,
-            data        = sub2,
-            x           = ~w,
-            y           = ~value,
-            name        = sp,
-            legendgroup = sp,
-            line        = list(color = colors[i], dash = "dash"),
-            inherit     = FALSE,
-            showlegend  = FALSE
-          )
-        }
-
-        axType <- if (isTRUE(input$logToggle5)) "log" else "linear"
-        tmp <- layout(
-          tmp,
-          xaxis     = list(type = axType, title = "Weight"),
-          yaxis     = list(type = "log", title = "Density"),
-          hovermode = "closest"
-        )
-        tmp <- tmp |>
-          event_register("plotly_restyle") |>
-          event_register("plotly_legendclick") |>
-          event_register("plotly_legenddoubleclick")
-
-        lastSpectrumPlot(tmp)
-        built(TRUE)
-        tmp
+      species <- sort(unique(c(df1$Species, df2$Species)))
+      maxn <- RColorBrewer::brewer.pal.info["Set3", "maxcolors"]
+      if (length(species) <= maxn) {
+        colors <- RColorBrewer::brewer.pal(length(species), "Set3")
       } else {
-        spec_df <- plotSpectra(sim$sim1,
-                               time_range  = win$start:win$end,
-                               return_data = TRUE)
-        spec <- split(spec_df, spec_df$Species)
-
-        species <- sort(unique(spec_df$Species))
-        maxn <- RColorBrewer::brewer.pal.info["Set3", "maxcolors"]
-        if (length(species) <= maxn) {
-          colors <- RColorBrewer::brewer.pal(length(species), "Set3")
-        } else {
-          colors <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(maxn, "Set3"))(length(species))
-        }
-
-        tmp <- plot_ly(source = "spec")
-        for (sp in species) {
-          i <- which(species == sp)
-          sub <- spec[[sp]]
-          tmp <- add_lines(
-            tmp,
-            data    = sub,
-            x       = ~w,
-            y       = ~value,
-            line    = list(color = colors[i]),
-            name    = sp,
-            inherit = FALSE
-          )
-        }
-
-        axType <- if (isTRUE(input$logToggle5)) "log" else "linear"
-        tmp <- layout(
-          tmp,
-          xaxis     = list(type = axType, title = "Weight"),
-          yaxis     = list(type = "log", title = "Density"),
-          hovermode = "closest"
-        )
-        tmp <- tmp |>
-          event_register("plotly_restyle") |>
-          event_register("plotly_legendclick") |>
-          event_register("plotly_legenddoubleclick")
-
-        lastSpectrumPlot(tmp)
-        built(TRUE)
-        tmp
+        colors <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(maxn, "Set3"))(length(species))
       }
+
+      tmp <- plot_ly(source = "spec")
+      for (sp in species) {
+        i <- which(species == sp)
+        sub1 <- df1 %>% filter(Species == sp)
+        tmp <- add_lines(
+          tmp,
+          data        = sub1,
+          x           = ~w,
+          y           = ~value,
+          name        = sp,
+          legendgroup = sp,
+          line        = list(color = colors[i], dash = "solid"),
+          inherit     = FALSE
+        )
+        sub2 <- df2 %>% filter(Species == sp)
+        tmp <- add_lines(
+          tmp,
+          data        = sub2,
+          x           = ~w,
+          y           = ~value,
+          name        = sp,
+          legendgroup = sp,
+          line        = list(color = colors[i], dash = "dash"),
+          inherit     = FALSE,
+          showlegend  = FALSE
+        )
+      }
+
+      axType <- if (isTRUE(input$logToggle5)) "log" else "linear"
+      tmp <- layout(
+        tmp,
+        xaxis     = list(type = axType, title = "Weight"),
+        yaxis     = list(type = "log", title = "Density"),
+        hovermode = "closest"
+      )
+      tmp <- tmp |>
+        event_register("plotly_restyle") |>
+        event_register("plotly_legendclick") |>
+        event_register("plotly_legenddoubleclick")
+
+      lastSpectrumPlot(tmp)
+      built(TRUE)
+      tmp
 
     }, error = function(e) {
       message("Spectrum build failed: ", e$message)
@@ -856,14 +787,10 @@ server <- function(input, output, session) {
                            return_data = TRUE)
         spec1 <- split(df1, df1$Species)
 
-        if (!is.null(sim$sim2)) {
-          df2 <- plotSpectra(sim$sim2,
-                             time_range  = win$start:win$end,
-                             return_data = TRUE)
-          spec2 <- split(df2, df2$Species)
-        } else {
-          spec2 <- list()
-        }
+        df2 <- plotSpectra(sim$sim2,
+                           time_range  = win$start:win$end,
+                           return_data = TRUE)
+        spec2 <- split(df2, df2$Species)
 
         species <- sort(unique(c(names(spec1), names(spec2))))
         px <- plotlyProxy("spectrumPlot", session)
@@ -921,16 +848,10 @@ server <- function(input, output, session) {
 
     win <- fish_win1()
 
-    sims <- if (is.null(fishSimData()$sim2))
-      list(fishSimData()$sim1)
-    else
-      list(fishSimData()$sim1,
-           fishSimData()$sim2)
+    sims <- list(fishSimData()$sim1,
+                 fishSimData()$sim2)
 
-    names <- if (length(sims) == 1)
-      c("Sim 1")
-    else
-      c("Sim 1", "Sim 2")
+    names <- c("Sim 1", "Sim 2")
 
     p <- tryCatch({
       # Add bounds checking for time range
@@ -976,11 +897,8 @@ server <- function(input, output, session) {
 
     win <- fish_win1()
 
-    sims <- if (is.null(fishSimData()$sim2))
-      list(fishSimData()$sim1)
-    else
-      list(fishSimData()$sim1,
-           fishSimData()$sim2)
+    sims <- list(fishSimData()$sim1,
+                 fishSimData()$sim2)
 
     p <- tryCatch({
       ggplotly(
@@ -1065,8 +983,7 @@ ui <- fluidPage(
                     actionButton("decYear_fish1", "-1 year", class = "btn-small"),
                     actionButton("incYear_fish1", "+1 year", class = "btn-small")
                 ),
-                div(id = "fishery_sliders", uiOutput("fishery_sliders_ui")),
-                actionButton(inputId = "goButton2",        label = "Run Simulation")
+                div(id = "fishery_sliders", uiOutput("fishery_sliders_ui"))
               ),
               tabPanel(
                 title = "Sim 2",
@@ -1084,8 +1001,7 @@ ui <- fluidPage(
                     actionButton("decYear_fish2", "-1 year", class = "btn-small"),
                     actionButton("incYear_fish2", "+1 year", class = "btn-small")
                 ),
-                div(id = "fishery_sliders", uiOutput("fishery_sliders_ui2")),
-                actionButton(inputId = "goButton22",        label = "Compare")
+                div(id = "fishery_sliders", uiOutput("fishery_sliders_ui2"))
               )
             )
           )
