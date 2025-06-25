@@ -954,7 +954,7 @@ ui <- fluidPage(
       "mizerShiny"
     ),
     selected    = "Single Species",
-    collapsible = TRUE,
+    navbar_options = bslib::navbar_options(collapsible = TRUE),
     theme       = bs_theme(bootswatch = "cerulean"),
 
     tabPanel(
