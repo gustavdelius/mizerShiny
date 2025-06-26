@@ -96,6 +96,13 @@ server <- function(input, output, session) {
     }
   })
 
+  # Reset sliders when species selection changes
+  observe({
+    req(input$species_name_select)
+    updateSliderInput(session, "species", value = 0)
+    updateSliderInput(session, "mortspecies", value = 0)
+  })
+
   #changing the fishery options to dynamically change depending on the model
   output$fishery_sliders_ui <- renderUI({
     effort <- default_params@initial_effort
