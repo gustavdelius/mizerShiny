@@ -624,7 +624,8 @@ server <- function(input, output, session) {
     p <- tryCatch({
       generateYieldDashboard(
         NS_sim          = sims,
-        highlight_times = input$fishyear2_yield
+        highlight_times = input$fishyear2_yield,
+        params          = default_params
       )
     },
     error = function(e) {
