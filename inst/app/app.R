@@ -806,9 +806,9 @@ server <- function(input, output, session) {
   })
 
   #helper to get the data
-  getSpectraData <- function(sim, win) {
-    df <- plotSpectra(sim$sim1,
-                      time_range  = win$start:win$end,
+  getSpectraData <- function(sim, year) {
+    df <- mizer::plotSpectra(sim$sim1,
+                      time_range  = year,
                       return_data = TRUE)
     split(df, df$Species)
   }
@@ -816,35 +816,20 @@ server <- function(input, output, session) {
   output$spectrumPlot <- renderPlotly({
     p <- tryCatch({
 
-      sim <- isolate(fishSimData()); req(sim)
-      win <- isolate(fish_win1())
+      sim <- fishSimData(); req(sim)
+      selected_year <- fish_win1()
+      log_toggle <- input$logToggle5  # Add dependency on log toggle
       
-      # Check which simulations to show
-      show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
-      show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+      # Always show both simulations
+      df1 <- mizer::plotSpectra(sim$sim1,
+                         time_range  = selected_year,
+                         return_data = TRUE) %>%
+        mutate(sim = "Sim 1")
       
-      # If no simulations are selected, return the last successful plot
-      if (!show_sim1 && !show_sim2) {
-        return(lastSpectrumPlot())
-      }
-      
-      # Prepare data for selected simulations
-      df1 <- NULL
-      df2 <- NULL
-      
-      if (show_sim1) {
-        df1 <- plotSpectra(sim$sim1,
-                           time_range  = win$start:win$end,
-                           return_data = TRUE) %>%
-          mutate(sim = "Sim 1")
-      }
-      
-      if (show_sim2) {
-        df2 <- plotSpectra(sim$sim2,
-                           time_range  = win$start:win$end,
-                           return_data = TRUE) %>%
-          mutate(sim = "Sim 2")
-      }
+      df2 <- mizer::plotSpectra(sim$sim2,
+                         time_range  = selected_year,
+                         return_data = TRUE) %>%
+        mutate(sim = "Sim 2")
 
       # Combine species from both simulations
       all_species <- c()
@@ -863,7 +848,7 @@ server <- function(input, output, session) {
       for (sp in species) {
         i <- which(species == sp)
         
-        if (show_sim1 && !is.null(df1)) {
+        if (!is.null(df1)) {
           sub1 <- df1 %>% filter(Species == sp)
           if (nrow(sub1) > 0) {
             tmp <- add_lines(
@@ -879,7 +864,7 @@ server <- function(input, output, session) {
           }
         }
         
-        if (show_sim2 && !is.null(df2)) {
+        if (!is.null(df2)) {
           sub2 <- df2 %>% filter(Species == sp)
           if (nrow(sub2) > 0) {
             tmp <- add_lines(
@@ -897,7 +882,7 @@ server <- function(input, output, session) {
         }
       }
 
-      axType <- if (isTRUE(input$logToggle5)) "log" else "linear"
+      axType <- if (isTRUE(log_toggle)) "log" else "linear"
       tmp <- layout(
         tmp,
         xaxis     = list(type = axType, title = "Weight"),
@@ -928,37 +913,26 @@ server <- function(input, output, session) {
       req(built())
 
       tryCatch({
-        win <- fish_win1()
+        selected_year <- fish_win1()
         sim <- fishSimData()
-        
-        # Check which simulations to show
-        show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
-        show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
 
         # ---- pull fresh spectra -------------------------------------------------
-        spec1 <- list()
-        spec2 <- list()
-        
-        if (show_sim1) {
-          df1 <- plotSpectra(sim$sim1,
-                             time_range  = win$start:win$end,
-                             return_data = TRUE)
-          spec1 <- split(df1, df1$Species)
-        }
+        df1 <- mizer::plotSpectra(sim$sim1,
+                           time_range  = selected_year,
+                           return_data = TRUE)
+        spec1 <- split(df1, df1$Species)
 
-        if (show_sim2) {
-          df2 <- plotSpectra(sim$sim2,
-                             time_range  = win$start:win$end,
-                             return_data = TRUE)
-          spec2 <- split(df2, df2$Species)
-        }
+        df2 <- mizer::plotSpectra(sim$sim2,
+                           time_range  = selected_year,
+                           return_data = TRUE)
+        spec2 <- split(df2, df2$Species)
 
         species <- sort(unique(c(names(spec1), names(spec2))))
         px <- plotlyProxy("spectrumPlot", session)
 
         i <- 0L
         for (sp in species) {
-          if (show_sim1 && sp %in% names(spec1)) {
+          if (sp %in% names(spec1)) {
             sub1 <- spec1[[sp]]
             plotlyProxyInvoke(
               px, "restyle",
@@ -967,7 +941,7 @@ server <- function(input, output, session) {
               list(i))
             i <- i + 1L
           }
-          if (show_sim2 && sp %in% names(spec2)) {
+          if (sp %in% names(spec2)) {
             sub2 <- spec2[[sp]]
             plotlyProxyInvoke(
               px, "restyle",
@@ -979,26 +953,6 @@ server <- function(input, output, session) {
         }
       }, error = function(e) {
         message("Spectrum proxy update failed: ", e$message)
-      })
-    },
-    ignoreInit = TRUE
-  )
-
-  #Toggle X axis to log or not for Spectrum
-  observeEvent(
-    input$logToggle5,
-    {
-      req(built())
-
-      tryCatch({
-        axType <- if (isTRUE(input$logToggle5)) "log" else "linear"
-        plotlyProxyInvoke(
-          plotlyProxy("spectrumPlot", session),
-          "relayout",
-          list(xaxis = list(type = axType),
-               yaxis = list(type = "linear")))
-      }, error = function(e) {
-        message("Axis relayout failed: ", e$message)
       })
     },
     ignoreInit = TRUE
@@ -1373,16 +1327,6 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_spectra)
-                  ),
-                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                      radioButtons(
-                        inputId = "sim_choice",
-                        label   = NULL,
-                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                        selected = "sim1",
-                        inline = TRUE
-                      )
                   ),
                   div(style = "padding: 10px; background-color: #fce4ec; border-radius: 5px; border: 1px solid #f8bbd9;",
                       materialSwitch(
