@@ -300,7 +300,7 @@ server <- function(input, output, session) {
 
     extmort[input$species_name_select, ] <-
       extmort[input$species_name_select, ] +
-      input$mortspecies * totalmort[input$species_name_select, ]
+      (input$mortspecies / 100) * totalmort[input$species_name_select, ]
 
     ext_mort(changed_params) <- extmort
 
@@ -525,7 +525,7 @@ server <- function(input, output, session) {
   observe({
     # Trigger on changes to these inputs
     input$fishyear
-    
+
     # Get all effort sliders for both simulations
     gears <- unique(default_params@gear_params$gear)
     effort1 <- makeEffort("effort_" , gears, default_params@initial_effort)
@@ -591,7 +591,7 @@ server <- function(input, output, session) {
     if (input$sim_choice == "sim2" || input$sim_choice == "both") {
       sims <- c(sims, list(fishSimData()$sim2))
     }
-    
+
     # If no simulations are selected, return the last successful plot
     if (length(sims) == 0) {
       return(lastYieldPlot())
@@ -618,7 +618,7 @@ server <- function(input, output, session) {
     # Check which simulations to show
     show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
     show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
-    
+
     # If no simulations are selected, return the last successful plot
     if (!show_sim1 && !show_sim2) {
       return(lastFishSpeciesPlot())
@@ -676,7 +676,7 @@ server <- function(input, output, session) {
     # Check which simulations to show
     show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
     show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
-    
+
     # If no simulations are selected, return the last successful plot
     if (!show_sim1 && !show_sim2) {
       return(lastFishSizePlot())
@@ -736,7 +736,7 @@ server <- function(input, output, session) {
     # Check which simulations to show
     show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
     show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
-    
+
     # If no simulations are selected, return the last successful plot
     if (!show_sim1 && !show_sim2) {
       return(lastFishGuildPlot())
@@ -798,7 +798,7 @@ server <- function(input, output, session) {
     fishSimData()
     built(FALSE)
   })
-  
+
   # Reset built when simulation visibility switches change
   observe({
     input$sim_choice
@@ -819,13 +819,13 @@ server <- function(input, output, session) {
       sim <- fishSimData(); req(sim)
       selected_year <- fish_win1()
       log_toggle <- input$logToggle5  # Add dependency on log toggle
-      
+
       # Always show both simulations
       df1 <- mizer::plotSpectra(sim$sim1,
                          time_range  = selected_year,
                          return_data = TRUE) %>%
         mutate(sim = "Sim 1")
-      
+
       df2 <- mizer::plotSpectra(sim$sim2,
                          time_range  = selected_year,
                          return_data = TRUE) %>%
@@ -836,7 +836,7 @@ server <- function(input, output, session) {
       if (!is.null(df1)) all_species <- c(all_species, unique(df1$Species))
       if (!is.null(df2)) all_species <- c(all_species, unique(df2$Species))
       species <- sort(unique(all_species))
-      
+
       maxn <- RColorBrewer::brewer.pal.info["Set3", "maxcolors"]
       if (length(species) <= maxn) {
         colors <- RColorBrewer::brewer.pal(length(species), "Set3")
@@ -847,7 +847,7 @@ server <- function(input, output, session) {
       tmp <- plot_ly(source = "spec")
       for (sp in species) {
         i <- which(species == sp)
-        
+
         if (!is.null(df1)) {
           sub1 <- df1 %>% filter(Species == sp)
           if (nrow(sub1) > 0) {
@@ -863,7 +863,7 @@ server <- function(input, output, session) {
             )
           }
         }
-        
+
         if (!is.null(df2)) {
           sub2 <- df2 %>% filter(Species == sp)
           if (nrow(sub2) > 0) {
@@ -966,7 +966,7 @@ server <- function(input, output, session) {
     # Check which simulations to show
     show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
     show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
-    
+
     # If no simulations are selected, return the last successful plot
     if (!show_sim1 && !show_sim2) {
       return(lastFishDietSinglePlot())
@@ -974,7 +974,7 @@ server <- function(input, output, session) {
 
     sims <- list()
     names <- c()
-    
+
     if (show_sim1) {
       sims <- c(sims, list(fishSimData()$sim1))
       names <- c(names, "Sim 1")
@@ -1031,14 +1031,14 @@ server <- function(input, output, session) {
     # Check which simulations to show
     show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
     show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
-    
+
     # If no simulations are selected, return the last successful plot
     if (!show_sim1 && !show_sim2) {
       return(lastNutritionPlot())
     }
 
     sims <- list()
-    
+
     if (show_sim1) {
       sims <- c(sims, list(fishSimData()$sim1))
     }
@@ -1425,13 +1425,13 @@ ui <- fluidPage(
               label   = HTML(
                 "Mortality Change <button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
                 data-bs-toggle='popover' title='' \
-                data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 1%, set the value of the slider to 0.01. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -0.01'>\
+                data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 10%, set the value of the slider to 10. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -1'>\
                 <strong>?</strong></button>"
               ),
-              min   = -0.25,
-              max   = 0.25,
+              min   = -25,
+              max   = 25,
               value = 0,
-              step  = 0.001,
+              step  = 1,
               width = "100%"
             ) %>% tagAppendAttributes(id = "mort_slider"),
             sliderInput(
