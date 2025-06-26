@@ -1148,13 +1148,13 @@ ui <- fluidPage(
               tabsetPanel(
                 id = "fishy_plots",
                 tabPanel(
-                  title = "Species",
+                  title = "Biomass",
                   div(style = "flex:1; display:flex;",
                       plotlyOutput("fishspeciesPlot", height = "100%", width = "100%")
                   )
                 ),
                 tabPanel(
-                  title = "Yield",
+                  title = "Yield Composition",
                   div(style = "flex:1; display:flex;",
                       plotlyOutput("yieldPlot", height = "100%", width = "100%")
                   )
@@ -1200,7 +1200,7 @@ ui <- fluidPage(
           card_body(
             style = "flex: auto",
             conditionalPanel(
-              condition = "input.fishy_plots == 'Yield'",
+              condition = "input.fishy_plots == 'Yield Composition'",
               div(style = "margin-bottom:1.5rem;",
                   legendUI("infoButtonOrder", legends$fishery_yield)
               ),
@@ -1228,7 +1228,7 @@ ui <- fluidPage(
               )
             ),
             conditionalPanel(
-              condition = "input.fishy_plots == 'Species'",
+              condition = "input.fishy_plots == 'Biomass'",
               div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_species)
@@ -1459,7 +1459,7 @@ ui <- fluidPage(
             style = "flex: 4; overflow: hidden; margin-top: -0.5rem",
             tabsetPanel(
               id = "plotTabs",
-              tabPanel(title = "Species", plotlyOutput("speciesPlot", height = "55vh")),
+              tabPanel(title = "Biomass", plotlyOutput("speciesPlot", height = "55vh")),
               tabPanel(title = "Size",     plotlyOutput("sizePlot",     height = "55vh")),
               if (app_exists("Including", "guilds_information", "checkGuilds",
                              "guildparams_preprocessed.Rdata")) {
@@ -1475,7 +1475,7 @@ ui <- fluidPage(
             style = "flex: 1.46;",
 
             conditionalPanel(
-              condition = "input.plotTabs == 'Species'",
+              condition = "input.plotTabs == 'Biomass'",
               div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$biomass_species)

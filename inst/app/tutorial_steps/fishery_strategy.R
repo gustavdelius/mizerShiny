@@ -20,12 +20,12 @@ intro_steps <- list(
        your simulation will be compared to. Fishing effort can be though of as the intensity of fishing and each fleet can be thought of as fishing vessels which
        fish similar species and with similar size selectivity."
   ),
-  list(element = "#fishy_plots .nav-link[data-value='Species']", title = "Species Plot",
+  list(element = "#fishy_plots .nav-link[data-value='Biomass']", title = "Biomass Plot",
        intro = "The plot presents the percentage change in each of the species. This percentage change is relative to the current fishing strategy. Each species has 3 bars, which indicate the species percentage change at
 specific time points: quarter of the selected year, half of the selected year, and the full selected year...
       "
   ),
-  list(element = "#fishy_plots .nav-link[data-value='Species']", title = "Species continued",
+  list(element = "#fishy_plots .nav-link[data-value='Biomass']", title = "Biomass continued",
        intro = "Plotting all 3 time points
 aids in understanding how the ecosystem changes evolve over time, showing the progression from early to late stages of the simulation.
 "
@@ -44,7 +44,7 @@ from 3 time points plotted to only the selected year plotted."
        Remember that each plot uses plotly, so you can look at specific areas of the plot by selecting with your mouse (then double click to reset),
        remove plot items by clicking them on the legend (double click to remove everything but that one), hover over plot information to get
        more specific values and save the plot by using the picture icon in the top right of the plot."),
-  list(element = "#fishy_plots .nav-link[data-value='Yield']", title = "Yield Plot",
+  list(element = "#fishy_plots .nav-link[data-value='Yield Composition']", title = "Yield Composition Plot",
        intro = "Dashboard of yield harvested from the simulation. Use the legend to understand what each of the plots mean"
   ),
   list(element = "#fishy_plots .nav-link[data-value='Size']", title = "Relative Size Spectrum Plot",
