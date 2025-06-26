@@ -443,10 +443,9 @@ server <- function(input, output, session) {
   #changing the timerange to subset on the plot  for yield
   observe({
     time1  <- input$fishyear  + 1
-    time22 <- input$fishyear2 + 1
 
-    time12 <- max(input$fishyear2 - 1, 1)
-    new_max <- max(time1, time22)
+    time12 <- max(input$fishyear - 1, 1)
+    new_max <- time1
 
     current <- input$fishyear2_yield
     new_val <- c(
@@ -501,13 +500,13 @@ server <- function(input, output, session) {
   observe({
     sims <- isolate(fishSimData())
     max_year <- dim(sims$sim1@n)[1] - 1
-    if (max(input$fishyear, input$fishyear2) <= max_year) return()  # No need to re-run if within bounds
+    if (input$fishyear <= max_year) return()  # No need to re-run if within bounds
 
     pb <- shiny::Progress$new(); on.exit(pb$close())
     total_steps <- 3
     pb$set(message = "Running simulation …", value = 0)
 
-    t_max <- max(input$fishyear, input$fishyear2) - max_year + 5  # Extend by 5 years
+    t_max <- input$fishyear - max_year + 5  # Extend by 5 years
     pb$inc(1/total_steps, "Projecting …")
     sim1 <- project(sims$sim1, t_max = t_max)
 
@@ -526,15 +525,14 @@ server <- function(input, output, session) {
   observe({
     # Trigger on changes to these inputs
     input$fishyear
-    input$fishyear2
     
     # Get all effort sliders for both simulations
     gears <- unique(default_params@gear_params$gear)
     effort1 <- makeEffort("effort_" , gears, default_params@initial_effort)
     effort2 <- makeEffort("effort2_", gears, default_params@initial_effort)
 
-    # long enough for *either* slider
-    max_year <- max(input$fishyear, input$fishyear2)          # ≥ 0
+    # long enough for the time range
+    max_year <- input$fishyear          # ≥ 0
 
     pb <- shiny::Progress$new(); on.exit(pb$close())
     total_steps <- 3
@@ -560,20 +558,18 @@ server <- function(input, output, session) {
                     unharv = unfishedprojection))
   })
 
-  #Change time plotted if either sim1 / sim2 panels time range changes.
-  lastChange <- reactiveVal("fishyear")
-  observeEvent(input$fishyear,  ignoreInit = TRUE, {
-    lastChange("fishyear")
-  })
-  observeEvent(input$fishyear2, ignoreInit = TRUE, {
-    lastChange("fishyear2")
-  })
-  fish_win1 <- reactive({
-    y <- if (lastChange() == "fishyear")  input$fishyear  else  input$fishyear2
-    y
-  })
+  # Single time control for both simulations
+  setupYearControls(
+    input, session,
+    sliderId  = "fishyear",
+    minusId   = "decYear_fish",
+    plusId    = "incYear_fish"
+  )
 
- #
+  # Simple reactive for the time range
+  fish_win1 <- reactive({
+    input$fishyear
+  })
 
   # Reactive storage for last successful plots
   lastYieldPlot             <- reactiveVal(NULL)
@@ -588,8 +584,18 @@ server <- function(input, output, session) {
   output$yieldPlot <- renderPlotly({
     req(fishSimData())
 
-    sims <- list(fishSimData()$sim1,
-                 fishSimData()$sim2)
+    sims <- list()
+    if (input$sim_choice == "sim1" || input$sim_choice == "both") {
+      sims <- c(sims, list(fishSimData()$sim1))
+    }
+    if (input$sim_choice == "sim2" || input$sim_choice == "both") {
+      sims <- c(sims, list(fishSimData()$sim2))
+    }
+    
+    # If no simulations are selected, return the last successful plot
+    if (length(sims) == 0) {
+      return(lastYieldPlot())
+    }
 
     p <- tryCatch({
       generateYieldDashboard(
@@ -609,15 +615,51 @@ server <- function(input, output, session) {
     req(fishSimData())
     chosen_year <- fish_win1()
 
+    # Check which simulations to show
+    show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
+    show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+    
+    # If no simulations are selected, return the last successful plot
+    if (!show_sim1 && !show_sim2) {
+      return(lastFishSpeciesPlot())
+    }
+
     p <- tryCatch({
-      ggplotly(
-        plotSpeciesWithTimeRange2(
-          fishSimData()$sim1,
-          fishSimData()$sim2,
-          fishSimData()$unharv,
-          chosen_year
-        ) + scale_x_discrete(limits = ordered_species())
-      )
+      if (show_sim1 && show_sim2) {
+        # Both simulations
+        ggplotly(
+          plotSpeciesWithTimeRange2(
+            fishSimData()$sim1,
+            fishSimData()$sim2,
+            fishSimData()$unharv,
+            chosen_year
+          ) + scale_x_discrete(limits = ordered_species())
+        )
+      } else if (show_sim1) {
+        # Only Sim 1
+        modeFish <- if (isTRUE(input$triplotToggleFish)) "chosen" else "triple"
+        ggplotly(
+          plotSpeciesWithTimeRange(
+            fishSimData()$sim1,
+            fishSimData()$unharv,
+            chosen_year,
+            mode = modeFish
+          ) +
+            scale_x_discrete(limits = ordered_species())
+        )
+      } else {
+        # Only Sim 2
+        modeFish <- if (isTRUE(input$triplotToggleFish)) "chosen" else "triple"
+        ggplotly(
+          plotSpeciesWithTimeRange(
+            fishSimData()$sim2,
+            fishSimData()$unharv,
+            chosen_year,
+            mode = modeFish
+          ) +
+            scale_x_discrete(limits = ordered_species())
+        )
+      }
     },
     error = function(e) {
       lastFishSpeciesPlot()
@@ -630,18 +672,54 @@ server <- function(input, output, session) {
   output$fishsizePlot <- renderPlotly({
     req(fishSimData())
 
+    # Check which simulations to show
+    show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
+    show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+    
+    # If no simulations are selected, return the last successful plot
+    if (!show_sim1 && !show_sim2) {
+      return(lastFishSizePlot())
+    }
+
     p <- tryCatch({
-      g <- plotSpectraRelative2(
-        fishSimData()$sim1,
-        fishSimData()$unharv,
-        fishSimData()$sim2,
-        fish_win1(),
-        fish_win1()
-      )
-      if (!isTRUE(input$logToggle4)) {
-        g <- g + scale_x_continuous()
+      if (show_sim1 && show_sim2) {
+        # Both simulations
+        g <- plotSpectraRelative2(
+          fishSimData()$sim1,
+          fishSimData()$unharv,
+          fishSimData()$sim2,
+          fish_win1(),
+          fish_win1()
+        )
+        if (!isTRUE(input$logToggle4)) {
+          g <- g + scale_x_continuous()
+        }
+        ggplotly(g)
+      } else if (show_sim1) {
+        # Only Sim 1
+        g <- plotSpectraRelative(
+          fishSimData()$sim1,
+          fishSimData()$unharv,
+          fish_win1(),
+          fish_win1()
+        )
+        if (!isTRUE(input$logToggle4)) {
+          g <- g + scale_x_continuous()
+        }
+        ggplotly(g)
+      } else {
+        # Only Sim 2
+        g <- plotSpectraRelative(
+          fishSimData()$sim2,
+          fishSimData()$unharv,
+          fish_win1(),
+          fish_win1()
+        )
+        if (!isTRUE(input$logToggle4)) {
+          g <- g + scale_x_continuous()
+        }
+        ggplotly(g)
       }
-      ggplotly(g)
     }, error = function(e) {
       lastFishSizePlot()
     })
@@ -654,17 +732,49 @@ server <- function(input, output, session) {
     req(fishSimData())
     chosen_year <- fish_win1()
 
+    # Check which simulations to show
+    show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
+    show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+    
+    # If no simulations are selected, return the last successful plot
+    if (!show_sim1 && !show_sim2) {
+      return(lastFishGuildPlot())
+    }
+
     modeGuild <- if (isTRUE(input$triguildToggleFish)) "chosen" else "triple"
 
     p <- tryCatch({
-      ggplotly(
-        guildplot_both(
-          fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
-          chosen_year,
-          guildparams, default_params,
-          mode = modeGuild
+      if (show_sim1 && show_sim2) {
+        # Both simulations
+        ggplotly(
+          guildplot_both(
+            fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
+            chosen_year,
+            guildparams, default_params,
+            mode = modeGuild
+          )
         )
-      )
+      } else if (show_sim1) {
+        # Only Sim 1
+        ggplotly(
+          guildplot(
+            fishSimData()$sim1, fishSimData()$unharv,
+            chosen_year,
+            guildparams, default_params,
+            mode = modeGuild
+          )
+        )
+      } else {
+        # Only Sim 2
+        ggplotly(
+          guildplot(
+            fishSimData()$sim2, fishSimData()$unharv,
+            chosen_year,
+            guildparams, default_params,
+            mode = modeGuild
+          )
+        )
+      }
     },
     error = function(e) {
       lastFishGuildPlot()
@@ -687,6 +797,12 @@ server <- function(input, output, session) {
     fishSimData()
     built(FALSE)
   })
+  
+  # Reset built when simulation visibility switches change
+  observe({
+    input$sim_choice
+    built(FALSE)
+  })
 
   #helper to get the data
   getSpectraData <- function(sim, win) {
@@ -702,16 +818,39 @@ server <- function(input, output, session) {
       sim <- isolate(fishSimData()); req(sim)
       win <- isolate(fish_win1())
       
-      df1 <- plotSpectra(sim$sim1,
-                         time_range  = win$start:win$end,
-                         return_data = TRUE) %>%
-        mutate(sim = "Sim 1")
-      df2 <- plotSpectra(sim$sim2,
-                         time_range  = win$start:win$end,
-                         return_data = TRUE) %>%
-        mutate(sim = "Sim 2")
+      # Check which simulations to show
+      show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
+      show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+      
+      # If no simulations are selected, return the last successful plot
+      if (!show_sim1 && !show_sim2) {
+        return(lastSpectrumPlot())
+      }
+      
+      # Prepare data for selected simulations
+      df1 <- NULL
+      df2 <- NULL
+      
+      if (show_sim1) {
+        df1 <- plotSpectra(sim$sim1,
+                           time_range  = win$start:win$end,
+                           return_data = TRUE) %>%
+          mutate(sim = "Sim 1")
+      }
+      
+      if (show_sim2) {
+        df2 <- plotSpectra(sim$sim2,
+                           time_range  = win$start:win$end,
+                           return_data = TRUE) %>%
+          mutate(sim = "Sim 2")
+      }
 
-      species <- sort(unique(c(df1$Species, df2$Species)))
+      # Combine species from both simulations
+      all_species <- c()
+      if (!is.null(df1)) all_species <- c(all_species, unique(df1$Species))
+      if (!is.null(df2)) all_species <- c(all_species, unique(df2$Species))
+      species <- sort(unique(all_species))
+      
       maxn <- RColorBrewer::brewer.pal.info["Set3", "maxcolors"]
       if (length(species) <= maxn) {
         colors <- RColorBrewer::brewer.pal(length(species), "Set3")
@@ -722,29 +861,39 @@ server <- function(input, output, session) {
       tmp <- plot_ly(source = "spec")
       for (sp in species) {
         i <- which(species == sp)
-        sub1 <- df1 %>% filter(Species == sp)
-        tmp <- add_lines(
-          tmp,
-          data        = sub1,
-          x           = ~w,
-          y           = ~value,
-          name        = sp,
-          legendgroup = sp,
-          line        = list(color = colors[i], dash = "solid"),
-          inherit     = FALSE
-        )
-        sub2 <- df2 %>% filter(Species == sp)
-        tmp <- add_lines(
-          tmp,
-          data        = sub2,
-          x           = ~w,
-          y           = ~value,
-          name        = sp,
-          legendgroup = sp,
-          line        = list(color = colors[i], dash = "dash"),
-          inherit     = FALSE,
-          showlegend  = FALSE
-        )
+        
+        if (show_sim1 && !is.null(df1)) {
+          sub1 <- df1 %>% filter(Species == sp)
+          if (nrow(sub1) > 0) {
+            tmp <- add_lines(
+              tmp,
+              data        = sub1,
+              x           = ~w,
+              y           = ~value,
+              name        = sp,
+              legendgroup = sp,
+              line        = list(color = colors[i], dash = "solid"),
+              inherit     = FALSE
+            )
+          }
+        }
+        
+        if (show_sim2 && !is.null(df2)) {
+          sub2 <- df2 %>% filter(Species == sp)
+          if (nrow(sub2) > 0) {
+            tmp <- add_lines(
+              tmp,
+              data        = sub2,
+              x           = ~w,
+              y           = ~value,
+              name        = sp,
+              legendgroup = sp,
+              line        = list(color = colors[i], dash = "dash"),
+              inherit     = FALSE,
+              showlegend  = FALSE
+            )
+          }
+        }
       }
 
       axType <- if (isTRUE(input$logToggle5)) "log" else "linear"
@@ -780,24 +929,35 @@ server <- function(input, output, session) {
       tryCatch({
         win <- fish_win1()
         sim <- fishSimData()
+        
+        # Check which simulations to show
+        show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
+        show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
 
         # ---- pull fresh spectra -------------------------------------------------
-        df1 <- plotSpectra(sim$sim1,
-                           time_range  = win$start:win$end,
-                           return_data = TRUE)
-        spec1 <- split(df1, df1$Species)
+        spec1 <- list()
+        spec2 <- list()
+        
+        if (show_sim1) {
+          df1 <- plotSpectra(sim$sim1,
+                             time_range  = win$start:win$end,
+                             return_data = TRUE)
+          spec1 <- split(df1, df1$Species)
+        }
 
-        df2 <- plotSpectra(sim$sim2,
-                           time_range  = win$start:win$end,
-                           return_data = TRUE)
-        spec2 <- split(df2, df2$Species)
+        if (show_sim2) {
+          df2 <- plotSpectra(sim$sim2,
+                             time_range  = win$start:win$end,
+                             return_data = TRUE)
+          spec2 <- split(df2, df2$Species)
+        }
 
         species <- sort(unique(c(names(spec1), names(spec2))))
         px <- plotlyProxy("spectrumPlot", session)
 
         i <- 0L
         for (sp in species) {
-          if (sp %in% names(spec1)) {
+          if (show_sim1 && sp %in% names(spec1)) {
             sub1 <- spec1[[sp]]
             plotlyProxyInvoke(
               px, "restyle",
@@ -806,7 +966,7 @@ server <- function(input, output, session) {
               list(i))
             i <- i + 1L
           }
-          if (sp %in% names(spec2)) {
+          if (show_sim2 && sp %in% names(spec2)) {
             sub2 <- spec2[[sp]]
             plotlyProxyInvoke(
               px, "restyle",
@@ -848,10 +1008,26 @@ server <- function(input, output, session) {
 
     win <- fish_win1()
 
-    sims <- list(fishSimData()$sim1,
-                 fishSimData()$sim2)
+    # Check which simulations to show
+    show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
+    show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+    
+    # If no simulations are selected, return the last successful plot
+    if (!show_sim1 && !show_sim2) {
+      return(lastFishDietSinglePlot())
+    }
 
-    names <- c("Sim 1", "Sim 2")
+    sims <- list()
+    names <- c()
+    
+    if (show_sim1) {
+      sims <- c(sims, list(fishSimData()$sim1))
+      names <- c(names, "Sim 1")
+    }
+    if (show_sim2) {
+      sims <- c(sims, list(fishSimData()$sim2))
+      names <- c(names, "Sim 2")
+    }
 
     p <- tryCatch({
       # Add bounds checking for time range
@@ -897,8 +1073,23 @@ server <- function(input, output, session) {
 
     win <- fish_win1()
 
-    sims <- list(fishSimData()$sim1,
-                 fishSimData()$sim2)
+    # Check which simulations to show
+    show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
+    show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+    
+    # If no simulations are selected, return the last successful plot
+    if (!show_sim1 && !show_sim2) {
+      return(lastNutritionPlot())
+    }
+
+    sims <- list()
+    
+    if (show_sim1) {
+      sims <- c(sims, list(fishSimData()$sim1))
+    }
+    if (show_sim2) {
+      sims <- c(sims, list(fishSimData()$sim2))
+    }
 
     p <- tryCatch({
       ggplotly(
@@ -966,41 +1157,27 @@ ui <- fluidPage(
           area = "area1",
           card_body(
             style = "margin-top: -0.5rem",
+            sliderInput(
+              inputId = "fishyear",
+              label   = "Time Range",
+              min     = 1,
+              max     = fish_max_year,
+              value   = 5,
+              step    = 1,
+              width   = "100%"
+            ) %>% tagAppendAttributes(id = "fishyyear"),
+            div(id   = "yearAdjustButtons_fish",
+                style = "display:flex; justify-content:center; gap:10px;",
+                actionButton("decYear_fish", "-1 year", class = "btn-small"),
+                actionButton("incYear_fish", "+1 year", class = "btn-small")
+            ),
             tabsetPanel(
               tabPanel(
                 title = "Sim 1",
-                sliderInput(
-                  inputId = "fishyear",
-                  label   = "Time Range",
-                  min     = 1,
-                  max     = fish_max_year,
-                  value   = 5,
-                  step    = 1,
-                  width   = "100%"
-                ) %>% tagAppendAttributes(id = "fishyyear"),
-                div(id   = "yearAdjustButtons_fish1",
-                    style = "display:flex; justify-content:center; gap:10px;",
-                    actionButton("decYear_fish1", "-1 year", class = "btn-small"),
-                    actionButton("incYear_fish1", "+1 year", class = "btn-small")
-                ),
                 div(id = "fishery_sliders", uiOutput("fishery_sliders_ui"))
               ),
               tabPanel(
                 title = "Sim 2",
-                sliderInput(
-                  inputId = "fishyear2",
-                  label   = "Time Range",
-                  min     = 1,
-                  max     = fish_max_year,
-                  value   = 5,
-                  step    = 1,
-                  width   = "100%"
-                ) %>% tagAppendAttributes(id = "fishyyear"),
-                div(id   = "yearAdjustButtons_fish2",
-                    style = "display:flex; justify-content:center; gap:10px;",
-                    actionButton("decYear_fish2", "-1 year", class = "btn-small"),
-                    actionButton("incYear_fish2", "+1 year", class = "btn-small")
-                ),
                 div(id = "fishery_sliders", uiOutput("fishery_sliders_ui2"))
               )
             )
@@ -1072,6 +1249,16 @@ ui <- fluidPage(
               div(style = "margin-bottom:1.5rem;",
                   legendUI("infoButtonOrder", legends$fishery_yield)
               ),
+              div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                  HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                  radioButtons(
+                    inputId = "sim_choice",
+                    label   = NULL,
+                    choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                    selected = "sim1",
+                    inline = TRUE
+                  )
+              ),
               div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                   HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Yield Time Range</span>"),
                   sliderInput(
@@ -1090,6 +1277,16 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_species)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                      radioButtons(
+                        inputId = "sim_choice",
+                        label   = NULL,
+                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                        selected = "sim1",
+                        inline = TRUE
+                      )
                   ),
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
                       HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
@@ -1124,6 +1321,16 @@ ui <- fluidPage(
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_size)
                   ),
+                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                      radioButtons(
+                        inputId = "sim_choice",
+                        label   = NULL,
+                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                        selected = "sim1",
+                        inline = TRUE
+                      )
+                  ),
                   div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
                       materialSwitch(
                         inputId = "logToggle4",
@@ -1139,6 +1346,16 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_guild)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                      radioButtons(
+                        inputId = "sim_choice",
+                        label   = NULL,
+                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                        selected = "sim1",
+                        inline = TRUE
+                      )
                   ),
                   div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                       materialSwitch(
@@ -1156,6 +1373,16 @@ ui <- fluidPage(
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_spectra)
                   ),
+                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                      radioButtons(
+                        inputId = "sim_choice",
+                        label   = NULL,
+                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                        selected = "sim1",
+                        inline = TRUE
+                      )
+                  ),
                   div(style = "padding: 10px; background-color: #fce4ec; border-radius: 5px; border: 1px solid #f8bbd9;",
                       materialSwitch(
                         inputId = "logToggle5",
@@ -1172,6 +1399,16 @@ ui <- fluidPage(
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_diet_single)
                   ),
+                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                      radioButtons(
+                        inputId = "sim_choice",
+                        label   = NULL,
+                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                        selected = "sim1",
+                        inline = TRUE
+                      )
+                  ),
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                       HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
                       selectInput(
@@ -1185,7 +1422,21 @@ ui <- fluidPage(
             ),
             conditionalPanel(
               condition = "input.fishy_plots == 'Nutrition'",
-              legendUI("infoButtonOrder", legends$nutrition)
+              div(style = "display: flex; align-items: center; gap: 15px;",
+                  div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
+                      legendUI("infoButtonOrder", legends$nutrition)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                      radioButtons(
+                        inputId = "sim_choice",
+                        label   = NULL,
+                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                        selected = "sim1",
+                        inline = TRUE
+                      )
+                  )
+              )
             )
           )
         )
@@ -1350,6 +1601,16 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonDietBio", legends$fishery_diet_single)
+                  ),
+                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
+                      radioButtons(
+                        inputId = "sim_choice",
+                        label   = NULL,
+                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                        selected = "sim1",
+                        inline = TRUE
+                      )
                   ),
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                       HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
