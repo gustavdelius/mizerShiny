@@ -495,6 +495,23 @@ server <- function(input, output, session) {
     ef
   }
 
+  # Observer to automatically switch to "Both" when Sim 2 sliders are changed
+  observeEvent({
+    # Get all gear names to watch for Sim 2 sliders
+    gears <- unique(default_params@gear_params$gear)
+
+    # Watch for changes to any Sim 2 slider - this will fire whenever any slider is moved
+    lapply(gears, function(gear) {
+      input[[paste0("effort2_", gear)]]
+    })
+  }, {
+    # Update sim_choice so that sim2 is visible
+    sim_choice <- isolate(input$sim_choice)
+    if (sim_choice != "sim2" && sim_choice != "both") {
+      updateRadioButtons(session, "sim_choice", selected = "both")
+    }
+  }, ignoreInit = TRUE)
+
   # Initialize fishSimData as a reactive value
   fishSimData <- reactiveVal(list(
     sim1 = unfishedprojection,
