@@ -1409,7 +1409,7 @@ ui <- fluidPage(
             sliderInput(
               inputId = "species",
               label   = HTML(
-                "Starting Biomass <button id='infoButtonSpecies' class='btn btn-info btn-xs' type='button' \
+                "% Change in Biomass <button id='infoButtonSpecies' class='btn btn-info btn-xs' type='button' \
                 data-bs-toggle='popover' title='' \
                 data-bs-content='Slider value indicates the percentage change in starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 20. To decrease by 20%, set value to -20.'>\
                 <strong>?</strong></button>"
@@ -1423,7 +1423,7 @@ ui <- fluidPage(
             sliderInput(
               inputId = "mortspecies",
               label   = HTML(
-                "Mortality Change <button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
+                "% Change in Mortality<button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
                 data-bs-toggle='popover' title='' \
                 data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 10%, set the value of the slider to 10. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -1'>\
                 <strong>?</strong></button>"
