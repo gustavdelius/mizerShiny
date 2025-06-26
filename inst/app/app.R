@@ -292,7 +292,7 @@ server <- function(input, output, session) {
     pb$inc(1/total_steps, "Adjusting biomass …")
 
     changed_params@initial_n[input$species_name_select, ] <-
-      default_params@initial_n[input$species_name_select, ] * input$species
+      default_params@initial_n[input$species_name_select, ] * (1 + input$species / 100)
 
     pb$inc(1/total_steps, "Updating mortality …")
     extmort   <- getExtMort(default_params)
@@ -1411,13 +1411,13 @@ ui <- fluidPage(
               label   = HTML(
                 "Starting Biomass <button id='infoButtonSpecies' class='btn btn-info btn-xs' type='button' \
                 data-bs-toggle='popover' title='' \
-                data-bs-content='Slider value indicates the starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 1.2. To decrease by 20%, set value to 0.8.'>\
+                data-bs-content='Slider value indicates the percentage change in starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 20. To decrease by 20%, set value to -20.'>\
                 <strong>?</strong></button>"
               ),
-              min   = 0,
-              max   = 2,
-              value = 1,
-              step  = 0.01,
+              min   = -100,
+              max   = 100,
+              value = 0,
+              step  = 1,
               width = "100%"
             ) %>% tagAppendAttributes(id = "species_slider"),
             sliderInput(
