@@ -1,8 +1,11 @@
+# Source the shared utility function
+source("Functions/species_plot_utils.R")
+
 plotSpeciesWithTimeRange <- function(harvestedprojection, unharvestedprojection, chosenyear,
                                      mode = c("triple", "chosen")) {
 
   mode <- match.arg(mode)
-  percentage_diff <- process_sim(harvestedprojection, unharvestedprojection, chosenyear)
+  percentage_diff <- process_sim_shared(harvestedprojection, unharvestedprojection, chosenyear, mode)
   percentage_diff$Percentage <- percentage_diff$percentage_diff
   percentage_diff$Class <- percentage_diff$fill_group
 

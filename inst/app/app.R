@@ -332,7 +332,7 @@ server <- function(input, output, session) {
     req(bioSimData())
     chosen_year <- input$year
     #does user want 3 times plotted or one
-    modeChoice <- if (isTRUE(input$triplotToggle)) "chosen" else "triple"
+    modeChoice <- if (isTRUE(input$triplotToggle)) "triple" else "chosen"
 
     #plot using the fucntion, but if its an error, load the previous plot
     p <- tryCatch({
@@ -374,7 +374,7 @@ server <- function(input, output, session) {
     req(bioSimData())
     chosen_year <- input$year
 
-    modeGuild <- if (isTRUE(input$triguildToggle)) "chosen" else "triple"
+    modeGuild <- if (isTRUE(input$triguildToggle)) "triple" else "chosen"
 
     p <- tryCatch({
       ggplotly(
@@ -632,12 +632,13 @@ server <- function(input, output, session) {
             fishSimData()$sim1,
             fishSimData()$sim2,
             fishSimData()$unharv,
-            chosen_year
+            chosen_year,
+            mode = if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
           ) + scale_x_discrete(limits = ordered_species())
         )
       } else if (show_sim1) {
         # Only Sim 1
-        modeFish <- if (isTRUE(input$triplotToggleFish)) "chosen" else "triple"
+        modeFish <- if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
         ggplotly(
           plotSpeciesWithTimeRange(
             fishSimData()$sim1,
@@ -649,7 +650,7 @@ server <- function(input, output, session) {
         )
       } else {
         # Only Sim 2
-        modeFish <- if (isTRUE(input$triplotToggleFish)) "chosen" else "triple"
+        modeFish <- if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
         ggplotly(
           plotSpeciesWithTimeRange(
             fishSimData()$sim2,
@@ -741,7 +742,7 @@ server <- function(input, output, session) {
       return(lastFishGuildPlot())
     }
 
-    modeGuild <- if (isTRUE(input$triguildToggleFish)) "chosen" else "triple"
+    modeGuild <- if (isTRUE(input$triguildToggleFish)) "triple" else "chosen"
 
     p <- tryCatch({
       if (show_sim1 && show_sim2) {
@@ -1308,8 +1309,8 @@ ui <- fluidPage(
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
                       materialSwitch(
                         inputId = "triplotToggleFish",
-                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
-                        value   = FALSE,
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
+                        value   = TRUE,
                         status  = "info"
                       )
                   )
@@ -1360,8 +1361,8 @@ ui <- fluidPage(
                   div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                       materialSwitch(
                         inputId = "triguildToggleFish",
-                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
-                        value   = FALSE,
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
+                        value   = TRUE,
                         status  = "info"
                       )
                   )
@@ -1555,8 +1556,8 @@ ui <- fluidPage(
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
                       materialSwitch(
                         inputId = "triplotToggle",
-                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
-                        value   = FALSE,
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
+                        value   = TRUE,
                         status  = "info"
                       )
                   )
@@ -1589,8 +1590,8 @@ ui <- fluidPage(
                   div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                       materialSwitch(
                         inputId = "triguildToggle",
-                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Chosen Only</span>"),
-                        value   = FALSE,
+                        label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
+                        value   = TRUE,
                         status  = "info"
                       )
                   )
