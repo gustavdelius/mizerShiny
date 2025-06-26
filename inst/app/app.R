@@ -1095,7 +1095,7 @@ ui <- fluidPage(
           style = "vertical-align: middle; margin-right: 15px; margin-bottom: 5px; margin-top: 5px;"),
       "mizerShiny"
     ),
-    selected    = "Species Role",
+    selected    = "Fishery Strategy",
     navbar_options = bslib::navbar_options(collapsible = TRUE),
     theme       = bs_theme(bootswatch = "cerulean"),
 
