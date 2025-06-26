@@ -53,14 +53,6 @@ source(app_path("Functions", "legendUI.R"), local = TRUE)
 # Server ----
 server <- function(input, output, session) {
 
-  # Global error handler for debugging
-  options(error = function() {
-    message("DEBUG: Global error caught!")
-    message("DEBUG: Error message: ", geterrmessage())
-    message("DEBUG: Call stack:")
-    print(sys.calls())
-  })
-
   # loading the introduction/guide ----
   source("tutorial_steps/get_intro_steps.R")
   observeEvent(input$start_tutorial, {
@@ -466,23 +458,6 @@ server <- function(input, output, session) {
       value = new_val
     )
   })
-
-  #Sim 1
-  setupYearControls(
-    input, session,
-    sliderId  = "fishyear",
-    minusId   = "decYear_fish1",
-    plusId    = "incYear_fish1"
-  )
-
-  #Sim 2
-  setupYearControls(
-    input, session,
-    sliderId  = "fishyear2",
-    minusId   = "decYear_fish2",
-    plusId    = "incYear_fish2"
-  )
-
 
 #Helper function to reactively make new effort vector depending on the input, for any mizer object.
   makeEffort <- function(prefix, gears, base_effort) {
