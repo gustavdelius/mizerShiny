@@ -1151,6 +1151,18 @@ ui <- fluidPage(
                 actionButton("decYear_fish", "-1 year", class = "btn-small"),
                 actionButton("incYear_fish", "+1 year", class = "btn-small")
             ),
+            div(style = "margin: 4px 0  0; padding: 6px 8px 0 8px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                div(style = "display: flex; align-items: center; gap: 8px;",
+                    HTML("<span style='font-weight:500; font-size: 0.9em; color: var(--bs-heading-color);'>Show:</span>"),
+                    radioButtons(
+                      inputId = "sim_choice",
+                      label   = NULL,
+                      choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                      selected = "sim1",
+                      inline = TRUE
+                    )
+                )
+            ),
             tabsetPanel(
               tabPanel(
                 title = "Sim 1",
@@ -1229,16 +1241,6 @@ ui <- fluidPage(
               div(style = "margin-bottom:1.5rem;",
                   legendUI("infoButtonOrder", legends$fishery_yield)
               ),
-              div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                  HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                  radioButtons(
-                    inputId = "sim_choice",
-                    label   = NULL,
-                    choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                    selected = "sim1",
-                    inline = TRUE
-                  )
-              ),
               div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                   HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Yield Time Range</span>"),
                   sliderInput(
@@ -1257,16 +1259,6 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_species)
-                  ),
-                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                      radioButtons(
-                        inputId = "sim_choice",
-                        label   = NULL,
-                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                        selected = "sim1",
-                        inline = TRUE
-                      )
                   ),
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
                       HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
@@ -1301,16 +1293,6 @@ ui <- fluidPage(
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_size)
                   ),
-                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                      radioButtons(
-                        inputId = "sim_choice",
-                        label   = NULL,
-                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                        selected = "sim1",
-                        inline = TRUE
-                      )
-                  ),
                   div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
                       materialSwitch(
                         inputId = "logToggle4",
@@ -1326,16 +1308,6 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_guild)
-                  ),
-                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                      radioButtons(
-                        inputId = "sim_choice",
-                        label   = NULL,
-                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                        selected = "sim1",
-                        inline = TRUE
-                      )
                   ),
                   div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                       materialSwitch(
@@ -1369,16 +1341,6 @@ ui <- fluidPage(
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$fishery_diet_single)
                   ),
-                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                      radioButtons(
-                        inputId = "sim_choice",
-                        label   = NULL,
-                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                        selected = "sim1",
-                        inline = TRUE
-                      )
-                  ),
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                       HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
                       selectInput(
@@ -1395,16 +1357,6 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonOrder", legends$nutrition)
-                  ),
-                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                      radioButtons(
-                        inputId = "sim_choice",
-                        label   = NULL,
-                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                        selected = "sim1",
-                        inline = TRUE
-                      )
                   )
               )
             )
@@ -1571,16 +1523,6 @@ ui <- fluidPage(
               div(style = "display: flex; align-items: center; gap: 15px;",
                   div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                       legendUI("infoButtonDietBio", legends$fishery_diet_single)
-                  ),
-                  div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                      HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show:</span>"),
-                      radioButtons(
-                        inputId = "sim_choice",
-                        label   = NULL,
-                        choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                        selected = "sim1",
-                        inline = TRUE
-                      )
                   ),
                   div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                       HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
