@@ -1,10 +1,7 @@
 setupYearControls <- function(input, session,
                               sliderId,
-                              runBtnId,
-                              boxId,
-                              resetId,
                               minusId,
-                              plusId,rvName) {
+                              plusId) {
 
   rv <- reactiveValues(
     origMin = NULL,
@@ -12,24 +9,15 @@ setupYearControls <- function(input, session,
     curMax  = NULL
   )
 
-  observeEvent(input[[runBtnId]], ignoreInit = TRUE, {
+  # Initialize the reactive values when the slider is first accessed
+  observeEvent(input[[sliderId]], ignoreInit = FALSE, {
     if (is.null(rv$origMin)) {
       cfg            <- session$clientData[[ paste0("input_", sliderId, "_min") ]]
       rv$origMin     <- if (length(cfg)) cfg else 1
       cfg            <- session$clientData[[ paste0("input_", sliderId, "_max") ]]
       rv$origMax     <- if (length(cfg)) cfg else 100
+      rv$curMax      <- rv$origMax
     }
-
-    # Set maximum to twice the selected value, capped between 12 and 100
-    rv$curMax <- max(12, min(2 * input[[sliderId]], 100))
-
-    updateSliderInput(session, sliderId,
-                      min   = rv$origMin,
-                      max   = rv$curMax,
-                      value = min(input[[sliderId]], rv$curMax))
-
-    shinyjs::show(boxId)
-    shinyjs::show(resetId)
   })
 
   # Update maximum value each time the user selects a new value
@@ -49,16 +37,5 @@ setupYearControls <- function(input, session,
     if (is.null(rv$origMin)) return()
     newVal <- max( input[[sliderId]] - 1, rv$origMin )
     updateSliderInput(session, sliderId, value = newVal)
-  })
-
-  observeEvent(input[[resetId]], {
-    if (is.null(rv$origMin)) return()
-    rv$curMax <- rv$origMax
-    updateSliderInput(session, sliderId,
-                      min   = rv$origMin,
-                      max   = rv$origMax,
-                      value = rv$origMin)
-    shinyjs::hide(boxId)
-    shinyjs::hide(resetId)
   })
 }

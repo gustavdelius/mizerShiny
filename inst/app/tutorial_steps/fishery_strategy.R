@@ -20,18 +20,19 @@ intro_steps <- list(
        your simulation will be compared to. Fishing effort can be though of as the intensity of fishing and each fleet can be thought of as fishing vessels which
        fish similar species and with similar size selectivity."
   ),
-  list(element = "#fishy_plots .nav-link[data-value='Species']", title = "Species Plot",
-       intro = "The plot presents the percentage change in each of the species. This percentage change is relative to the current fishing strategy. Each species has 3 bars, which indicate the species percentage change across a shorter timescale (a half of the chosen time), the chosen timescale and a longer timescale (double the chosen time)...
+  list(element = "#fishy_plots .nav-link[data-value='Biomass']", title = "Biomass Plot",
+       intro = "The plot presents the percentage change in each of the species. This percentage change is relative to the current fishing strategy. Each species has 3 bars, which indicate the species percentage change at
+specific time points: quarter of the selected year, half of the selected year, and the full selected year...
       "
   ),
-  list(element = "#fishy_plots .nav-link[data-value='Species']", title = "Species continued",
-       intro = "Plotting all 3 timescales
-aids in understanding the oscillatory nature of fish populations, but also gives a greater resolution of the effect of the imposed change.
+  list(element = "#fishy_plots .nav-link[data-value='Biomass']", title = "Biomass continued",
+       intro = "Plotting all 3 time points
+aids in understanding how the ecosystem changes evolve over time, showing the progression from early to late stages of the simulation.
 "
   ),
   list(element = "#triMode_fish", title = "Change Time Plotted",
-       intro = "When changing the time with the +1/-1 buttons, it is difficult to observe changes when 3 timeranges are plotted. Use this toggle to change
-from 3 times plotted to only the chosen time plotted."
+       intro = "When changing the time with the +1/-1 buttons, it is difficult to observe changes when 3 time points are plotted. Use this toggle to change
+from 3 time points plotted to only the selected year plotted."
        # Added step
   ),
   list(element = "#species_order_fish_box", title = "Order of Species",
@@ -43,7 +44,7 @@ from 3 times plotted to only the chosen time plotted."
        Remember that each plot uses plotly, so you can look at specific areas of the plot by selecting with your mouse (then double click to reset),
        remove plot items by clicking them on the legend (double click to remove everything but that one), hover over plot information to get
        more specific values and save the plot by using the picture icon in the top right of the plot."),
-  list(element = "#fishy_plots .nav-link[data-value='Yield']", title = "Yield Plot",
+  list(element = "#fishy_plots .nav-link[data-value='Yield Composition']", title = "Yield Composition Plot",
        intro = "Dashboard of yield harvested from the simulation. Use the legend to understand what each of the plots mean"
   ),
   list(element = "#fishy_plots .nav-link[data-value='Size']", title = "Relative Size Spectrum Plot",
@@ -53,7 +54,7 @@ from 3 times plotted to only the chosen time plotted."
   list(element = "#fishy_plots .nav-link[data-value='Guild']", title = "Guild Plot",
        intro = "The plot here showcases the change in the guilds within the species, which are fish in the ecosystem that share a distinct
        feeding pattern in relation to other fish. Observing this plot helps to understand how the trophic dynamics of the ecosystem are changing.
-      Additionally, the guilds are plotted as 3 bars of a short, chosen and long timescale."
+      Additionally, the guilds are plotted as 3 bars representing biomass at quarter, half and full of the selected year."
   ),
   list(element = "#fishy_plots .nav-link[data-value='Spectra']", title = "Size Spectrum Plot",
        intro = "This plot is the size spectrum (the biomass distribution across sizes of fish) of each

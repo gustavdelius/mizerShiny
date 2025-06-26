@@ -37,7 +37,7 @@ plotSpectraRelative <- function(object1, object2, time1, time2) {
     geom_hline(yintercept = 0, linetype = "dashed",
                colour = "dark grey", linewidth = 0.75) +
     labs(x = "Size (g)",
-         y = "Percentage Change") +
+         y = "Biomass % Change") +
     theme_minimal() +
     theme(axis.text.x = element_text(size = 14, hjust = 1, vjust = 0.5),
           axis.text.y = element_text(size = 14),
