@@ -12,7 +12,7 @@ plotSpeciesWithTimeRange <- function(harvestedprojection, unharvestedprojection,
   ggplot(percentage_diff, aes(x = Species, y = Percentage, fill = Class)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
     geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5)+
-    labs(x = "Species", y = "% Change") +
+    labs(x = "Species", y = "Biomass % Change") +
     scale_fill_manual(values = c(
       "Quarter, Negative" = "#F2A488",
       "Quarter, Positive" = "#2FA4E799",

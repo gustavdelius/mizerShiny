@@ -36,7 +36,7 @@ plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
                        linetype = "dashed") +
     ggplot2::geom_hline(yintercept = 0, linetype = "dashed",
                         color = "dark grey", linewidth = 0.75) +
-    ggplot2::labs(x = "Size (g)", y = "Percentage Change", color = "Comparison") +
+    ggplot2::labs(x = "Size (g)", y = "Biomass % Change", color = "Comparison") +
     ggplot2::scale_color_manual(values = c("Sim 1" = "#2FA4E7", "Sim 2" = "#E76F51")) +
     ggplot2::theme_minimal() +
     ggplot2::theme(

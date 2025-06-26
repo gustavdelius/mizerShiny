@@ -116,7 +116,7 @@ guildplot <- function(harvestedprojection, unharvestedprojection,
       ),
       drop = FALSE
     ) +
-    labs(x = "Guild", y = "Percentage Change") +
+    labs(x = "Guild", y = "Biomass % Change") +
     theme_minimal() +
     theme(
       axis.text.x = element_text(size = 14, angle = 90, vjust = 0.5),
