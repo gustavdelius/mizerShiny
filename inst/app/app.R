@@ -1,22 +1,20 @@
-library(mizerShiny)
+# Core Shiny and UI packages
 library(shiny)
-library(mizer)
-library(ggplot2)
 library(bslib)
-library(plotly)
-library(ggplot2)
 library(gridlayout)
-library(thematic)
-library(tidyverse)
-library(forcats)
-library(shinyBS)
-library(rintrojs)
-library(patchwork)
-library(here)
-library(sortable)
 library(shinyjs)
 library(shinyWidgets)
+library(rintrojs)
+library(sortable)
+
+# Data manipulation and visualization
 library(dplyr)
+library(ggplot2)
+library(plotly)
+
+# Mizer ecosystem packages
+library(mizer)
+library(mizerShiny)
 
 default_params <- getShinyOption("default_params")
 if (is.null(default_params)) default_params <- mizerShiny::default_params
