@@ -4,55 +4,23 @@
 \alias{mizerShiny}
 \title{Launch mizerShiny}
 \usage{
-mizerShiny(
-  mizerParams = NULL,
-  baseSpSim = NULL,
-  baseFishSim = NULL,
-  REPLACE = FALSE,
-  ...
-)
+mizerShiny(params = default_params, ...)
 }
 \arguments{
-\item{mizerParams}{an \strong{MizerParams} object to use instead of the default.
-The initial effort here will be the starting values of
-the effort sliders in the \emph{Fishery Strategy} section.
-If the species list in mizerParams matches the species list in
-the downloaded mizerSim objects, it will use them as baseSpSim
-and baseFishSim. So if making alterations to mizerParams whilst
-retaining species list, remember to reload then replace the mizerSim objects.}
+\item{params}{A MizerParams object. Defaults to NS_params.}
 
-\item{baseSpSim}{an \strong{MizerSim} object for the \emph{Single-species} baseline
-(stored internally as \code{unharvestedprojection}). Initial effort in this object is the initial effort used in running simulations in the 'Single Species' section.}
-
-\item{baseFishSim}{an \strong{MizerSim} object for the \emph{Fishery Strategy}
-baseline (stored as \code{unfishedprojection}).}
-
-\item{REPLACE}{logical. If \code{TRUE}, the supplied objects overwrite the
-corresponding files inside \emph{Including/} so they become
-the new defaults on future launches.}
-
-\item{...}{passed on to \code{shiny::runApp()}}
+\item{...}{further arguments passed on to \code{shiny::runApp()}
+(e.g. \code{host}, \code{port}, \code{launch.browser}).}
 }
 \description{
 Launch mizerShiny
 }
 \examples{
 \dontrun{
+# Run with default model
 mizerShiny()
 
-#Load a new mizerParams object
-mizerShiny(mizerParams = NS_params)
-
-#Load a new mizerSim object
-simbio <- project(NS_params, effort=2)
-simfish <- project(NS_params, effort=0)
-
-mizerShiny(mizerParams = NS_params, baseSpSim=simbio, baseFishSim=simfish)
-
-#If you like this and want to run it quicker, use REPLACE.
-mizerShiny(mizerParams = NS_params, baseSpSim=simbio, baseFishSim=simfish, REPLACE=TRUE)
-#Then this will load the same
-
-mizerShiny()
+# Run with custom model
+mizerShiny(NS_params)
 }
 }
