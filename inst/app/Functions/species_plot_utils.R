@@ -11,68 +11,68 @@ process_sim_shared <- function(harvestedprojection, unharvestedprojection, chose
 
   # Get biomass at the full year (chosen time point)
   unharvestedbio_full <-
-    getBiomass(unharvestedprojection)[full_year, , drop = FALSE] %>%
-    melt() %>%
-    group_by(sp) %>%
+    getBiomass(unharvestedprojection)[full_year, , drop = FALSE] |>
+    melt() |>
+    group_by(sp) |>
     summarise(value = mean(value, na.rm = TRUE))
 
   harvestedbio_full <-
-    getBiomass(harvestedprojection)[full_year, , drop = FALSE] %>%
-    melt() %>%
-    group_by(sp) %>%
+    getBiomass(harvestedprojection)[full_year, , drop = FALSE] |>
+    melt() |>
+    group_by(sp) |>
     summarise(value = mean(value, na.rm = TRUE))
 
   percentage_diff_full <-
-    left_join(harvestedbio_full, unharvestedbio_full, by = "sp") %>%
+    left_join(harvestedbio_full, unharvestedbio_full, by = "sp") |>
     mutate(percentage_diff = ((value.x - value.y) / value.y) * 100,
-           Species = sp) %>%
-    select(Species, percentage_diff) %>%
-    filter(!Species %in% "Resource") %>%
+           Species = sp) |>
+    select(Species, percentage_diff) |>
+    filter(!Species %in% "Resource") |>
     mutate(class = "full")
 
   if (mode == "triple") {
     # Get biomass at quarter year
     unharvestedbio_quarter <-
-      getBiomass(unharvestedprojection)[quarter_year, , drop = FALSE] %>%
-      melt() %>%
-      group_by(sp) %>%
+      getBiomass(unharvestedprojection)[quarter_year, , drop = FALSE] |>
+      melt() |>
+      group_by(sp) |>
       summarise(value = mean(value, na.rm = TRUE))
 
     harvestedbio_quarter <-
-      getBiomass(harvestedprojection)[quarter_year, , drop = FALSE] %>%
-      melt() %>%
-      group_by(sp) %>%
+      getBiomass(harvestedprojection)[quarter_year, , drop = FALSE] |>
+      melt() |>
+      group_by(sp) |>
       summarise(value = mean(value, na.rm = TRUE))
 
     percentage_diff_quarter <-
-      left_join(harvestedbio_quarter, unharvestedbio_quarter, by = "sp") %>%
+      left_join(harvestedbio_quarter, unharvestedbio_quarter, by = "sp") |>
       mutate(
         percentage_diff = ((value.x - value.y) / value.y) * 100,
         Species = sp
-      ) %>%
-      select(Species, percentage_diff) %>%
-      filter(!Species %in% "Resource") %>%
+      ) |>
+      select(Species, percentage_diff) |>
+      filter(!Species %in% "Resource") |>
       mutate(class = "quarter")
 
     # Get biomass at half year
     unharvestedbio_half <-
-      getBiomass(unharvestedprojection)[half_year, , drop = FALSE] %>%
-      melt() %>%
-      group_by(sp) %>%
+      getBiomass(unharvestedprojection)[half_year, , drop = FALSE] |>
+      melt() |>
+      group_by(sp) |>
       summarise(value = mean(value, na.rm = TRUE))
 
     harvestedbio_half <-
-      getBiomass(harvestedprojection)[half_year, , drop = FALSE] %>%
-      melt() %>%
-      group_by(sp) %>%
+      getBiomass(harvestedprojection)[half_year, , drop = FALSE] |>
+      melt() |>
+      group_by(sp) |>
       summarise(value = mean(value, na.rm = TRUE))
 
     percentage_diff_half <-
-      left_join(harvestedbio_half, unharvestedbio_half, by = "sp") %>%
+      left_join(harvestedbio_half, unharvestedbio_half, by = "sp") |>
       mutate(percentage_diff = ((value.x - value.y) / value.y) * 100,
-             Species = sp) %>%
-      select(Species, percentage_diff) %>%
-      filter(!Species %in% "Resource") %>%
+             Species = sp) |>
+      select(Species, percentage_diff) |>
+      filter(!Species %in% "Resource") |>
       mutate(class = "half")
 
     plot_data <- bind_rows(percentage_diff_quarter,

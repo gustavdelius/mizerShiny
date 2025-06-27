@@ -9,22 +9,22 @@ plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
   sf3 <- mizer::plotSpectra(object3, return_data = TRUE,
                             resource = FALSE, background = FALSE,
                             time_range = time1:time2)
-  df1 <- dplyr::left_join(sf2, sf1, by = c("w", "Legend")) %>%
-    dplyr::group_by(w) %>%
+  df1 <- dplyr::left_join(sf2, sf1, by = c("w", "Legend")) |>
+    dplyr::group_by(w) |>
     dplyr::summarise(
       x = sum(value.x, na.rm = TRUE),
       y1 = sum(value.y, na.rm = TRUE),
       .groups = "drop"
-    ) %>%
+    ) |>
     dplyr::mutate(Percentage_Change = 2 * (y1 - x) / (x + y1) * 100)
 
-  df3 <- dplyr::left_join(sf2, sf3, by = c("w", "Legend")) %>%
-    dplyr::group_by(w) %>%
+  df3 <- dplyr::left_join(sf2, sf3, by = c("w", "Legend")) |>
+    dplyr::group_by(w) |>
     dplyr::summarise(
       x = sum(value.x, na.rm = TRUE),
       y3 = sum(value.y, na.rm = TRUE),
       .groups = "drop"
-    ) %>%
+    ) |>
     dplyr::mutate(Percentage_Change = 2 * (y3 - x) / (x + y3) * 100)
 
   p <- ggplot2::ggplot() +

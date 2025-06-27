@@ -133,23 +133,23 @@ guildplot <- function(harvestedprojection, unharvestedprojection,
 # guildinfo <- read.table("Guilds information/guild_cleaned.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 # fish_names <- read.table("Guilds information/fishinfo.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 #
-# guildparams <- celticsim@species_params%>%
-#   select(species, a, b)%>%
-#   rename(Common_Name=species)%>%
+# guildparams <- celticsim@species_params|>
+#   select(species, a, b)|>
+#   rename(Common_Name=species)|>
 #   #this code has correctly formatted the species params
-#   inner_join(fish_names, by=c("Common_Name"))%>%
+#   inner_join(fish_names, by=c("Common_Name"))|>
 #   #we have now joined species params to a table containing the scientific names
-#   rename(Species=Scientific_Name)%>%
+#   rename(Species=Scientific_Name)|>
 #   inner_join(
-#     guildinfo%>%
+#     guildinfo|>
 #       filter(Species %in% fish_names$Scientific_Name),
-#     by="Species")%>%
+#     by="Species")|>
 #   #we have now joined the rows with the same scientific names - so
 #   #we have joined the a and b values to the given species
 #   #this is converting from length to weight
 #   mutate(maxw=a*Max.cm^b,
-#          minw=a*Min.cm^b)%>%
-#   select(Common_Name, maxw, minw, Feeding.guild)%>%
+#          minw=a*Min.cm^b)|>
+#   select(Common_Name, maxw, minw, Feeding.guild)|>
 #   rename(Species=Common_Name)
 
 #So what the code does above is take the table of the guild information,

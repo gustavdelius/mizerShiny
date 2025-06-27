@@ -1,8 +1,8 @@
 plotSpectra2 <- function(harvestedprojection, harvestedprojection2, time1, end1, time2, end2) {
   
-  data1 <- plotSpectra(harvestedprojection, time_range = time1:end1, return_data = TRUE) %>%
+  data1 <- plotSpectra(harvestedprojection, time_range = time1:end1, return_data = TRUE) |>
     mutate(sim = "Sim 1")
-  data2 <- plotSpectra(harvestedprojection2, time_range = time1:end1, return_data = TRUE) %>%
+  data2 <- plotSpectra(harvestedprojection2, time_range = time1:end1, return_data = TRUE) |>
     mutate(sim = "Sim 2")
   combined_data <- bind_rows(data1, data2)
   

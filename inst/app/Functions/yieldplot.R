@@ -31,9 +31,9 @@ generateYieldDashboard <- function(NS_sim,
   }
 
   sp_all <- bind_rows(lapply(seq_along(yieldGearList), function(i) {
-    melt(yieldGearList[[i]]) %>%
-      group_by(sp, time) %>%
-      summarise(value = sum(value, na.rm=TRUE), .groups="drop") %>%
+    melt(yieldGearList[[i]]) |>
+      group_by(sp, time) |>
+      summarise(value = sum(value, na.rm=TRUE), .groups="drop") |>
       mutate(sim = paste0("Sim ", i))
   }))
   
@@ -58,8 +58,8 @@ generateYieldDashboard <- function(NS_sim,
       theme_minimal() +
       theme(axis.text.x = element_text(hjust = 1)) +
       {if (!is.null(species_colors)) scale_color_manual(values = species_colors) else NULL}
-  ) %>%
-    ggplotly() %>%
+  ) |>
+    ggplotly() |>
     { if (!is.null(highlight_times) && length(highlight_times) == 2)
       layout(., xaxis = list(range = highlight_times))
       else
@@ -68,23 +68,23 @@ generateYieldDashboard <- function(NS_sim,
 
   # 2) Yield over time by gear
   gear_all <- bind_rows(lapply(seq_along(yieldGearList), function(i) {
-    melt(yieldGearList[[i]]) %>%
-      group_by(gear, time) %>%
-      summarise(value = sum(value, na.rm=TRUE), .groups="drop") %>%
+    melt(yieldGearList[[i]]) |>
+      group_by(gear, time) |>
+      summarise(value = sum(value, na.rm=TRUE), .groups="drop") |>
       mutate(sim = paste0("Sim ", i))
   }))
   gearline_plotly <- (
     ggplot(gear_all, aes(time, value, color = gear, linetype = sim)) +
       geom_line(linewidth = 1) +
       geom_line(
-        data = gear_all %>% group_by(time,sim) %>% summarise(total = sum(value)),
+        data = gear_all |> group_by(time,sim) |> summarise(total = sum(value)),
         aes(time, total, linetype = sim), colour = "grey"
       ) +
       labs(x = "Time", y = "Yield") +
       theme_minimal() +
       theme(axis.text.x = element_text(hjust = 1))
-  ) %>%
-    ggplotly() %>%
+  ) |>
+    ggplotly() |>
     { if (!is.null(highlight_times) && length(highlight_times) == 2)
       layout(., xaxis = list(range = highlight_times))
       else
@@ -94,11 +94,11 @@ generateYieldDashboard <- function(NS_sim,
   # 3) Bar plots - Yield Composition by Species (not gear)
   compo_all <- bind_rows(lapply(seq_along(yieldGearList), function(i) {
     mat <- apply(yieldGearList[[i]], c(2,3), sum)
-    melt(mat, varnames = c("Gear","Species"), value.name = "Yield") %>%
+    melt(mat, varnames = c("Gear","Species"), value.name = "Yield") |>
       mutate(sim = paste0("Sim ", i))
   }))
-  compo_summ <- compo_all %>%
-    group_by(Species, sim) %>%
+  compo_summ <- compo_all |>
+    group_by(Species, sim) |>
     summarise(total = sum(Yield), .groups="drop")
 
   compo_plotly <- (
@@ -113,8 +113,8 @@ generateYieldDashboard <- function(NS_sim,
       theme_minimal() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
       {if (!is.null(species_colors)) scale_fill_manual(values = species_colors) else NULL}
-  ) %>%
-    ggplotly() %>%
+  ) |>
+    ggplotly() |>
     layout(barmode = "group", bargap = 0.01)
 
   # Total Yield per Sim - by Species
@@ -131,7 +131,7 @@ generateYieldDashboard <- function(NS_sim,
       theme_minimal() +
       theme(axis.text.x = element_text(hjust = 1)) +
       {if (!is.null(species_colors)) scale_fill_manual(values = species_colors) else NULL}
-  ) %>%
+  ) |>
     ggplotly()
 
   # 4) Pie charts - by Species
@@ -170,7 +170,7 @@ generateYieldDashboard <- function(NS_sim,
       type   = "pie",
       domain = dom,
       marker = list(colors = pie_colors)
-    ) %>%
+    ) |>
       layout(legend = list(title = list(text = "Species")))
   })
 
@@ -201,11 +201,11 @@ generateYieldDashboard <- function(NS_sim,
   fig <- subplot(left_col, right_col,
                  nrows  = 1,
                  widths = c(0.7, 0.3),
-                 margin = 0.05) %>%
+                 margin = 0.05) |>
     layout(annotations = annotations)
 
   # 7) Final per-pie annotations
-  domains <- purrr::keep(fig$x$data, ~ .$type == "pie") %>%
+  domains <- purrr::keep(fig$x$data, ~ .$type == "pie") |>
     purrr::map(~ .$domain)
 
   labs <- purrr::imap(domains, function(dom, idx) {
@@ -232,7 +232,7 @@ generateYieldDashboard <- function(NS_sim,
     )
   })
 
-  fig <- fig %>% layout(annotations = labs)
+  fig <- fig |> layout(annotations = labs)
 
   fig
 }

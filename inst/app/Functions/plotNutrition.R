@@ -11,11 +11,11 @@ plotNutrition <- function(sims, ref, step) {
 
     nut_cols <- setdiff(names(nut), "species")
 
-    yield_df %>%
-      left_join(all_matches,  by = "fmp") %>%
-      left_join(nut,           by = c(nut_match = "species")) %>%
-      mutate(across(all_of(nut_cols), ~ .x * Yield) ) %>%
-      summarise(across(all_of(nut_cols), ~ sum(.x, na.rm = TRUE)))%>%
+    yield_df |>
+      left_join(all_matches,  by = "fmp") |>
+      left_join(nut,           by = c(nut_match = "species")) |>
+      mutate(across(all_of(nut_cols), ~ .x * Yield) ) |>
+      summarise(across(all_of(nut_cols), ~ sum(.x, na.rm = TRUE)))|>
       unlist(use.names = TRUE)
   }
 
@@ -30,12 +30,12 @@ plotNutrition <- function(sims, ref, step) {
       Sim      = paste0("Sim ", i)
     )
   })
-  plot_dat <- bind_rows(rel_list)%>%
+  plot_dat <- bind_rows(rel_list)|>
     filter(!is.na(Relative))
 
   dodge <- if (length(sims) == 2) position_dodge(width = 0.7) else "identity"
 
-  plot_dat <- plot_dat%>%
+  plot_dat <- plot_dat|>
                  mutate(Value = (Relative - 1) * 100)
 
   ggplot(plot_dat, aes(Nutrient, Value, fill = Sim)) +
@@ -72,15 +72,15 @@ if (file.exists(nutrition_file)) {
         invokeRestart("muffleMessage")
       }
     }
-  ) %>%
+  ) |>
     select(
       common_name,
       matches("\\(")        # keep only columns with parentheses
-    ) %>%
+    ) |>
     rename_with(
       ~ toupper(gsub("\\s*\\(.*\\)", "", .x)),
       everything()
-    ) %>%
+    ) |>
     rename(
       species = COMMON_NAME
     )
@@ -117,8 +117,8 @@ if (length(match_file) == 1L) {
 # #fmp <- NS_params@species_params$species
 # nutsp  <- nut$species
 #
-# pre_matches <- tibble(fmp = fmp) %>%
-#   rowwise() %>%
+# pre_matches <- tibble(fmp = fmp) |>
+#   rowwise() |>
 #   mutate(
 #     nut_match = {
 #       # look for any nutsp that contains the fmp name
@@ -126,17 +126,17 @@ if (length(match_file) == 1L) {
 #                                fixed(str_to_lower(fmp)))]
 #       if (length(hits) > 0) hits[1] else NA_character_
 #     }
-#   ) %>%
+#   ) |>
 #   ungroup()
 #
 # # Step 2: pull out the leftovers and do a fuzzy‐join on those
-# leftovers <- pre_matches %>%
-#   filter(is.na(nut_match)) %>%
+# leftovers <- pre_matches |>
+#   filter(is.na(nut_match)) |>
 #   select(fmp)
 #
-# fuzzy_matches <- leftovers %>%
+# fuzzy_matches <- leftovers |>
 #   # need a column named the same on both sides, so call it tmp
-#   mutate(tmp = fmp) %>%
+#   mutate(tmp = fmp) |>
 #   stringdist_inner_join(
 #     tibble(nutsp = nutsp),
 #     by           = c("tmp" = "nutsp"),
@@ -144,15 +144,15 @@ if (length(match_file) == 1L) {
 #     max_dist     = 0.25,    # you can tweak this threshold
 #     ignore_case  = TRUE,
 #     distance_col = "dist"
-#   ) %>%
-#   group_by(fmp) %>%
-#   slice_min(dist, with_ties = FALSE) %>%
-#   ungroup() %>%
+#   ) |>
+#   group_by(fmp) |>
+#   slice_min(dist, with_ties = FALSE) |>
+#   ungroup() |>
 #   select(fmp, nut_match = nutsp)
 #
 # # Step 3: combine the two
 # all_matches <- bind_rows(
-#   pre_matches    %>% filter(!is.na(nut_match)) %>% select(fmp, nut_match),
+#   pre_matches    |> filter(!is.na(nut_match)) |> select(fmp, nut_match),
 #   fuzzy_matches
 # )
 #

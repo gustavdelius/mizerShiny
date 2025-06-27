@@ -6,25 +6,25 @@ comparedietmatrix <- function(unharvestedprojection, harvestedprojection, timera
                         n = apply(unharvestedprojection@n[timerange,,], c(2, 3), mean),
                         n_pp = apply(unharvestedprojection@n_pp[timerange,], 2, mean),
                         n_other = apply(unharvestedprojection@n_other[timerange,], 2, mean),
-                        proportion = TRUE) %>%
-    as.table()%>%
-    as.data.frame()%>%
-    group_by(predator, prey)%>%
+                        proportion = TRUE) |>
+    as.table()|>
+    as.data.frame()|>
+    group_by(predator, prey)|>
     summarise(Proportion=mean(Freq))
 
   dietharv <- getDiet(unharvestedprojection@params,
                       n = apply(unharvestedprojection@n[timerange,,], c(2, 3), mean),
                       n_pp = apply(unharvestedprojection@n_pp[timerange,], 2, mean),
                       n_other = apply(unharvestedprojection@n_other[timerange,], 2, mean),
-                      proportion = TRUE) %>%
-    as.table()%>%
-    as.data.frame()%>%
-    group_by(predator, prey)%>%
+                      proportion = TRUE) |>
+    as.table()|>
+    as.data.frame()|>
+    group_by(predator, prey)|>
     summarise(Proportion=mean(Freq))
 
-  joindiet <- left_join(dietharv, dietunharv, by = c("prey", "predator"))%>%
-    mutate(Difference = ((Proportion.x - Proportion.y) / Proportion.y) * 100) %>%  # Calculate percentage change
-    select(predator, prey, Difference)%>%
+  joindiet <- left_join(dietharv, dietunharv, by = c("prey", "predator"))|>
+    mutate(Difference = ((Proportion.x - Proportion.y) / Proportion.y) * 100) |>  # Calculate percentage change
+    select(predator, prey, Difference)|>
     filter(!predator %in% ("Resource"),
            !prey %in% ("Resource"))
 

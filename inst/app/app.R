@@ -219,16 +219,16 @@ server <- function(input, output, session) {
           pull(sp)
 }
     } else if (choice == "Size") {
-      default_params@species_params %>%
-        filter(species != "Resource") %>%
-        arrange(w_mat) %>% pull(species)
+      default_params@species_params |>
+        filter(species != "Resource") |>
+        arrange(w_mat) |> pull(species)
 
     } else {
       # This handles "Custom" case - either use custom order or fall back to default order
       ord <- custom_species_order()
       if (length(ord)) ord else
-        as.data.frame(default_params@species_params$species) %>%
-        setNames("sp") %>% filter(sp != "Resource") %>% pull(sp)
+        as.data.frame(default_params@species_params$species) |>
+        setNames("sp") |> filter(sp != "Resource") |> pull(sp)
     }
   })
 
@@ -823,12 +823,12 @@ server <- function(input, output, session) {
       # Always show both simulations
       df1 <- mizer::plotSpectra(sim$sim1,
                          time_range  = selected_year,
-                         return_data = TRUE) %>%
+                         return_data = TRUE) |>
         mutate(sim = "Sim 1")
 
       df2 <- mizer::plotSpectra(sim$sim2,
                          time_range  = selected_year,
-                         return_data = TRUE) %>%
+                         return_data = TRUE) |>
         mutate(sim = "Sim 2")
 
       # Combine species from both simulations
@@ -849,7 +849,7 @@ server <- function(input, output, session) {
         i <- which(species == sp)
 
         if (!is.null(df1)) {
-          sub1 <- df1 %>% filter(Species == sp)
+          sub1 <- df1 |> filter(Species == sp)
           if (nrow(sub1) > 0) {
             tmp <- add_lines(
               tmp,
@@ -865,7 +865,7 @@ server <- function(input, output, session) {
         }
 
         if (!is.null(df2)) {
-          sub2 <- df2 %>% filter(Species == sp)
+          sub2 <- df2 |> filter(Species == sp)
           if (nrow(sub2) > 0) {
             tmp <- add_lines(
               tmp,
@@ -1120,7 +1120,7 @@ ui <- fluidPage(
               value   = 5,
               step    = 1,
               width   = "100%"
-            ) %>% tagAppendAttributes(id = "fishyyear"),
+            ) |> tagAppendAttributes(id = "fishyyear"),
             div(id   = "yearAdjustButtons_fish",
                 style = "display:flex; justify-content:center; gap:10px;",
                 actionButton("decYear_fish", "-1 year", class = "btn-small"),
@@ -1226,7 +1226,7 @@ ui <- fluidPage(
                     value   = c(1, 10),
                     step    = 1,
                     width   = "200px"
-                  ) %>% tagAppendAttributes(id = "fishyyear_yield")
+                  ) |> tagAppendAttributes(id = "fishyyear_yield")
               )
             ),
             conditionalPanel(
@@ -1357,7 +1357,7 @@ ui <- fluidPage(
               inputId = "species_name_select",
               label   = "Select a Species:",
               choices = NULL
-            ) %>% tagAppendAttributes(id = "species_chose"),
+            ) |> tagAppendAttributes(id = "species_chose"),
             sliderInput(
               inputId = "species",
               label   = HTML(
@@ -1371,7 +1371,7 @@ ui <- fluidPage(
               value = 0,
               step  = 1,
               width = "100%"
-            ) %>% tagAppendAttributes(id = "species_slider"),
+            ) |> tagAppendAttributes(id = "species_slider"),
             sliderInput(
               inputId = "mortspecies",
               label   = HTML(
@@ -1385,7 +1385,7 @@ ui <- fluidPage(
               value = 0,
               step  = 1,
               width = "100%"
-            ) %>% tagAppendAttributes(id = "mort_slider"),
+            ) |> tagAppendAttributes(id = "mort_slider"),
             sliderInput(
               inputId = "year",
               label   = "Time Range",
@@ -1394,7 +1394,7 @@ ui <- fluidPage(
               value   = 5,
               step    = 1,
               width   = "100%"
-            ) %>% tagAppendAttributes(id = "yearspecies_slider"),
+            ) |> tagAppendAttributes(id = "yearspecies_slider"),
             div(id   = "yearAdjustButtons_bio",
                 style = "display:flex; justify-content:center; gap:10px;",
                 actionButton("decYear_bio", "-1 year", class = "btn-small"),

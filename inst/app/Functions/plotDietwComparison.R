@@ -63,7 +63,7 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
       stackgroup  = "one",
       legendgroup = ~Prey,
       showlegend  = (i == 1)
-    ) %>%
+    ) |>
       plotly::layout(
         xaxis = list(
           type        = "log",
@@ -118,7 +118,7 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
     )
   })
 
-  fig %>%
+  fig |>
     plotly::layout(
       annotations = annotation_list,
       legend      = list(title = list(text = "Prey")),
