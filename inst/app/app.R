@@ -12,12 +12,13 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 
-# Mizer ecosystem packages
+# Mizer ecosystem package
 library(mizer)
-library(mizerShiny)
 
 default_params <- getShinyOption("default_params")
-if (is.null(default_params)) default_params <- mizerShiny::default_params
+if (is.null(default_params)) {
+  default_params <- readRDS("default_params.rds")
+}
 
 unharvestedprojection <- project(default_params, t_max = 12)
 unfishedprojection <- project(default_params, t_max = 12)
