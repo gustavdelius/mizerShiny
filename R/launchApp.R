@@ -3,22 +3,6 @@
 #' @param params A MizerParams object. Defaults to NS_params.
 #' @param ... further arguments passed on to `shiny::runApp()`
 #'            (e.g. `host`, `port`, `launch.browser`).
-#' @import shiny
-#' @import mizer
-#' @import ggplot2
-#' @import bslib
-#' @import plotly
-#' @import gridlayout
-#' @import thematic
-#' @import dplyr
-#' @import forcats
-#' @import shinyBS
-#' @import rintrojs
-#' @import patchwork
-#' @import here
-#' @import sortable
-#' @import shinyjs
-#' @import shinyWidgets
 #'
 #' @examples
 #' \dontrun{
