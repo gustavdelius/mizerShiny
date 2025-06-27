@@ -36,7 +36,7 @@ generateYieldDashboard <- function(NS_sim,
       summarise(value = sum(value, na.rm=TRUE), .groups="drop") |>
       mutate(sim = paste0("Sim ", i))
   }))
-  
+
   # Use linecolour from params for consistent species colors
   if (!is.null(params) && !is.null(params@linecolour)) {
     species_colors <- params@linecolour[unique(sp_all$sp)]
@@ -50,21 +50,19 @@ generateYieldDashboard <- function(NS_sim,
   } else {
     species_colors <- NULL
   }
-  
+
   spline_plotly <- (
     ggplot(sp_all, aes(time, value, color = sp, linetype = sim)) +
       geom_line(linewidth = 1) +
       labs(x = "Time", y = "Yield") +
       theme_minimal() +
       theme(axis.text.x = element_text(hjust = 1)) +
-      {if (!is.null(species_colors)) scale_color_manual(values = species_colors) else NULL}
-  ) |>
-    ggplotly() |>
-    { if (!is.null(highlight_times) && length(highlight_times) == 2)
-      layout(., xaxis = list(range = highlight_times))
-      else
-        .
-    }
+      (if (!is.null(species_colors)) scale_color_manual(values = species_colors) else NULL)
+  ) |> ggplotly()
+  if (!is.null(highlight_times) && length(highlight_times) == 2) {
+    spline_plotly <- spline_plotly |>
+      layout(xaxis = list(range = highlight_times))
+  }
 
   # 2) Yield over time by gear
   gear_all <- bind_rows(lapply(seq_along(yieldGearList), function(i) {
@@ -83,13 +81,11 @@ generateYieldDashboard <- function(NS_sim,
       labs(x = "Time", y = "Yield") +
       theme_minimal() +
       theme(axis.text.x = element_text(hjust = 1))
-  ) |>
-    ggplotly() |>
-    { if (!is.null(highlight_times) && length(highlight_times) == 2)
-      layout(., xaxis = list(range = highlight_times))
-      else
-        .
-    }
+  ) |> ggplotly()
+  if (!is.null(highlight_times) && length(highlight_times) == 2) {
+    gearline_plotly <- gearline_plotly |>
+      layout(xaxis = list(range = highlight_times))
+  }
 
   # 3) Bar plots - Yield Composition by Species (not gear)
   compo_all <- bind_rows(lapply(seq_along(yieldGearList), function(i) {
@@ -112,7 +108,7 @@ generateYieldDashboard <- function(NS_sim,
       labs(x = "Species", y = "Yield", fill = "Species", alpha = "Simulation") +
       theme_minimal() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-      {if (!is.null(species_colors)) scale_fill_manual(values = species_colors) else NULL}
+      (if (!is.null(species_colors)) scale_fill_manual(values = species_colors) else NULL)
   ) |>
     ggplotly() |>
     layout(barmode = "group", bargap = 0.01)
@@ -130,7 +126,7 @@ generateYieldDashboard <- function(NS_sim,
       labs(x = "Simulation", y = "Total Yield", fill = "Species") +
       theme_minimal() +
       theme(axis.text.x = element_text(hjust = 1)) +
-      {if (!is.null(species_colors)) scale_fill_manual(values = species_colors) else NULL}
+      (if (!is.null(species_colors)) scale_fill_manual(values = species_colors) else NULL)
   ) |>
     ggplotly()
 
@@ -148,7 +144,7 @@ generateYieldDashboard <- function(NS_sim,
     } else {
       list(x = c(0.70, 1.00), y = c(0.00,       0.45 - headRoom/2))
     }
-    
+
     # Apply consistent colors to pie chart
     if (!is.null(species_colors)) {
       pie_colors <- species_colors[df$Category]
@@ -162,7 +158,7 @@ generateYieldDashboard <- function(NS_sim,
     } else {
       pie_colors <- NULL
     }
-    
+
     plot_ly(
       df,
       labels = ~Category,
@@ -236,7 +232,3 @@ generateYieldDashboard <- function(NS_sim,
 
   fig
 }
-
-
-
-
