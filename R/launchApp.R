@@ -16,7 +16,7 @@
 mizerShiny <- function(params = default_params, ...) {
 
   ## make the params object available to the Shiny session
-  shiny::shinyOptions("default_params" = default_params)
+  shiny::shinyOptions("default_params" = params)
 
   ## Locate and run the Shiny app
   dev_path <- file.path("inst", "app", "app.R")
