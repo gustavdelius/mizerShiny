@@ -141,6 +141,16 @@ process_sim_shared_actual <- function(harvestedprojection, chosenyear, mode = c(
   quarter_year <- max(1, ceiling(chosenyear * 0.25))
   half_year    <- max(1, ceiling(chosenyear * 0.5))
   full_year    <- chosenyear
+  time_0       <- 1  # Initial time (time 0)
+
+  # Get initial biomass (time 0)
+  harvestedbio_initial <- getBiomass(harvestedprojection)[time_0, , drop = FALSE] |>
+    melt() |>
+    dplyr::group_by(sp) |>
+    dplyr::summarise(value = mean(value, na.rm = TRUE)) |>
+    dplyr::mutate(Species = sp, biomass = value, class = "initial") |>
+    dplyr::select(Species, biomass, class) |>
+    dplyr::filter(!Species %in% "Resource")
 
   harvestedbio_full <- getBiomass(harvestedprojection)[full_year, , drop = FALSE] |>
     melt() |>
@@ -167,16 +177,16 @@ process_sim_shared_actual <- function(harvestedprojection, chosenyear, mode = c(
       dplyr::select(Species, biomass, class) |>
       dplyr::filter(!Species %in% "Resource")
 
-    plot_data <- dplyr::bind_rows(harvestedbio_quarter, harvestedbio_half, harvestedbio_full)
+    plot_data <- dplyr::bind_rows(harvestedbio_initial, harvestedbio_quarter, harvestedbio_half, harvestedbio_full)
   } else {
-    plot_data <- harvestedbio_full
+    plot_data <- dplyr::bind_rows(harvestedbio_initial, harvestedbio_full)
   }
 
-  plot_data$class <- factor(plot_data$class, levels = c("quarter", "half", "full"))
+  plot_data$class <- factor(plot_data$class, levels = c("initial", "quarter", "half", "full"))
   plot_data$fill_group <- factor(
     plot_data$class,
-    levels = c("quarter", "half", "full"),
-    labels = c("Quarter", "Half", "Full")
+    levels = c("initial", "quarter", "half", "full"),
+    labels = c("Initial", "Quarter", "Half", "Full")
   )
   plot_data
 }
@@ -202,6 +212,7 @@ plotSpeciesActualBiomass <- function(harvestedprojection, chosenyear,
     geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
     labs(x = "Species", y = "Biomass [g]") +
     scale_fill_manual(values = c(
+      "Initial" = "#808080",
       "Quarter" = "#2FA4E799",
       "Half"    = "#2FA4E7cc",
       "Full"    = "#2FA4E7"

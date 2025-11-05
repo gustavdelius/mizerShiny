@@ -209,6 +209,7 @@ plotSpeciesActualBiomass2 <- function(harvestedprojection1, harvestedprojection2
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::labs(x = "Species", y = "Biomass [g]") +
     ggplot2::scale_fill_manual(values = c(
+      "Initial" = "#808080",
       "Quarter" = "#2FA4E799",
       "Half"    = "#2FA4E7cc",
       "Full"    = "#2FA4E7"
