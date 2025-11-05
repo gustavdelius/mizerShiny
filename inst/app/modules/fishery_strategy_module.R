@@ -466,8 +466,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       
       p <- tryCatch({
         if (show_sim1 && show_sim2) {
-          ggplotly(
-            plotSpeciesWithTimeRange2(
+        ggplotly(
+          plotSpeciesWithTimeRange2(
               fishSimData()$sim1,
               fishSimData()$sim2,
               fishSimData()$unharv,
@@ -478,7 +478,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         } else if (show_sim1) {
           modeFish <- if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
           ggplotly(
-            plotSpeciesWithTimeRange(
+            mizerShiny:::plotSpeciesWithTimeRange(
               fishSimData()$sim1,
               fishSimData()$unharv,
               chosen_year,
@@ -489,7 +489,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         } else {
           modeFish <- if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
           ggplotly(
-            plotSpeciesWithTimeRange(
+            mizerShiny:::plotSpeciesWithTimeRange(
               fishSimData()$sim2,
               fishSimData()$unharv,
               chosen_year,
@@ -816,7 +816,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           })
         })
         
-        plotDietCompare(harvest_sub, species = input$fish_name_select,
+        mizerShiny:::plotDietCompare(harvest_sub, species = input$fish_name_select,
                         sim_names = names
         )
         

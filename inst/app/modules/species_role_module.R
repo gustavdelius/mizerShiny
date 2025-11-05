@@ -297,7 +297,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       
       p <- tryCatch({
         ggplotly(
-          plotSpeciesWithTimeRange(
+          mizerShiny:::plotSpeciesWithTimeRange(
             bioSimData()$harvested,
             bioSimData()$unharvested,
             chosen_year,
@@ -380,7 +380,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
           })
         })
         
-        plotDietCompare(
+        mizerShiny:::plotDietCompare(
           harvest_sub,
           species   = input$diet_species_select,
           sim_names = c("Your Sim", "Base Sim")
