@@ -81,14 +81,6 @@ server <- function(input, output, session) {
     species
   })
 
-  # Helper functions are sourced at top-level for module access
-
-  source(app_path("Functions", "2sims", "plotSpeciesWithTimeRange2.R"), local = TRUE)
-  source(app_path("Functions", "2sims", "create_species_level_plot2.R"), local = TRUE)
-  source(app_path("Functions", "2sims", "plotSpectraRelative2.R"), local = TRUE)
-  source(app_path("Functions", "2sims", "guildplot2.R"), local = TRUE)
-  source(app_path("Functions", "2sims", "plotSpectra2.R"), local = TRUE)
-
   #Having a custom order on the X axis
   # Map module names to context suffixes
   module_contexts <- list(species = "bio", fishery = "fish")
@@ -146,10 +138,10 @@ server <- function(input, output, session) {
   # Initialize modules ----
   # Pass shared reactive for species ordering to modules
   ordered_species_reactive <- ordered_species
-  
+
   # Handle guildparams - may not exist (check parent environments too)
   guildparams_for_modules <- if (exists("guildparams", inherits = TRUE)) guildparams else NULL
-  
+
   # Species Role module
   species_role_server(
     "species",
@@ -159,7 +151,7 @@ server <- function(input, output, session) {
     ordered_species_reactive = ordered_species_reactive,
     species_list = species_list
   )
-  
+
   # Fishery Strategy module
   fishery_strategy_server(
     "fishery",
