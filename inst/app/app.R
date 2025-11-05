@@ -97,17 +97,7 @@ server <- function(input, output, session) {
     species
   })
 
-  #This section contains all the functions to be used
-  source(app_path("Functions", "plotSpectraRelative.R"), local = TRUE)
-  source(app_path("Functions", "percentdiff.R"), local = TRUE)
-  source(app_path("Functions", "plotSpeciesWithTimeRange.R"), local = TRUE)
-  source(app_path("Functions", "guildplot.R"), local = TRUE)
-  source(app_path("Functions", "comparedietmatrix.R"), local = TRUE)
-  source(app_path("Functions", "create_species_level_plot.R"), local = TRUE)
-  source(app_path("Functions", "yieldplot.R"), local = TRUE)
-  source(app_path("Functions", "plotDietwComparison.R"), local = TRUE)
-  source(app_path("Functions", "plotNutrition.R"), local = TRUE)
-  source(app_path("Functions", "yearControls.R"), local = TRUE)
+  # Helper functions are sourced at top-level for module access
 
   source(app_path("Functions", "2sims", "plotSpeciesWithTimeRange2.R"), local = TRUE)
   source(app_path("Functions", "2sims", "create_species_level_plot2.R"), local = TRUE)
@@ -161,42 +151,12 @@ server <- function(input, output, session) {
   })
   #sets the order chosen by the user
   ordered_species <- reactive({
-    choice <- species_order_choice()
-
-    if (choice == "Guild") {
-      if (exists("guildparams", inherits = FALSE)) {
-        guild_order <- guildparams |>
-          ## keep only the size-class with the largest maxw for each species
-          group_by(Species, Feeding.guild) |>
-          slice_max(maxw, n = 1, with_ties = FALSE) |>
-          ungroup() |>
-          ## order by the guilds' first appearance, then pull the Species names
-          arrange(factor(Feeding.guild,
-                         levels = unique(Feeding.guild))) |>
-          pull(Species) |>
-          unique()
-
-        ## return just the species that are actually in the current model
-        intersect(guild_order, default_params@species_params$species)
-
-      } else { #if theres no guild infomration, this is the order if they choose guild
-        as.data.frame(default_params@species_params$species) |>
-          setNames("sp") |>
-          filter(sp != "Resource") |>
-          pull(sp)
-}
-    } else if (choice == "Size") {
-      default_params@species_params |>
-        filter(species != "Resource") |>
-        arrange(w_mat) |> pull(species)
-
-    } else {
-      # This handles "Custom" case - either use custom order or fall back to default order
-      ord <- custom_species_order()
-      if (length(ord)) ord else
-        as.data.frame(default_params@species_params$species) |>
-        setNames("sp") |> filter(sp != "Resource") |> pull(sp)
-    }
+    mizerShiny:::compute_ordered_species(
+      default_params = default_params,
+      guildparams    = if (exists("guildparams", inherits = TRUE)) guildparams else NULL,
+      choice         = species_order_choice(),
+      custom_order   = custom_species_order()
+    )
   })
 
   # Initialize modules ----
