@@ -1,7 +1,8 @@
+library(mizer)
 test_that("plotbothbiomass works with default_sim", {
   params <- default_sim@params
   sim <- default_sim
-  sim2 <- mizer::project(params, t_max = 10, effort = 1)
+  sim2 <- project(params, t_max = 10, effort = 1)
 
   specie <- NULL
   start_time <- 1
@@ -46,6 +47,6 @@ test_that("plotbothbiomass snapshot test", {
     start_time2 = 1, end_time2 = 10
   )
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("plotbothbiomass", p)
 })
 

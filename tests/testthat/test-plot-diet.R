@@ -42,11 +42,6 @@ test_that("plotDietCompare snapshot test", {
 
   p <- mizerShiny:::plotDietCompare(objects, species = species, sim_names = NULL)
 
-  if (!is.null(p)) {
-    # For plotly objects, we can snapshot the structure
-    expect_snapshot_output(str(p))
-  } else {
-    skip("plotDietCompare returned NULL (no data to plot)")
-  }
+  expect_doppelganger("plotDietCompare", p)
 })
 

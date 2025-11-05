@@ -34,7 +34,7 @@ plotSpectraRelative <- function(object1, object2, time1, time2) {
                    legend.position = "none",
                    axis.title.x = ggplot2::element_text(size = 16),
                    axis.title.y = ggplot2::element_text(size = 16)) +
-    ggplot2::xlim(NA, 10000) + ggplot2::scale_x_log10()
+    ggplot2::scale_x_log10()
 }
 
 #' Relative spectra for two sims vs baseline
@@ -80,7 +80,7 @@ plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
                    axis.text.y = ggplot2::element_text(size = 14),
                    axis.title.x = ggplot2::element_text(size = 16),
                    axis.title.y = ggplot2::element_text(size = 16)) +
-    ggplot2::xlim(NA, 10000) + ggplot2::scale_x_log10()
+    ggplot2::scale_x_log10()
 }
 
 

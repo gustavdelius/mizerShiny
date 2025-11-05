@@ -26,6 +26,6 @@ test_that("plotNutrition snapshot test", {
 
   p <- mizerShiny:::plotNutrition(sims, ref, step)
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("plotNutrition", p)
 })
 

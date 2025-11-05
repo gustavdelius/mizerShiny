@@ -40,7 +40,7 @@ test_that("plotSpeciesWithTimeRange2 snapshot test", {
     harvested1, harvested2, unharvested, chosenyear = 10, mode = "chosen"
   )
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("plotSpeciesWithTimeRange2", p)
 })
 
 test_that("plotSpeciesActualBiomass2 works with default_sim", {
@@ -76,7 +76,7 @@ test_that("plotSpeciesActualBiomass2 snapshot test", {
 
   p <- mizerShiny:::plotSpeciesActualBiomass2(harvested1, harvested2, chosenyear = 10, mode = "chosen")
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("plotSpeciesActualBiomass2", p)
 })
 
 test_that("plotSpeciesActualYield2 works with default_sim", {
@@ -112,7 +112,7 @@ test_that("plotSpeciesActualYield2 snapshot test", {
 
   p <- mizerShiny:::plotSpeciesActualYield2(harvested1, harvested2, chosenyear = 10, mode = "chosen")
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("plotSpeciesActualYield2", p)
 })
 
 test_that("plotSpeciesYieldChange2 works with default_sim", {
@@ -157,7 +157,7 @@ test_that("plotSpeciesYieldChange2 snapshot test", {
     harvested1, harvested2, unharvested, chosenyear = 10, mode = "chosen"
   )
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("plotSpeciesYieldChange2", p)
 })
 
 test_that("guildplot_both works with default_sim", {
@@ -229,6 +229,6 @@ test_that("guildplot_both snapshot test", {
     harvested1, harvested2, unharvested, chosenyear = 10, guildparams, NULL, mode = "chosen"
   )
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("guildplot_both", p)
 })
 

@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' data-engine-version='2.0' width='720.00pt' height='576.00pt' viewBox='0 0 720.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA='>
+    <rect x='0.00' y='0.00' width='720.00' height='576.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<rect x='0.00' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+</g>
+<defs>
+  <clipPath id='cpNDcuNzJ8NzE0LjUyfDIyLjc4fDQ5MS43MQ=='>
+    <rect x='47.72' y='22.78' width='666.80' height='468.92' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcuNzJ8NzE0LjUyfDIyLjc4fDQ5MS43MQ==)'>
+<polyline points='47.72,399.99 714.52,399.99 ' style='stroke-width: 0.53; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='47.72,257.63 714.52,257.63 ' style='stroke-width: 0.53; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='47.72,115.28 714.52,115.28 ' style='stroke-width: 0.53; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='47.72,471.17 714.52,471.17 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='47.72,328.81 714.52,328.81 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='47.72,186.46 714.52,186.46 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='47.72,44.10 714.52,44.10 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='229.57,491.71 229.57,22.78 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<polyline points='532.67,491.71 532.67,22.78 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
+<rect x='93.18' y='44.10' width='272.78' height='426.29' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #E76F51;' />
+<rect x='396.27' y='44.10' width='272.78' height='92.80' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #E76F51;' />
+<line x1='47.72' y1='44.10' x2='714.52' y2='44.10' style='stroke-width: 1.07; stroke: #BEBEBE; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<text x='42.79' y='475.99' text-anchor='end' style='font-size: 14.00px; fill: #4D4D4D; font-family: sans;' textLength='20.24px' lengthAdjust='spacingAndGlyphs'>-30</text>
+<text x='42.79' y='333.63' text-anchor='end' style='font-size: 14.00px; fill: #4D4D4D; font-family: sans;' textLength='20.24px' lengthAdjust='spacingAndGlyphs'>-20</text>
+<text x='42.79' y='191.27' text-anchor='end' style='font-size: 14.00px; fill: #4D4D4D; font-family: sans;' textLength='20.24px' lengthAdjust='spacingAndGlyphs'>-10</text>
+<text x='42.79' y='48.92' text-anchor='end' style='font-size: 14.00px; fill: #4D4D4D; font-family: sans;' textLength='7.79px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(234.39,525.04) rotate(-90)' text-anchor='middle' style='font-size: 14.00px; fill: #4D4D4D; font-family: sans;' textLength='56.81px' lengthAdjust='spacingAndGlyphs'>Piscivore</text>
+<text transform='translate(537.48,525.04) rotate(-90)' text-anchor='middle' style='font-size: 14.00px; fill: #4D4D4D; font-family: sans;' textLength='35.03px' lengthAdjust='spacingAndGlyphs'>Plank</text>
+<text x='381.12' y='567.20' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='37.35px' lengthAdjust='spacingAndGlyphs'>Guild</text>
+<text transform='translate(16.49,257.25) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: sans;' textLength='140.54px' lengthAdjust='spacingAndGlyphs'>Biomass % Change</text>
+<text x='47.72' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='49.17px' lengthAdjust='spacingAndGlyphs'>guildplot</text>
+</g>
+</svg>

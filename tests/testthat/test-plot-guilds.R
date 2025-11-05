@@ -63,6 +63,6 @@ test_that("guildplot snapshot test", {
     guildparams, NULL, mode = "chosen"
   )
 
-  expect_snapshot_output(print(p))
+  expect_doppelganger("guildplot", p)
 })
 

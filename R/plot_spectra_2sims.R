@@ -26,7 +26,6 @@ plotSpectra2 <- function(harvestedprojection, harvestedprojection2, time1, end1,
           axis.title.x = ggplot2::element_text(size = 16),
           axis.title.y = ggplot2::element_text(size = 16),
           legend.position = "bottom") +
-    ggplot2::xlim(NA, 10000) +
     ggplot2::scale_x_log10() +
     ggplot2::scale_y_log10() +
     ggplot2::scale_linetype_manual(values = c("Sim 1" = "solid", "Sim 2" = "dashed")) +
