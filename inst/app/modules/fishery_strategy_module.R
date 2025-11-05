@@ -355,10 +355,18 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       
       t_max <- input$fishyear - max_year + 5
       pb$inc(1/total_steps, "Projecting …")
-      sim1 <- project(sims$sim1, t_max = t_max)
+      sim1 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(sims$sim1, t_max = t_max),
+        context = "fishery_time_range_sim1"
+      )
       
       pb$inc(1/total_steps, "Projecting …")
-      sim2 <- if (!is.null(sims$sim2)) project(sims$sim2, t_max = t_max) else NULL
+      sim2 <- if (!is.null(sims$sim2)) {
+        mizerShiny:::runSimulationWithErrorHandling(
+          function() project(sims$sim2, t_max = t_max),
+          context = "fishery_time_range_sim2"
+        )
+      } else NULL
       
       pb$inc(1/total_steps, "Done")
       
@@ -382,15 +390,15 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       pb$set(message = "Running fishery simulation …", value = 0)
       
       pb$inc(1/total_steps, "Projecting Sim 1 …")
-      sim1 <- project(
-        default_params, effort = effort1,
-        t_max   = max_year * 2 + 2
+      sim1 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(default_params, effort = effort1, t_max = max_year * 2 + 2),
+        context = "fishery_sim1"
       )
       
       pb$inc(1/total_steps, "Projecting Sim 2 …")
-      sim2 <- project(
-        default_params, effort = effort2,
-        t_max   = max_year * 2 + 2
+      sim2 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(default_params, effort = effort2, t_max = max_year * 2 + 2),
+        context = "fishery_sim2"
       )
       
       pb$inc(1/total_steps, "Done")
@@ -437,7 +445,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           )
         },
         last_plot_reactive = lastYieldPlot,
-        condition = length(sims) > 0
+        condition = length(sims) > 0,
+        context = "yieldPlot"
       )
     })
     
@@ -484,7 +493,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           }
         },
         last_plot_reactive = lastFishSpeciesPlot,
-        condition = vis$show_sim1 || vis$show_sim2
+        condition = vis$show_sim1 || vis$show_sim2,
+        context = "fishspeciesPlot"
       )
     })
     
@@ -527,7 +537,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           ggplotly(g)
         },
         last_plot_reactive = lastFishSizePlot,
-        condition = vis$show_sim1 || vis$show_sim2
+        condition = vis$show_sim1 || vis$show_sim2,
+        context = "fishsizePlot"
       )
     })
     
@@ -572,7 +583,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           }
         },
         last_plot_reactive = lastFishGuildPlot,
-        condition = vis$show_sim1 || vis$show_sim2
+        condition = vis$show_sim1 || vis$show_sim2,
+        context = "fishguildPlot"
       )
     })
     
@@ -674,7 +686,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         tmp
         
       }, error = function(e) {
-        message("Spectrum build failed: ", e$message)
+        mizerShiny:::logError("spectrumPlot", e)
         lastSpectrumPlot()
       })
       
@@ -726,7 +738,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
             }
           }
         }, error = function(e) {
-          message("Spectrum proxy update failed: ", e$message)
+          mizerShiny:::logError("spectrumPlot_proxy", e)
         })
       },
       ignoreInit = TRUE
@@ -742,9 +754,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         plot_fun = function() {
           # Check bounds
           if (!mizerShiny:::checkTimeRangeBounds(fishSimData()$sim1, win)) {
-            message("DEBUG: Fishery time range out of bounds")
-            message("DEBUG: win = ", win)
-            stop("Time range out of bounds")
+            details <- paste0("win = ", win, ", max_time = ", dim(fishSimData()$sim1@n)[1])
+            stop(paste("Time range out of bounds:", details))
           }
           
           # Build sims list and names
@@ -772,7 +783,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           )
         },
         last_plot_reactive = lastFishDietSinglePlot,
-        condition = vis$show_sim1 || vis$show_sim2
+        condition = vis$show_sim1 || vis$show_sim2,
+        context = "fishdietsingleplot"
       )
     })
     
@@ -790,7 +802,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           )
         },
         last_plot_reactive = lastNutritionPlot,
-        condition = vis$show_sim1 || vis$show_sim2
+        condition = vis$show_sim1 || vis$show_sim2,
+        context = "nutritionplot"
       )
     })
   })

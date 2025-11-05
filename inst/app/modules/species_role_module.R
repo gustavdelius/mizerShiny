@@ -227,10 +227,16 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       
       t_max <- input$year - max_year + 5  # Extend by 5 years
       pb$inc(1/total_steps, "Projecting …")
-      unharvested <- project(sims$unharvested, t_max = t_max)
+      unharvested <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(sims$unharvested, t_max = t_max),
+        context = "species_role_time_range_unharvested"
+      )
       
       pb$inc(1/total_steps, "Projecting …")
-      harvested <- project(sims$harvested, t_max = t_max)
+      harvested <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(sims$harvested, t_max = t_max),
+        context = "species_role_time_range_harvested"
+      )
       
       pb$inc(1/total_steps, "Done")
       
@@ -269,11 +275,14 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       ext_mort(changed_params) <- extmort
       
       pb$inc(1/total_steps, "Projecting …")
-      harvested <- project(
-        changed_params,
-        # We run the simulation for an extra 5 years so that the +1 button
-        # does not immediately trigger a re-run.
-        t_max  = isolate(input$year) + 5
+      harvested <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(
+          changed_params,
+          # We run the simulation for an extra 5 years so that the +1 button
+          # does not immediately trigger a re-run.
+          t_max  = isolate(input$year) + 5
+        ),
+        context = "species_role_simulation"
       )
       
       pb$inc(1/total_steps, "Done")
@@ -307,7 +316,8 @@ species_role_server <- function(id, default_params, unharvestedprojection,
               scale_x_discrete(limits = ordered_species_reactive())
           )
         },
-        last_plot_reactive = lastBioSpeciesPlot
+        last_plot_reactive = lastBioSpeciesPlot,
+        context = "speciesPlot"
       )
     })
     
@@ -328,7 +338,8 @@ species_role_server <- function(id, default_params, unharvestedprojection,
           }
           ggplotly(g)
         },
-        last_plot_reactive = lastBioSizePlot
+        last_plot_reactive = lastBioSizePlot,
+        context = "sizePlot"
       )
     })
     
@@ -349,7 +360,8 @@ species_role_server <- function(id, default_params, unharvestedprojection,
             )
           )
         },
-        last_plot_reactive = lastBioGuildPlot
+        last_plot_reactive = lastBioGuildPlot,
+        context = "guildPlot"
       )
     })
     
@@ -362,9 +374,9 @@ species_role_server <- function(id, default_params, unharvestedprojection,
         plot_fun = function() {
           # Add bounds checking for time range
           if (!mizerShiny:::checkTimeRangeBounds(bioSimData()$harvested, win)) {
-            message("DEBUG: Time range out of bounds")
-            message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
-            stop("Time range out of bounds")
+            details <- paste0("win$start = ", win$start, ", win$end = ", win$end,
+                            ", max_time = ", dim(bioSimData()$harvested@n)[1])
+            stop(paste("Time range out of bounds:", details))
           }
           
           # Subset simulations by time range
@@ -378,7 +390,8 @@ species_role_server <- function(id, default_params, unharvestedprojection,
             sim_names = c("Your Sim", "Base Sim")
           )
         },
-        last_plot_reactive = lastDietPlot
+        last_plot_reactive = lastDietPlot,
+        context = "dietplot"
       )
     })
   })

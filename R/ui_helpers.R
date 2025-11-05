@@ -80,6 +80,23 @@ setupYearControls <- function(input, session,
   })
 }
 
+#' Log error with consistent format
+#'
+#' Helper function to log errors with a consistent format across the application.
+#'
+#' @param context Character string describing the context where error occurred
+#' @param error Error object or error message
+#' @param details Optional additional details about the error
+#' @keywords internal
+logError <- function(context, error, details = NULL) {
+  error_msg <- if (inherits(error, "error")) error$message else as.character(error)
+  msg <- paste0("[", context, "] Error: ", error_msg)
+  if (!is.null(details)) {
+    msg <- paste0(msg, " | Details: ", details)
+  }
+  message(msg)
+}
+
 #' Generate plot with error handling
 #'
 #' Wraps plot generation in tryCatch with fallback to last successful plot.
@@ -88,9 +105,11 @@ setupYearControls <- function(input, session,
 #' @param plot_fun Function that generates the plot (called in tryCatch)
 #' @param last_plot_reactive A reactiveVal that stores the last successful plot
 #' @param condition Optional condition to check before rendering (e.g., data requirements)
+#' @param context Character string for error logging context (e.g., "yieldPlot")
 #' @return The generated plot or the last successful plot on error
 #' @keywords internal
-generatePlotWithErrorHandling <- function(plot_fun, last_plot_reactive, condition = NULL) {
+generatePlotWithErrorHandling <- function(plot_fun, last_plot_reactive, condition = NULL, 
+                                         context = "plot") {
   # Check condition if provided
   if (!is.null(condition) && !isTRUE(condition)) {
     return(last_plot_reactive())
@@ -99,11 +118,14 @@ generatePlotWithErrorHandling <- function(plot_fun, last_plot_reactive, conditio
   p <- tryCatch({
     plot_fun()
   }, error = function(e) {
+    logError(context, e)
     last_plot_reactive()
   })
   
-  # Store successful plot and return
-  last_plot_reactive(p)
+  # Store successful plot and return (only store if not NULL/empty)
+  if (!is.null(p)) {
+    last_plot_reactive(p)
+  }
   p
 }
 
@@ -188,9 +210,14 @@ subsetSimByTimeRange <- function(sim, time_range) {
     sim@n_other <- sim@n_other[start:end, , drop = FALSE]
     sim
   }, error = function(e) {
-    message("Error in subsetSimByTimeRange: ", e$message)
-    message("time_range: ", if (is.list(time_range)) paste(time_range$start, time_range$end) else time_range)
-    message("sim@n dims: ", paste(dim(sim@n), collapse = "x"))
+    time_range_str <- if (is.list(time_range)) {
+      paste(time_range$start, time_range$end, sep = "-")
+    } else {
+      as.character(time_range)
+    }
+    details <- paste0("time_range: ", time_range_str, 
+                     ", sim dimensions: ", paste(dim(sim@n), collapse = "x"))
+    logError("subsetSimByTimeRange", e, details)
     stop(e)
   })
 }
@@ -214,6 +241,28 @@ createLastPlotReactive <- function() {
 #' @keywords internal
 getModeFromToggle <- function(toggle_value) {
   if (isTRUE(toggle_value)) "triple" else "chosen"
+}
+
+#' Run simulation with error handling
+#'
+#' Wraps simulation projection in error handling with consistent logging.
+#'
+#' @param sim_fun Function that runs the simulation (e.g., project())
+#' @param context Character string for error logging context
+#' @param default_result Optional default value to return on error
+#' @return Result of sim_fun() or default_result on error
+#' @keywords internal
+runSimulationWithErrorHandling <- function(sim_fun, context = "simulation", 
+                                          default_result = NULL) {
+  tryCatch({
+    sim_fun()
+  }, error = function(e) {
+    logError(context, e)
+    if (!is.null(default_result)) {
+      return(default_result)
+    }
+    stop(e)
+  })
 }
 
 
