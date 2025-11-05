@@ -316,7 +316,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       t1 <- max(input$year - 1, 1);  t2 <- input$year + 1
       
       p <- tryCatch({
-        g <- plotSpectraRelative(
+        g <- mizerShiny:::plotSpectraRelative(
           bioSimData()$harvested,
           bioSimData()$unharvested,
           t1, t2
@@ -339,7 +339,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       
       p <- tryCatch({
         ggplotly(
-          guildplot(
+          mizerShiny:::guildplot(
             bioSimData()$harvested, bioSimData()$unharvested,
             chosen_year,
             guildparams, default_params,

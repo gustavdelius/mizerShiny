@@ -439,7 +439,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       }
       
       p <- tryCatch({
-        generateYieldDashboard(
+        mizerShiny:::generateYieldDashboard(
           NS_sim          = sims,
           highlight_times = input$fishyear2_yield,
           params          = default_params
@@ -467,7 +467,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       p <- tryCatch({
         if (show_sim1 && show_sim2) {
         ggplotly(
-          plotSpeciesWithTimeRange2(
+          mizerShiny:::plotSpeciesWithTimeRange2(
               fishSimData()$sim1,
               fishSimData()$sim2,
               fishSimData()$unharv,
@@ -519,7 +519,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       
       p <- tryCatch({
         if (show_sim1 && show_sim2) {
-          g <- plotSpectraRelative2(
+        g <- mizerShiny:::plotSpectraRelative2(
             fishSimData()$sim1,
             fishSimData()$unharv,
             fishSimData()$sim2,
@@ -531,7 +531,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           }
           ggplotly(g)
         } else if (show_sim1) {
-          g <- plotSpectraRelative(
+        g <- mizerShiny:::plotSpectraRelative(
             fishSimData()$sim1,
             fishSimData()$unharv,
             fish_win1(),
@@ -542,7 +542,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           }
           ggplotly(g)
         } else {
-          g <- plotSpectraRelative(
+        g <- mizerShiny:::plotSpectraRelative(
             fishSimData()$sim2,
             fishSimData()$unharv,
             fish_win1(),
@@ -578,7 +578,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       p <- tryCatch({
         if (show_sim1 && show_sim2) {
           ggplotly(
-            guildplot_both(
+          mizerShiny:::guildplot_both(
               fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
               chosen_year,
               guildparams, default_params,
@@ -587,7 +587,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           )
         } else if (show_sim1) {
           ggplotly(
-            guildplot(
+          mizerShiny:::guildplot(
               fishSimData()$sim1, fishSimData()$unharv,
               chosen_year,
               guildparams, default_params,
@@ -596,7 +596,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           )
         } else {
           ggplotly(
-            guildplot(
+          mizerShiny:::guildplot(
               fishSimData()$sim2, fishSimData()$unharv,
               chosen_year,
               guildparams, default_params,
@@ -852,8 +852,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       }
       
       p <- tryCatch({
-        ggplotly(
-          plotNutrition(sims, fishSimData()$unharv ,win)
+      ggplotly(
+        mizerShiny:::plotNutrition(sims, fishSimData()$unharv ,win)
         )
       },
       error = function(e) {

@@ -59,19 +59,7 @@ source(app_path("modules", "species_role_module.R"), local = TRUE)
 source(app_path("modules", "fishery_strategy_module.R"), local = TRUE)
 
 # Make helper functions available to modules (source at top-level)
-source(app_path("Functions", "plotSpectraRelative.R"), local = TRUE)
-source(app_path("Functions", "percentdiff.R"), local = TRUE)
-source(app_path("Functions", "guildplot.R"), local = TRUE)
-source(app_path("Functions", "comparedietmatrix.R"), local = TRUE)
-source(app_path("Functions", "create_species_level_plot.R"), local = TRUE)
-source(app_path("Functions", "yieldplot.R"), local = TRUE)
-source(app_path("Functions", "plotNutrition.R"), local = TRUE)
-## plotSpeciesWithTimeRange and plotDietCompare now come from package code
-source(app_path("Functions", "2sims", "plotSpeciesWithTimeRange2.R"), local = TRUE)
-source(app_path("Functions", "2sims", "create_species_level_plot2.R"), local = TRUE)
-source(app_path("Functions", "2sims", "plotSpectraRelative2.R"), local = TRUE)
-source(app_path("Functions", "2sims", "guildplot2.R"), local = TRUE)
-source(app_path("Functions", "2sims", "plotSpectra2.R"), local = TRUE)
+## plot helpers now come from package code (R/plot_*.R)
 
 # Server ----
 server <- function(input, output, session) {
