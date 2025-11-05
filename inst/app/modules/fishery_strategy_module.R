@@ -74,6 +74,18 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
               )
             ),
             tabPanel(
+              title = "Yield",
+              div(style = "flex:1; display:flex;",
+                  plotlyOutput(ns("fishspeciesYieldPlot"), height = "100%", width = "100%")
+              )
+            ),
+            tabPanel(
+              title = "Yield change",
+              div(style = "flex:1; display:flex;",
+                  plotlyOutput(ns("fishspeciesYieldChangePlot"), height = "100%", width = "100%")
+              )
+            ),
+            tabPanel(
               title = "Yield Composition",
               div(style = "flex:1; display:flex;",
                   plotlyOutput(ns("yieldPlot"), height = "100%", width = "100%")
@@ -138,7 +150,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           )
         ),
         conditionalPanel(
-          condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change'"),
+          condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield change'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
                   mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_species)
@@ -428,14 +440,16 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
     })
     
     # Reactive storage for last successful plots
-    lastYieldPlot             <- mizerShiny:::createLastPlotReactive()
-    lastFishSpeciesPlot       <- mizerShiny:::createLastPlotReactive()
-    lastFishSpeciesActualPlot <- mizerShiny:::createLastPlotReactive()
-    lastFishSizePlot          <- mizerShiny:::createLastPlotReactive()
-    lastFishGuildPlot         <- mizerShiny:::createLastPlotReactive()
-    lastSpectrumPlot          <- mizerShiny:::createLastPlotReactive()
-    lastFishDietSinglePlot    <- mizerShiny:::createLastPlotReactive()
-    lastNutritionPlot         <- mizerShiny:::createLastPlotReactive()
+    lastYieldPlot                <- mizerShiny:::createLastPlotReactive()
+    lastFishSpeciesPlot          <- mizerShiny:::createLastPlotReactive()
+    lastFishSpeciesActualPlot    <- mizerShiny:::createLastPlotReactive()
+    lastFishSpeciesYieldPlot     <- mizerShiny:::createLastPlotReactive()
+    lastFishSpeciesYieldChangePlot <- mizerShiny:::createLastPlotReactive()
+    lastFishSizePlot             <- mizerShiny:::createLastPlotReactive()
+    lastFishGuildPlot            <- mizerShiny:::createLastPlotReactive()
+    lastSpectrumPlot             <- mizerShiny:::createLastPlotReactive()
+    lastFishDietSinglePlot       <- mizerShiny:::createLastPlotReactive()
+    lastNutritionPlot            <- mizerShiny:::createLastPlotReactive()
     
     # Plots
     output$yieldPlot <- renderPlotly({
@@ -499,6 +513,99 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         last_plot_reactive = lastFishSpeciesActualPlot,
         condition = vis$show_sim1 || vis$show_sim2,
         context = "fishspeciesActualPlot"
+      )
+    })
+    
+    output$fishspeciesYieldPlot <- renderPlotly({
+      req(fishSimData())
+      chosen_year <- fish_win1()
+      
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
+      
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
+          
+          if (vis$show_sim1 && vis$show_sim2) {
+            ggplotly(
+              mizerShiny:::plotSpeciesActualYield2(
+                fishSimData()$sim1,
+                fishSimData()$sim2,
+                chosen_year,
+                mode = mode
+              ) + scale_x_discrete(limits = ordered_species_reactive())
+            )
+          } else if (vis$show_sim1) {
+            ggplotly(
+              mizerShiny:::plotSpeciesActualYield(
+                fishSimData()$sim1,
+                chosen_year,
+                mode = mode
+              ) +
+                scale_x_discrete(limits = ordered_species_reactive())
+            )
+          } else {
+            ggplotly(
+              mizerShiny:::plotSpeciesActualYield(
+                fishSimData()$sim2,
+                chosen_year,
+                mode = mode
+              ) +
+                scale_x_discrete(limits = ordered_species_reactive())
+            )
+          }
+        },
+        last_plot_reactive = lastFishSpeciesYieldPlot,
+        condition = vis$show_sim1 || vis$show_sim2,
+        context = "fishspeciesYieldPlot"
+      )
+    })
+    
+    output$fishspeciesYieldChangePlot <- renderPlotly({
+      req(fishSimData())
+      chosen_year <- fish_win1()
+      
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
+      
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
+          
+          if (vis$show_sim1 && vis$show_sim2) {
+            ggplotly(
+              mizerShiny:::plotSpeciesYieldChange2(
+                fishSimData()$sim1,
+                fishSimData()$sim2,
+                fishSimData()$unharv,
+                chosen_year,
+                mode = mode
+              ) + scale_x_discrete(limits = ordered_species_reactive())
+            )
+          } else if (vis$show_sim1) {
+            ggplotly(
+              mizerShiny:::plotSpeciesYieldChange(
+                fishSimData()$sim1,
+                fishSimData()$unharv,
+                chosen_year,
+                mode = mode
+              ) +
+                scale_x_discrete(limits = ordered_species_reactive())
+            )
+          } else {
+            ggplotly(
+              mizerShiny:::plotSpeciesYieldChange(
+                fishSimData()$sim2,
+                fishSimData()$unharv,
+                chosen_year,
+                mode = mode
+              ) +
+                scale_x_discrete(limits = ordered_species_reactive())
+            )
+          }
+        },
+        last_plot_reactive = lastFishSpeciesYieldChangePlot,
+        condition = vis$show_sim1 || vis$show_sim2,
+        context = "fishspeciesYieldChangePlot"
       )
     })
     

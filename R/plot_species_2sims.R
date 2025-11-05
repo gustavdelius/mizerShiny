@@ -209,12 +209,149 @@ plotSpeciesActualBiomass2 <- function(harvestedprojection1, harvestedprojection2
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::labs(x = "Species", y = "Biomass [g]") +
     ggplot2::scale_fill_manual(values = c(
-      "Initial" = "#808080",
+      "Initial" = "#2FA4E766",
       "Quarter" = "#2FA4E799",
       "Half"    = "#2FA4E7cc",
       "Full"    = "#2FA4E7"
     )) +
     # ggplot2::scale_y_continuous(trans = "log10") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
+                   axis.text.y = ggplot2::element_text(size = 14),
+                   legend.position = "none",
+                   axis.title.x = ggplot2::element_text(size = 16),
+                   axis.title.y = ggplot2::element_text(size = 16),
+                   panel.spacing.y = grid::unit(2, "lines")) +
+    ggplot2::facet_wrap(~ sim, nrow = 2)
+}
+
+#' Plot species actual yield for two simulations
+#'
+#' Uses shared processing to compute actual yield values for each species
+#' at selected times, and renders separate facets for two simulations.
+#'
+#' @param harvestedprojection1 First harvested mizer projection
+#' @param harvestedprojection2 Second harvested mizer projection
+#' @param chosenyear Integer defining full period; quarter/half derived
+#' @param mode Either "triple" or "chosen"
+#' @return A ggplot object
+#' @keywords internal
+plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
+                                      chosenyear, mode = c("triple", "chosen")) {
+  mode <- match.arg(mode)
+  df1 <- process_sim_shared_actual_yield(harvestedprojection1, chosenyear, mode)
+  df2 <- process_sim_shared_actual_yield(harvestedprojection2, chosenyear, mode)
+
+  df1$sim <- "Sim 1"
+  df2$sim <- "Sim 2"
+  plot_df <- dplyr::bind_rows(df1, df2)
+  
+  # Get unique gears and assign colors
+  gears <- sort(unique(plot_df$Gear))
+  n_gears <- length(gears)
+  
+  # Generate colors for gears
+  if (n_gears <= 8) {
+    gear_colors <- RColorBrewer::brewer.pal(max(3, n_gears), "Set2")[1:n_gears]
+  } else {
+    gear_colors <- grDevices::rainbow(n_gears)
+  }
+  names(gear_colors) <- gears
+  
+  # Define opacities for different time points
+  opacity_values <- c(
+    "Initial" = 0.4,
+    "Quarter" = 0.6,
+    "Half"    = 0.8,
+    "Full"    = 1.0
+  )
+  
+  # Calculate cumulative positions for stacking manually
+  plot_df <- plot_df |>
+    dplyr::arrange(sim, Species, class, Gear) |>
+    dplyr::group_by(sim, Species, class) |>
+    dplyr::mutate(
+      Ymin = dplyr::lag(cumsum(yield), default = 0),
+      Ymax = cumsum(yield)
+    ) |>
+    dplyr::ungroup()
+  
+  # Create position offsets for dodging bars by time
+  time_levels <- c("initial", "quarter", "half", "full")
+  n_times <- length(unique(plot_df$class))
+  dodge_width <- 0.8
+  dodge_offset <- (seq_len(n_times) - (n_times + 1) / 2) * dodge_width / n_times
+  
+  plot_df <- plot_df |>
+    dplyr::mutate(
+      TimeNum = as.numeric(factor(class, levels = time_levels)),
+      SpeciesNum = as.numeric(factor(Species)),
+      XPos = SpeciesNum + dodge_offset[TimeNum],
+      BarWidth = dodge_width / n_times,
+      TimeClass = fill_group
+    )
+  
+  # Get unique species in order for labeling
+  species_order <- unique(plot_df$Species)
+  
+  # Use geom_rect for manual stacking and dodging
+  p <- ggplot2::ggplot(plot_df) +
+    ggplot2::geom_rect(ggplot2::aes(xmin = XPos - BarWidth/2, 
+                  xmax = XPos + BarWidth/2,
+                  ymin = Ymin, ymax = Ymax, 
+                  fill = Gear, alpha = TimeClass)) +
+    ggplot2::scale_x_continuous(breaks = seq_along(species_order),
+                       labels = species_order) +
+    ggplot2::scale_fill_manual(values = gear_colors, name = "Gear") +
+    ggplot2::scale_alpha_manual(values = opacity_values, name = "Time") +
+    ggplot2::labs(x = "Species", y = "Yield [g/year]") +
+    # ggplot2::scale_y_continuous(trans = "log10") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
+                   axis.text.y = ggplot2::element_text(size = 14),
+                   legend.position = "right",
+                   axis.title.x = ggplot2::element_text(size = 16),
+                   axis.title.y = ggplot2::element_text(size = 16),
+                   panel.spacing.y = grid::unit(2, "lines")) +
+    ggplot2::facet_wrap(~ sim, nrow = 2)
+  
+  p
+}
+
+#' Plot species yield change for two simulations
+#'
+#' Uses shared processing to compute percentage yield changes for each species
+#' at selected times, and renders separate facets for two simulations.
+#'
+#' @param harvestedprojection1 First harvested mizer projection
+#' @param harvestedprojection2 Second harvested mizer projection
+#' @param unharvestedprojection Baseline unharvested mizer projection
+#' @param chosenyear Integer defining full period; quarter/half derived
+#' @param mode Either "triple" or "chosen"
+#' @return A ggplot object
+#' @keywords internal
+plotSpeciesYieldChange2 <- function(harvestedprojection1, harvestedprojection2,
+                                      unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+  mode <- match.arg(mode)
+  df1 <- process_sim_shared_yield(harvestedprojection1, unharvestedprojection, chosenyear, mode)
+  df2 <- process_sim_shared_yield(harvestedprojection2, unharvestedprojection, chosenyear, mode)
+
+  df1$sim <- "Sim 1"
+  df2$sim <- "Sim 2"
+  plot_df <- dplyr::bind_rows(df1, df2)
+
+  ggplot2::ggplot(plot_df, ggplot2::aes(x = Species, y = percentage_diff, fill = fill_group)) +
+    ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
+    ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
+    ggplot2::labs(x = "Species", y = "Yield % Change") +
+    ggplot2::scale_fill_manual(values = c(
+      "Quarter, Negative"  = "#F2A488",
+      "Quarter, Positive"  = "#2FA4E799",
+      "Half, Negative"     = "#E98C6B",
+      "Half, Positive"     = "#2FA4E7cc",
+      "Full, Negative"     = "#E76F51",
+      "Full, Positive"     = "#2FA4E7"
+    )) +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
                    axis.text.y = ggplot2::element_text(size = 14),
