@@ -3,13 +3,13 @@
 
 fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutrition_file, app_exists) {
   ns <- NS(id)
-  
+
   grid_container(
     layout    = c("area1 area0"),
     row_sizes = c("1fr"),
     col_sizes = c("0.3fr", "1.7fr"),
     gap_size  = "10px",
-    
+
     grid_card(
       area = "area1",
       card_body(
@@ -52,7 +52,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
         )
       )
     ),
-    
+
     grid_card(
       area = "area0",
       card_body(
@@ -85,18 +85,18 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
                   plotlyOutput(ns("fishspeciesYieldChangePlot"), height = "100%", width = "100%")
               )
             ),
-            tabPanel(
-              title = "Yield Composition",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("yieldPlot"), height = "100%", width = "100%")
-              )
-            ),
-            tabPanel(
-              title = "Size",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("fishsizePlot"), height = "100%", width = "100%")
-              )
-            ),
+            # tabPanel(
+            #   title = "Yield Composition",
+            #   div(style = "flex:1; display:flex;",
+            #       plotlyOutput(ns("yieldPlot"), height = "100%", width = "100%")
+            #   )
+            # ),
+            # tabPanel(
+            #   title = "Size",
+            #   div(style = "flex:1; display:flex;",
+            #       plotlyOutput(ns("fishsizePlot"), height = "100%", width = "100%")
+            #   )
+            # ),
             if (have_guild_file) {
               tabPanel(
                 title = "Guild",
@@ -105,18 +105,18 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
                 )
               )
             },
-            tabPanel(
-              title = "Spectra",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("spectrumPlot"), height = "100%", width = "100%")
-              )
-            ),
-            tabPanel(
-              title = "Diet",
-              div(style = "height:50vh; display:flex;",
-                  plotlyOutput(ns("fishdietsingleplot"), height = "100%", width = "100%")
-              )
-            ),
+            # tabPanel(
+            #   title = "Spectra",
+            #   div(style = "flex:1; display:flex;",
+            #       plotlyOutput(ns("spectrumPlot"), height = "100%", width = "100%")
+            #   )
+            # ),
+            # tabPanel(
+            #   title = "Diet",
+            #   div(style = "height:50vh; display:flex;",
+            #       plotlyOutput(ns("fishdietsingleplot"), height = "100%", width = "100%")
+            #   )
+            # ),
             if (have_nutrition_file) {
               tabPanel(
                 title = "Nutrition",
@@ -128,7 +128,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           )
         )
       ),
-      
+
       card_body(
         style = "flex: auto",
         conditionalPanel(
@@ -264,12 +264,12 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
                                    guildparams, ordered_species_reactive, species_list,
                                    fish_max_year) {
   moduleServer(id, function(input, output, session) {
-    
+
     # Update species select input
     observe({
       updateSelectInput(session, "fish_name_select", choices = species_list())
     })
-    
+
     # Dynamic fishery effort sliders for Sim 1
     output$fishery_sliders_ui <- renderUI({
       effort <- default_params@initial_effort
@@ -289,7 +289,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       })
       div(id = "fishery_sliders", slider_list)
     })
-    
+
     # Dynamic fishery effort sliders for Sim 2
     output$fishery_sliders_ui2 <- renderUI({
       effort <- default_params@initial_effort
@@ -309,26 +309,26 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       })
       div(id = "fishery_sliders", slider_list)
     })
-    
+
     # Changing the timerange to subset on the plot for yield
     observe({
       time1  <- input$fishyear  + 1
       time12 <- max(input$fishyear - 1, 1)
       new_max <- time1
-      
+
       current <- input$fishyear2_yield
       new_val <- c(
         max(min(current[1], new_max), 0),
         max(min(current[2], new_max), time12)
       )
-      
+
       updateSliderInput(
         session, "fishyear2_yield",
         max   = new_max,
         value = new_val
       )
     })
-    
+
     # Helper function to reactively make new effort vector depending on the input
     makeEffort <- function(prefix, gears, base_effort) {
       ef <- base_effort
@@ -340,7 +340,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       }
       ef
     }
-    
+
     # Observer to automatically switch to "Both" when Sim 2 sliders are changed
     observeEvent({
       gears <- unique(default_params@gear_params$gear)
@@ -353,31 +353,31 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         updateRadioButtons(session, "sim_choice", selected = "both")
       }
     }, ignoreInit = TRUE)
-    
+
     # Initialize fishSimData as a reactive value
     fishSimData <- reactiveVal(list(
       sim1 = unfishedprojection,
       sim2 = NULL,
       unharv = unfishedprojection
     ))
-    
+
     # Reactive observer that runs when time range changes
     observe({
       sims <- isolate(fishSimData())
       max_year <- dim(sims$sim1@n)[1] - 1
       if (input$fishyear <= max_year) return()
-      
+
       pb <- shiny::Progress$new(); on.exit(pb$close())
       total_steps <- 3
       pb$set(message = "Running simulation …", value = 0)
-      
+
       t_max <- input$fishyear - max_year + 5
       pb$inc(1/total_steps, "Projecting …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(sims$sim1, t_max = t_max),
         context = "fishery_time_range_sim1"
       )
-      
+
       pb$inc(1/total_steps, "Projecting …")
       sim2 <- if (!is.null(sims$sim2)) {
         mizerShiny:::runSimulationWithErrorHandling(
@@ -385,47 +385,47 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           context = "fishery_time_range_sim2"
         )
       } else NULL
-      
+
       pb$inc(1/total_steps, "Done")
-      
+
       fishSimData(list(sim1 = sim1,
                       sim2 = sim2,
                       unharv = unfishedprojection))
     })
-    
+
     # Reactive observer that runs simulation when inputs change
     observe({
       input$fishyear
-      
+
       gears <- unique(default_params@gear_params$gear)
       effort1 <- makeEffort("effort_" , gears, default_params@initial_effort)
       effort2 <- makeEffort("effort2_", gears, default_params@initial_effort)
-      
+
       max_year <- input$fishyear
-      
+
       pb <- shiny::Progress$new(); on.exit(pb$close())
       total_steps <- 3
       pb$set(message = "Running fishery simulation …", value = 0)
-      
+
       pb$inc(1/total_steps, "Projecting Sim 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(default_params, effort = effort1, t_max = max_year * 2 + 2),
         context = "fishery_sim1"
       )
-      
+
       pb$inc(1/total_steps, "Projecting Sim 2 …")
       sim2 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(default_params, effort = effort2, t_max = max_year * 2 + 2),
         context = "fishery_sim2"
       )
-      
+
       pb$inc(1/total_steps, "Done")
-      
+
       fishSimData(list(sim1   = sim1,
                       sim2   = sim2,
                       unharv = unfishedprojection))
     })
-    
+
     # Setup year controls
     mizerShiny:::setupYearControls(
       input, session,
@@ -433,12 +433,12 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       minusId   = "decYear_fish",
       plusId    = "incYear_fish"
     )
-    
+
     # Simple reactive for the time range
     fish_win1 <- reactive({
       input$fishyear
     })
-    
+
     # Reactive storage for last successful plots
     lastYieldPlot                <- mizerShiny:::createLastPlotReactive()
     lastFishSpeciesPlot          <- mizerShiny:::createLastPlotReactive()
@@ -450,13 +450,13 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
     lastSpectrumPlot             <- mizerShiny:::createLastPlotReactive()
     lastFishDietSinglePlot       <- mizerShiny:::createLastPlotReactive()
     lastNutritionPlot            <- mizerShiny:::createLastPlotReactive()
-    
+
     # Plots
     output$yieldPlot <- renderPlotly({
       req(fishSimData())
-      
+
       sims <- mizerShiny:::filterSimsByChoice(fishSimData(), input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mizerShiny:::generateYieldDashboard(
@@ -470,17 +470,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "yieldPlot"
       )
     })
-    
+
     output$fishspeciesActualPlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
-      
+
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
-          
+
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
               mizerShiny:::plotSpeciesActualBiomass2(
@@ -515,17 +515,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishspeciesActualPlot"
       )
     })
-    
+
     output$fishspeciesYieldPlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
-      
+
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
-          
+
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
               mizerShiny:::plotSpeciesActualYield2(
@@ -560,17 +560,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishspeciesYieldPlot"
       )
     })
-    
+
     output$fishspeciesYieldChangePlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
-      
+
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
-          
+
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
               mizerShiny:::plotSpeciesYieldChange2(
@@ -608,17 +608,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishspeciesYieldChangePlot"
       )
     })
-    
+
     output$fishspeciesPlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
-      
+
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
-          
+
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
               mizerShiny:::plotSpeciesWithTimeRange2(
@@ -656,16 +656,16 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishspeciesPlot"
       )
     })
-    
+
     output$fishsizePlot <- renderPlotly({
       req(fishSimData())
-      
+
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           year <- fish_win1()
-          
+
           if (vis$show_sim1 && vis$show_sim2) {
             g <- mizerShiny:::plotSpectraRelative2(
               fishSimData()$sim1,
@@ -689,7 +689,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
               year
             )
           }
-          
+
           if (!isTRUE(input$logToggle4)) {
             g <- g + scale_x_continuous()
           }
@@ -700,18 +700,18 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishsizePlot"
       )
     })
-    
+
     output$fishguildPlot <- renderPlotly({
       req(fishSimData())
       validate(need(!is.null(guildparams), "Guild data not available"))
       chosen_year <- fish_win1()
-      
+
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mode <- mizerShiny:::getModeFromToggle(input$triguildToggleFish)
-          
+
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
               mizerShiny:::guildplot_both(
@@ -746,54 +746,54 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishguildPlot"
       )
     })
-    
+
     # So that it saves the last plot, and remembers that the plot is already built
     built <- reactiveVal(FALSE)
-    
+
     # Reset built when simulation data changes
     observe({
       fishSimData()
       built(FALSE)
     })
-    
+
     # Reset built when simulation visibility switches change
     observe({
       input$sim_choice
       built(FALSE)
     })
-    
+
     output$spectrumPlot <- renderPlotly({
       p <- tryCatch({
         sim <- fishSimData(); req(sim)
         selected_year <- fish_win1()
         log_toggle <- input$logToggle5
-        
+
         df1 <- mizer::plotSpectra(sim$sim1,
                            time_range  = selected_year,
                            return_data = TRUE) |>
           mutate(sim = "Sim 1")
-        
+
         df2 <- mizer::plotSpectra(sim$sim2,
                            time_range  = selected_year,
                            return_data = TRUE) |>
           mutate(sim = "Sim 2")
-        
+
         all_species <- c()
         if (!is.null(df1)) all_species <- c(all_species, unique(df1$Species))
         if (!is.null(df2)) all_species <- c(all_species, unique(df2$Species))
         species <- sort(unique(all_species))
-        
+
         maxn <- RColorBrewer::brewer.pal.info["Set3", "maxcolors"]
         if (length(species) <= maxn) {
           colors <- RColorBrewer::brewer.pal(length(species), "Set3")
         } else {
           colors <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(maxn, "Set3"))(length(species))
         }
-        
+
         tmp <- plot_ly(source = "spec")
         for (sp in species) {
           i <- which(species == sp)
-          
+
           if (!is.null(df1)) {
             sub1 <- df1 |> filter(Species == sp)
             if (nrow(sub1) > 0) {
@@ -809,7 +809,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
               )
             }
           }
-          
+
           if (!is.null(df2)) {
             sub2 <- df2 |> filter(Species == sp)
             if (nrow(sub2) > 0) {
@@ -827,7 +827,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
             }
           }
         }
-        
+
         axType <- if (isTRUE(log_toggle)) "log" else "linear"
         tmp <- layout(
           tmp,
@@ -839,42 +839,42 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           event_register("plotly_restyle") |>
           event_register("plotly_legendclick") |>
           event_register("plotly_legenddoubleclick")
-        
+
         lastSpectrumPlot(tmp)
         built(TRUE)
         tmp
-        
+
       }, error = function(e) {
         mizerShiny:::logError("spectrumPlot", e)
         lastSpectrumPlot()
       })
-      
+
       p
     })
-    
+
     # Change the time plotted without having to replot everything
     observeEvent(
       fish_win1(),
       {
         req(built())
-        
+
         tryCatch({
           selected_year <- fish_win1()
           sim <- fishSimData()
-          
+
           df1 <- mizer::plotSpectra(sim$sim1,
                              time_range  = selected_year,
                              return_data = TRUE)
           spec1 <- split(df1, df1$Species)
-          
+
           df2 <- mizer::plotSpectra(sim$sim2,
                              time_range  = selected_year,
                              return_data = TRUE)
           spec2 <- split(df2, df2$Species)
-          
+
           species <- sort(unique(c(names(spec1), names(spec2))))
           px <- plotlyProxy(ns("spectrumPlot"), session)
-          
+
           i <- 0L
           for (sp in species) {
             if (sp %in% names(spec1)) {
@@ -902,13 +902,13 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       },
       ignoreInit = TRUE
     )
-    
+
     output$fishdietsingleplot <- renderPlotly({
       req(fishSimData())
-      
+
       win <- fish_win1()
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           # Check bounds
@@ -916,11 +916,11 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
             details <- paste0("win = ", win, ", max_time = ", dim(fishSimData()$sim1@n)[1])
             stop(paste("Time range out of bounds:", details))
           }
-          
+
           # Build sims list and names
           sims <- list()
           names <- c()
-          
+
           if (vis$show_sim1) {
             sims <- c(sims, list(fishSimData()$sim1))
             names <- c(names, "Sim 1")
@@ -929,12 +929,12 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
             sims <- c(sims, list(fishSimData()$sim2))
             names <- c(names, "Sim 2")
           }
-          
+
           # Subset simulations by time range
           harvest_sub <- lapply(sims, function(sim) {
             mizerShiny:::subsetSimByTimeRange(sim, win)
           })
-          
+
           mizerShiny:::plotDietCompare(
             harvest_sub,
             species = input$fish_name_select,
@@ -946,13 +946,13 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishdietsingleplot"
       )
     })
-    
+
     output$nutritionplot <- renderPlotly({
       req(fishSimData())
-      
+
       win <- fish_win1()
       vis <- mizerShiny:::getSimVisibility(input$sim_choice)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           sims <- mizerShiny:::filterSimsByChoice(fishSimData(), input$sim_choice)
