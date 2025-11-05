@@ -22,15 +22,17 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
   if (nrow(plot_dat) == 0) return(NULL)
 
   params      <- objects[[1]]@params
-  prey_levels <- names(params@linecolour)[names(params@linecolour) %in% plot_dat$Prey]
+  # Use a fixed global order for prey based on params@linecolour to keep colors consistent
+  prey_levels <- names(params@linecolour)
   plot_dat$Prey <- factor(plot_dat$Prey, levels = prey_levels)
 
-  col_vec <- params@linecolour[prey_levels]
+  col_vec <- params@linecolour
   if (any(is.na(col_vec))) {
     extra <- grDevices::rainbow(sum(is.na(col_vec)))
     names(extra) <- prey_levels[is.na(col_vec)]
     col_vec[is.na(col_vec)] <- extra
   }
+  # Ensure vector order aligns with factor levels
   col_vec <- col_vec[prey_levels]
 
   sims   <- unique(plot_dat$Sim)
@@ -52,18 +54,40 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
 
   panels <- lapply(seq_along(sims), function(i) {
     sub <- full_panels[[i]]
-    plotly::plot_ly(
-      data        = sub,
-      x           = ~w,
-      y           = ~Proportion,
-      color       = ~Prey,
-      colors      = col_vec,
-      type        = "scatter",
-      mode        = "none",
-      stackgroup  = "one",
-      legendgroup = ~Prey,
-      showlegend  = (i == 1)
-    ) |>
+    # Build panel by adding one trace per prey with fixed colours
+    plt <- plotly::plot_ly()
+    for (prey in prey_levels) {
+      prey_col <- unname(col_vec[prey])
+      prey_sub <- sub[sub$Prey == prey, , drop = FALSE]
+      if (nrow(prey_sub) == 0) {
+        # ensure presence in legend with a zero area at min w if missing
+        if (nrow(sub) > 0) {
+          prey_sub <- data.frame(
+            w = min(sub$w),
+            Proportion = 0,
+            Prey = factor(prey, levels = prey_levels)
+          )
+        } else {
+          next
+        }
+      }
+      plt <- plotly::add_trace(
+        plt,
+        data        = prey_sub,
+        x           = ~w,
+        y           = ~Proportion,
+        name        = prey,
+        type        = "scatter",
+        mode        = "lines",
+        stackgroup  = "one",
+        fill        = "tonexty",
+        legendgroup = prey,
+        showlegend  = (i == 1),
+        line        = list(color = prey_col, width = 0),
+        fillcolor   = prey_col
+      )
+    }
+    plt |>
       plotly::layout(
         xaxis = list(
           type        = "log",
@@ -87,8 +111,7 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
           zeroline   = FALSE
         ),
         plot_bgcolor  = "white",
-        paper_bgcolor = "white",
-        colorway      = unname(col_vec)
+        paper_bgcolor = "white"
       )
   })
 
