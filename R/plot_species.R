@@ -126,4 +126,95 @@ plotSpeciesWithTimeRange <- function(harvestedprojection, unharvestedprojection,
     )
 }
 
+#' Shared processing for actual species biomass plots
+#'
+#' Computes actual biomass values per species from harvested projections at one or three time ranges.
+#'
+#' @param harvestedprojection Harvested mizer projection
+#' @param chosenyear Integer defining the full period; quarter/half derived
+#' @param mode Either "triple" or "chosen"
+#' @return A data frame with Species, biomass and class/fill_group columns
+#' @keywords internal
+process_sim_shared_actual <- function(harvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+  mode <- match.arg(mode)
+
+  quarter_year <- max(1, ceiling(chosenyear * 0.25))
+  half_year    <- max(1, ceiling(chosenyear * 0.5))
+  full_year    <- chosenyear
+
+  harvestedbio_full <- getBiomass(harvestedprojection)[full_year, , drop = FALSE] |>
+    melt() |>
+    dplyr::group_by(sp) |>
+    dplyr::summarise(value = mean(value, na.rm = TRUE)) |>
+    dplyr::mutate(Species = sp, biomass = value, class = "full") |>
+    dplyr::select(Species, biomass, class) |>
+    dplyr::filter(!Species %in% "Resource")
+
+  if (mode == "triple") {
+    harvestedbio_quarter <- getBiomass(harvestedprojection)[quarter_year, , drop = FALSE] |>
+      melt() |>
+      dplyr::group_by(sp) |>
+      dplyr::summarise(value = mean(value, na.rm = TRUE)) |>
+      dplyr::mutate(Species = sp, biomass = value, class = "quarter") |>
+      dplyr::select(Species, biomass, class) |>
+      dplyr::filter(!Species %in% "Resource")
+
+    harvestedbio_half <- getBiomass(harvestedprojection)[half_year, , drop = FALSE] |>
+      melt() |>
+      dplyr::group_by(sp) |>
+      dplyr::summarise(value = mean(value, na.rm = TRUE)) |>
+      dplyr::mutate(Species = sp, biomass = value, class = "half") |>
+      dplyr::select(Species, biomass, class) |>
+      dplyr::filter(!Species %in% "Resource")
+
+    plot_data <- dplyr::bind_rows(harvestedbio_quarter, harvestedbio_half, harvestedbio_full)
+  } else {
+    plot_data <- harvestedbio_full
+  }
+
+  plot_data$class <- factor(plot_data$class, levels = c("quarter", "half", "full"))
+  plot_data$fill_group <- factor(
+    plot_data$class,
+    levels = c("quarter", "half", "full"),
+    labels = c("Quarter", "Half", "Full")
+  )
+  plot_data
+}
+
+#' Plot species actual biomass at selected times
+#'
+#' Renders a bar chart of species actual biomass values at selected times for
+#' a harvested projection.
+#'
+#' @param harvestedprojection Harvested mizer projection
+#' @param chosenyear Integer defining the full period; quarter/half derived
+#' @param mode Either "triple" or "chosen"
+#' @return A ggplot object
+#' @keywords internal
+plotSpeciesActualBiomass <- function(harvestedprojection, chosenyear,
+                                     mode = c("triple", "chosen")) {
+  mode <- match.arg(mode)
+  biomass_data <- process_sim_shared_actual(harvestedprojection, chosenyear, mode)
+  biomass_data$Biomass <- biomass_data$biomass
+  biomass_data$Class   <- biomass_data$fill_group
+
+  ggplot(biomass_data, aes(x = Species, y = Biomass, fill = Class)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
+    labs(x = "Species", y = "Biomass [g]") +
+    scale_fill_manual(values = c(
+      "Quarter" = "#2FA4E799",
+      "Half"    = "#2FA4E7cc",
+      "Full"    = "#2FA4E7"
+    )) +
+    # scale_y_continuous(trans = "log10") +
+    theme_minimal() +
+    theme(
+      axis.text.x   = element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
+      axis.text.y   = element_text(size = 14),
+      legend.position = "none",
+      axis.title.x  = element_text(size = 16),
+      axis.title.y  = element_text(size = 16)
+    )
+}
+
 

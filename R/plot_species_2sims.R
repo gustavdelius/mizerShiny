@@ -184,4 +184,44 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
     ggplot2::facet_wrap(~ sim, nrow = 2)
 }
 
+#' Plot species actual biomass for two simulations
+#'
+#' Uses shared processing to compute actual biomass values for each species
+#' at selected times, and renders separate facets for two simulations.
+#'
+#' @param harvestedprojection1 First harvested mizer projection
+#' @param harvestedprojection2 Second harvested mizer projection
+#' @param chosenyear Integer defining full period; quarter/half derived
+#' @param mode Either "triple" or "chosen"
+#' @return A ggplot object
+#' @keywords internal
+plotSpeciesActualBiomass2 <- function(harvestedprojection1, harvestedprojection2,
+                                      chosenyear, mode = c("triple", "chosen")) {
+  mode <- match.arg(mode)
+  df1 <- process_sim_shared_actual(harvestedprojection1, chosenyear, mode)
+  df2 <- process_sim_shared_actual(harvestedprojection2, chosenyear, mode)
+
+  df1$sim <- "Sim 1"
+  df2$sim <- "Sim 2"
+  plot_df <- dplyr::bind_rows(df1, df2)
+
+  ggplot2::ggplot(plot_df, ggplot2::aes(x = Species, y = biomass, fill = fill_group)) +
+    ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
+    ggplot2::labs(x = "Species", y = "Biomass [g]") +
+    ggplot2::scale_fill_manual(values = c(
+      "Quarter" = "#2FA4E799",
+      "Half"    = "#2FA4E7cc",
+      "Full"    = "#2FA4E7"
+    )) +
+    # ggplot2::scale_y_continuous(trans = "log10") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
+                   axis.text.y = ggplot2::element_text(size = 14),
+                   legend.position = "none",
+                   axis.title.x = ggplot2::element_text(size = 16),
+                   axis.title.y = ggplot2::element_text(size = 16),
+                   panel.spacing.y = grid::unit(2, "lines")) +
+    ggplot2::facet_wrap(~ sim, nrow = 2)
+}
+
 
