@@ -414,151 +414,121 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
     })
     
     # Reactive storage for last successful plots
-    lastYieldPlot             <- reactiveVal(NULL)
-    lastFishSpeciesPlot       <- reactiveVal(NULL)
-    lastFishSizePlot          <- reactiveVal(NULL)
-    lastFishGuildPlot         <- reactiveVal(NULL)
-    lastSpectrumPlot          <- reactiveVal(NULL)
-    lastFishDietSinglePlot    <- reactiveVal(NULL)
-    lastNutritionPlot         <- reactiveVal(NULL)
+    lastYieldPlot             <- mizerShiny:::createLastPlotReactive()
+    lastFishSpeciesPlot       <- mizerShiny:::createLastPlotReactive()
+    lastFishSizePlot          <- mizerShiny:::createLastPlotReactive()
+    lastFishGuildPlot         <- mizerShiny:::createLastPlotReactive()
+    lastSpectrumPlot          <- mizerShiny:::createLastPlotReactive()
+    lastFishDietSinglePlot    <- mizerShiny:::createLastPlotReactive()
+    lastNutritionPlot         <- mizerShiny:::createLastPlotReactive()
     
     # Plots
     output$yieldPlot <- renderPlotly({
       req(fishSimData())
       
-      sims <- list()
-      if (input$sim_choice == "sim1" || input$sim_choice == "both") {
-        sims <- c(sims, list(fishSimData()$sim1))
-      }
-      if (input$sim_choice == "sim2" || input$sim_choice == "both") {
-        sims <- c(sims, list(fishSimData()$sim2))
-      }
+      sims <- mizerShiny:::filterSimsByChoice(fishSimData(), input$sim_choice)
       
-      if (length(sims) == 0) {
-        return(lastYieldPlot())
-      }
-      
-      p <- tryCatch({
-        mizerShiny:::generateYieldDashboard(
-          NS_sim          = sims,
-          highlight_times = input$fishyear2_yield,
-          params          = default_params
-        )
-      },
-      error = function(e) {
-        lastYieldPlot()
-      })
-      
-      lastYieldPlot(p)
-      p
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          mizerShiny:::generateYieldDashboard(
+            NS_sim          = sims,
+            highlight_times = input$fishyear2_yield,
+            params          = default_params
+          )
+        },
+        last_plot_reactive = lastYieldPlot,
+        condition = length(sims) > 0
+      )
     })
     
     output$fishspeciesPlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
       
-      show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
-      show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
       
-      if (!show_sim1 && !show_sim2) {
-        return(lastFishSpeciesPlot())
-      }
-      
-      p <- tryCatch({
-        if (show_sim1 && show_sim2) {
-        ggplotly(
-          mizerShiny:::plotSpeciesWithTimeRange2(
-              fishSimData()$sim1,
-              fishSimData()$sim2,
-              fishSimData()$unharv,
-              chosen_year,
-              mode = if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
-            ) + scale_x_discrete(limits = ordered_species_reactive())
-          )
-        } else if (show_sim1) {
-          modeFish <- if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
-          ggplotly(
-            mizerShiny:::plotSpeciesWithTimeRange(
-              fishSimData()$sim1,
-              fishSimData()$unharv,
-              chosen_year,
-              mode = modeFish
-            ) +
-              scale_x_discrete(limits = ordered_species_reactive())
-          )
-        } else {
-          modeFish <- if (isTRUE(input$triplotToggleFish)) "triple" else "chosen"
-          ggplotly(
-            mizerShiny:::plotSpeciesWithTimeRange(
-              fishSimData()$sim2,
-              fishSimData()$unharv,
-              chosen_year,
-              mode = modeFish
-            ) +
-              scale_x_discrete(limits = ordered_species_reactive())
-          )
-        }
-      },
-      error = function(e) {
-        lastFishSpeciesPlot()
-      })
-      
-      lastFishSpeciesPlot(p)
-      p
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
+          
+          if (vis$show_sim1 && vis$show_sim2) {
+            ggplotly(
+              mizerShiny:::plotSpeciesWithTimeRange2(
+                fishSimData()$sim1,
+                fishSimData()$sim2,
+                fishSimData()$unharv,
+                chosen_year,
+                mode = mode
+              ) + scale_x_discrete(limits = ordered_species_reactive())
+            )
+          } else if (vis$show_sim1) {
+            ggplotly(
+              mizerShiny:::plotSpeciesWithTimeRange(
+                fishSimData()$sim1,
+                fishSimData()$unharv,
+                chosen_year,
+                mode = mode
+              ) +
+                scale_x_discrete(limits = ordered_species_reactive())
+            )
+          } else {
+            ggplotly(
+              mizerShiny:::plotSpeciesWithTimeRange(
+                fishSimData()$sim2,
+                fishSimData()$unharv,
+                chosen_year,
+                mode = mode
+              ) +
+                scale_x_discrete(limits = ordered_species_reactive())
+            )
+          }
+        },
+        last_plot_reactive = lastFishSpeciesPlot,
+        condition = vis$show_sim1 || vis$show_sim2
+      )
     })
     
     output$fishsizePlot <- renderPlotly({
       req(fishSimData())
       
-      show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
-      show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
       
-      if (!show_sim1 && !show_sim2) {
-        return(lastFishSizePlot())
-      }
-      
-      p <- tryCatch({
-        if (show_sim1 && show_sim2) {
-        g <- mizerShiny:::plotSpectraRelative2(
-            fishSimData()$sim1,
-            fishSimData()$unharv,
-            fishSimData()$sim2,
-            fish_win1(),
-            fish_win1()
-          )
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          year <- fish_win1()
+          
+          if (vis$show_sim1 && vis$show_sim2) {
+            g <- mizerShiny:::plotSpectraRelative2(
+              fishSimData()$sim1,
+              fishSimData()$unharv,
+              fishSimData()$sim2,
+              year,
+              year
+            )
+          } else if (vis$show_sim1) {
+            g <- mizerShiny:::plotSpectraRelative(
+              fishSimData()$sim1,
+              fishSimData()$unharv,
+              year,
+              year
+            )
+          } else {
+            g <- mizerShiny:::plotSpectraRelative(
+              fishSimData()$sim2,
+              fishSimData()$unharv,
+              year,
+              year
+            )
+          }
+          
           if (!isTRUE(input$logToggle4)) {
             g <- g + scale_x_continuous()
           }
           ggplotly(g)
-        } else if (show_sim1) {
-        g <- mizerShiny:::plotSpectraRelative(
-            fishSimData()$sim1,
-            fishSimData()$unharv,
-            fish_win1(),
-            fish_win1()
-          )
-          if (!isTRUE(input$logToggle4)) {
-            g <- g + scale_x_continuous()
-          }
-          ggplotly(g)
-        } else {
-        g <- mizerShiny:::plotSpectraRelative(
-            fishSimData()$sim2,
-            fishSimData()$unharv,
-            fish_win1(),
-            fish_win1()
-          )
-          if (!isTRUE(input$logToggle4)) {
-            g <- g + scale_x_continuous()
-          }
-          ggplotly(g)
-        }
-      }, error = function(e) {
-        lastFishSizePlot()
-      })
-      
-      lastFishSizePlot(p)
-      p
+        },
+        last_plot_reactive = lastFishSizePlot,
+        condition = vis$show_sim1 || vis$show_sim2
+      )
     })
     
     output$fishguildPlot <- renderPlotly({
@@ -566,51 +536,44 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       validate(need(!is.null(guildparams), "Guild data not available"))
       chosen_year <- fish_win1()
       
-      show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
-      show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
       
-      if (!show_sim1 && !show_sim2) {
-        return(lastFishGuildPlot())
-      }
-      
-      modeGuild <- if (isTRUE(input$triguildToggleFish)) "triple" else "chosen"
-      
-      p <- tryCatch({
-        if (show_sim1 && show_sim2) {
-          ggplotly(
-          mizerShiny:::guildplot_both(
-              fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
-              chosen_year,
-              guildparams, default_params,
-              mode = modeGuild
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          mode <- mizerShiny:::getModeFromToggle(input$triguildToggleFish)
+          
+          if (vis$show_sim1 && vis$show_sim2) {
+            ggplotly(
+              mizerShiny:::guildplot_both(
+                fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
+                chosen_year,
+                guildparams, default_params,
+                mode = mode
+              )
             )
-          )
-        } else if (show_sim1) {
-          ggplotly(
-          mizerShiny:::guildplot(
-              fishSimData()$sim1, fishSimData()$unharv,
-              chosen_year,
-              guildparams, default_params,
-              mode = modeGuild
+          } else if (vis$show_sim1) {
+            ggplotly(
+              mizerShiny:::guildplot(
+                fishSimData()$sim1, fishSimData()$unharv,
+                chosen_year,
+                guildparams, default_params,
+                mode = mode
+              )
             )
-          )
-        } else {
-          ggplotly(
-          mizerShiny:::guildplot(
-              fishSimData()$sim2, fishSimData()$unharv,
-              chosen_year,
-              guildparams, default_params,
-              mode = modeGuild
+          } else {
+            ggplotly(
+              mizerShiny:::guildplot(
+                fishSimData()$sim2, fishSimData()$unharv,
+                chosen_year,
+                guildparams, default_params,
+                mode = mode
+              )
             )
-          )
-        }
-      },
-      error = function(e) {
-        lastFishGuildPlot()
-      })
-      
-      lastFishGuildPlot(p)
-      p
+          }
+        },
+        last_plot_reactive = lastFishGuildPlot,
+        condition = vis$show_sim1 || vis$show_sim2
+      )
     })
     
     # So that it saves the last plot, and remembers that the plot is already built
@@ -773,95 +736,62 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       req(fishSimData())
       
       win <- fish_win1()
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
       
-      show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
-      show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
-      
-      if (!show_sim1 && !show_sim2) {
-        return(lastFishDietSinglePlot())
-      }
-      
-      sims <- list()
-      names <- c()
-      
-      if (show_sim1) {
-        sims <- c(sims, list(fishSimData()$sim1))
-        names <- c(names, "Sim 1")
-      }
-      if (show_sim2) {
-        sims <- c(sims, list(fishSimData()$sim2))
-        names <- c(names, "Sim 2")
-      }
-      
-      p <- tryCatch({
-        sim_dims <- dim(fishSimData()$sim1@n)
-        if (win > sim_dims[1]) {
-          message("DEBUG: Fishery time range out of bounds")
-          message("DEBUG: win = ", win)
-          message("DEBUG: sim_dims[1] = ", sim_dims[1])
-          return(lastFishDietSinglePlot())
-        }
-        
-        harvest_sub <- lapply(sims, function(p) {
-          tryCatch({
-            p@n       <- p@n      [win, , , drop = FALSE]
-            p@n_pp    <- p@n_pp   [win, ,      drop = FALSE]
-            p@n_other <- p@n_other[win, ,      drop = FALSE]
-            p
-          }, error = function(e) {
-            message("DEBUG: Error in fishery diet plot subsetting: ", e$message)
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          # Check bounds
+          if (!mizerShiny:::checkTimeRangeBounds(fishSimData()$sim1, win)) {
+            message("DEBUG: Fishery time range out of bounds")
             message("DEBUG: win = ", win)
-            message("DEBUG: p@n dims = ", paste(dim(p@n), collapse = "x"))
-            stop(e)
+            stop("Time range out of bounds")
+          }
+          
+          # Build sims list and names
+          sims <- list()
+          names <- c()
+          
+          if (vis$show_sim1) {
+            sims <- c(sims, list(fishSimData()$sim1))
+            names <- c(names, "Sim 1")
+          }
+          if (vis$show_sim2) {
+            sims <- c(sims, list(fishSimData()$sim2))
+            names <- c(names, "Sim 2")
+          }
+          
+          # Subset simulations by time range
+          harvest_sub <- lapply(sims, function(sim) {
+            mizerShiny:::subsetSimByTimeRange(sim, win)
           })
-        })
-        
-        mizerShiny:::plotDietCompare(harvest_sub, species = input$fish_name_select,
-                        sim_names = names
-        )
-        
-      },
-      error = function(e) {
-        message("DEBUG: Fishery diet plot error: ", e$message)
-        lastFishDietSinglePlot()
-      })
-      
-      lastFishDietSinglePlot(p)
-      p
+          
+          mizerShiny:::plotDietCompare(
+            harvest_sub,
+            species = input$fish_name_select,
+            sim_names = names
+          )
+        },
+        last_plot_reactive = lastFishDietSinglePlot,
+        condition = vis$show_sim1 || vis$show_sim2
+      )
     })
     
     output$nutritionplot <- renderPlotly({
       req(fishSimData())
       
       win <- fish_win1()
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
       
-      show_sim1 <- input$sim_choice == "sim1" || input$sim_choice == "both"
-      show_sim2 <- input$sim_choice == "sim2" || input$sim_choice == "both"
-      
-      if (!show_sim1 && !show_sim2) {
-        return(lastNutritionPlot())
-      }
-      
-      sims <- list()
-      
-      if (show_sim1) {
-        sims <- c(sims, list(fishSimData()$sim1))
-      }
-      if (show_sim2) {
-        sims <- c(sims, list(fishSimData()$sim2))
-      }
-      
-      p <- tryCatch({
-      ggplotly(
-        mizerShiny:::plotNutrition(sims, fishSimData()$unharv ,win)
-        )
-      },
-      error = function(e) {
-        lastNutritionPlot()
-      })
-      
-      lastNutritionPlot(p)
-      p
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          sims <- mizerShiny:::filterSimsByChoice(fishSimData(), input$sim_choice)
+          ggplotly(
+            mizerShiny:::plotNutrition(sims, fishSimData()$unharv, win)
+          )
+        },
+        last_plot_reactive = lastNutritionPlot,
+        condition = vis$show_sim1 || vis$show_sim2
+      )
     })
   })
 }

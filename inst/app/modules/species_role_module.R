@@ -284,50 +284,52 @@ species_role_server <- function(id, default_params, unharvestedprojection,
     })
     
     # Store last successful plots for error recovery
-    lastBioSpeciesPlot <- reactiveVal(NULL)
-    lastBioSizePlot    <- reactiveVal(NULL)
-    lastBioGuildPlot   <- reactiveVal(NULL)
-    lastDietPlot       <- reactiveVal(NULL)
+    lastBioSpeciesPlot <- mizerShiny:::createLastPlotReactive()
+    lastBioSizePlot    <- mizerShiny:::createLastPlotReactive()
+    lastBioGuildPlot   <- mizerShiny:::createLastPlotReactive()
+    lastDietPlot       <- mizerShiny:::createLastPlotReactive()
     
     # Output plots
     output$speciesPlot <- renderPlotly({
       req(bioSimData())
       chosen_year <- input$year
-      modeChoice <- if (isTRUE(input$triplotToggle)) "triple" else "chosen"
       
-      p <- tryCatch({
-        ggplotly(
-          mizerShiny:::plotSpeciesWithTimeRange(
-            bioSimData()$harvested,
-            bioSimData()$unharvested,
-            chosen_year,
-            mode = modeChoice
-          ) +
-            scale_x_discrete(limits = ordered_species_reactive())
-        )
-      }, error = function(e) lastBioSpeciesPlot())
-      
-      lastBioSpeciesPlot(p)
-      p
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          mode <- mizerShiny:::getModeFromToggle(input$triplotToggle)
+          ggplotly(
+            mizerShiny:::plotSpeciesWithTimeRange(
+              bioSimData()$harvested,
+              bioSimData()$unharvested,
+              chosen_year,
+              mode = mode
+            ) +
+              scale_x_discrete(limits = ordered_species_reactive())
+          )
+        },
+        last_plot_reactive = lastBioSpeciesPlot
+      )
     })
     
     output$sizePlot <- renderPlotly({
       req(bioSimData())
-      t1 <- max(input$year - 1, 1);  t2 <- input$year + 1
+      t1 <- max(input$year - 1, 1)
+      t2 <- input$year + 1
       
-      p <- tryCatch({
-        g <- mizerShiny:::plotSpectraRelative(
-          bioSimData()$harvested,
-          bioSimData()$unharvested,
-          t1, t2
-        )
-        if (!isTRUE(input$logToggle))
-          g <- g + scale_x_continuous()
-        
-        ggplotly(g)
-      }, error = function(e) lastBioSizePlot())
-      
-      lastBioSizePlot(p); p
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          g <- mizerShiny:::plotSpectraRelative(
+            bioSimData()$harvested,
+            bioSimData()$unharvested,
+            t1, t2
+          )
+          if (!isTRUE(input$logToggle)) {
+            g <- g + scale_x_continuous()
+          }
+          ggplotly(g)
+        },
+        last_plot_reactive = lastBioSizePlot
+      )
     })
     
     output$guildPlot <- renderPlotly({
@@ -335,20 +337,20 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       validate(need(!is.null(guildparams), "Guild data not available"))
       chosen_year <- input$year
       
-      modeGuild <- if (isTRUE(input$triguildToggle)) "triple" else "chosen"
-      
-      p <- tryCatch({
-        ggplotly(
-          mizerShiny:::guildplot(
-            bioSimData()$harvested, bioSimData()$unharvested,
-            chosen_year,
-            guildparams, default_params,
-            mode = modeGuild
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          mode <- mizerShiny:::getModeFromToggle(input$triguildToggle)
+          ggplotly(
+            mizerShiny:::guildplot(
+              bioSimData()$harvested, bioSimData()$unharvested,
+              chosen_year,
+              guildparams, default_params,
+              mode = mode
+            )
           )
-        )
-      }, error = function(e) lastBioGuildPlot())
-      
-      lastBioGuildPlot(p); p
+        },
+        last_plot_reactive = lastBioGuildPlot
+      )
     })
     
     output$dietplot <- renderPlotly({
@@ -356,42 +358,28 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       win <- list(start = max(input$year - 1, 1), end = input$year + 1)
       sims <- list(bioSimData()$harvested, bioSimData()$unharvested)
       
-      p <- tryCatch({
-        # Add bounds checking for time range
-        sim_dims <- dim(bioSimData()$harvested@n)
-        if (win$start > sim_dims[1] || win$end > sim_dims[1]) {
-          message("DEBUG: Time range out of bounds")
-          message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
-          message("DEBUG: sim_dims[1] = ", sim_dims[1])
-          return(lastDietPlot())
-        }
-        
-        harvest_sub <- lapply(sims, function(p) {
-          tryCatch({
-            p@n       <- p@n      [win$start:win$end, , , drop = FALSE]
-            p@n_pp    <- p@n_pp   [win$start:win$end, ,      drop = FALSE]
-            p@n_other <- p@n_other[win$start:win$end, ,      drop = FALSE]
-            p
-          }, error = function(e) {
-            message("DEBUG: Error in diet plot subsetting: ", e$message)
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          # Add bounds checking for time range
+          if (!mizerShiny:::checkTimeRangeBounds(bioSimData()$harvested, win)) {
+            message("DEBUG: Time range out of bounds")
             message("DEBUG: win$start = ", win$start, ", win$end = ", win$end)
-            message("DEBUG: p@n dims = ", paste(dim(p@n), collapse = "x"))
-            stop(e)
+            stop("Time range out of bounds")
+          }
+          
+          # Subset simulations by time range
+          harvest_sub <- lapply(sims, function(sim) {
+            mizerShiny:::subsetSimByTimeRange(sim, win)
           })
-        })
-        
-        mizerShiny:::plotDietCompare(
-          harvest_sub,
-          species   = input$diet_species_select,
-          sim_names = c("Your Sim", "Base Sim")
-        )
-      },
-      error = function(e) {
-        message("DEBUG: Diet plot error: ", e$message)
-        lastDietPlot()
-      })
-      lastDietPlot(p)
-      p
+          
+          mizerShiny:::plotDietCompare(
+            harvest_sub,
+            species   = input$diet_species_select,
+            sim_names = c("Your Sim", "Base Sim")
+          )
+        },
+        last_plot_reactive = lastDietPlot
+      )
     })
   })
 }
