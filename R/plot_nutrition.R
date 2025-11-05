@@ -135,14 +135,7 @@ plotNutritionChange <- function(harvestedprojection, unharvestedprojection, chos
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
     ggplot2::labs(x = "Nutrient", y = "Nutrition % Change") +
-    ggplot2::scale_fill_manual(values = c(
-      "Quarter, Negative" = "#F2A488",
-      "Quarter, Positive" = "#2FA4E799",
-      "Half, Negative"    = "#E98C6B",
-      "Half, Positive"    = "#2FA4E7cc",
-      "Full, Negative"    = "#E76F51",
-      "Full, Positive"    = "#2FA4E7"
-    )) +
+    ggplot2::scale_fill_manual(values = change_colours()) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       axis.text.x   = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
@@ -179,14 +172,7 @@ plotNutritionChange2 <- function(harvestedprojection1, harvestedprojection2,
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
     ggplot2::labs(x = "Nutrient", y = "Nutrition % Change") +
-    ggplot2::scale_fill_manual(values = c(
-      "Quarter, Negative"  = "#F2A488",
-      "Quarter, Positive"  = "#2FA4E799",
-      "Half, Negative"     = "#E98C6B",
-      "Half, Positive"     = "#2FA4E7cc",
-      "Full, Negative"     = "#E76F51",
-      "Full, Positive"     = "#2FA4E7"
-    )) +
+    ggplot2::scale_fill_manual(values = change_colours()) +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
                    axis.text.y = ggplot2::element_text(size = 14),

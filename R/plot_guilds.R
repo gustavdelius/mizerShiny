@@ -91,14 +91,7 @@ guildplot <- function(harvestedprojection, unharvestedprojection, chosenyear, gu
   ggplot2::ggplot(joinedguilds, ggplot2::aes(Guild, Percentage, fill = Class)) +
     ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::geom_hline(yintercept = 0, colour = "grey", linetype = "dashed", linewidth = 0.5) +
-    ggplot2::scale_fill_manual(values = c(
-      "Quarter, Negative"  = "#F2A488",
-      "Quarter, Positive"  = "#2FA4E799",
-      "Half, Negative"     = "#E98C6B",
-      "Half, Positive"     = "#2FA4E7cc",
-      "Full, Negative"     = "#E76F51",
-      "Full, Positive"     = "#2FA4E7"
-    ), drop = FALSE) +
+    ggplot2::scale_fill_manual(values = change_colours(), drop = FALSE) +
     ggplot2::labs(x = "Guild", y = "Biomass % Change") +
     ggplot2::theme_minimal() +
     ggplot2::theme(

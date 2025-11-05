@@ -26,14 +26,7 @@ plotSpeciesWithTimeRange2 <- function(harvestedprojection1, harvestedprojection2
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
     ggplot2::labs(x = "Species", y = "Biomass % Change") +
-    ggplot2::scale_fill_manual(values = c(
-      "Quarter, Negative"  = "#F2A488",
-      "Quarter, Positive"  = "#2FA4E799",
-      "Half, Negative"     = "#E98C6B",
-      "Half, Positive"     = "#2FA4E7cc",
-      "Full, Negative"     = "#E76F51",
-      "Full, Positive"     = "#2FA4E7"
-    )) +
+    ggplot2::scale_fill_manual(values = change_colours()) +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
                    axis.text.y = ggplot2::element_text(size = 14),
@@ -167,14 +160,7 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
   ggplot2::ggplot(joinedguilds, ggplot2::aes(Guild, Percentage, fill = Class)) +
     ggplot2::geom_col(position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::geom_hline(yintercept = 0, colour = "grey", linetype = "dashed", linewidth = 0.5) +
-    ggplot2::scale_fill_manual(values = c(
-      "Quarter, Negative"  = "#F2A488",
-      "Quarter, Positive"  = "#2FA4E799",
-      "Half, Negative"     = "#E98C6B",
-      "Half, Positive"     = "#2FA4E7cc",
-      "Full, Negative"     = "#E76F51",
-      "Full, Positive"     = "#2FA4E7"
-    ), drop = FALSE) +
+    ggplot2::scale_fill_manual(values = change_colours(), drop = FALSE) +
     ggplot2::labs(x = "Guild", y = "Biomass % Change") +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 14, angle = 90, vjust = 0.5),
@@ -208,12 +194,7 @@ plotSpeciesActualBiomass2 <- function(harvestedprojection1, harvestedprojection2
   ggplot2::ggplot(plot_df, ggplot2::aes(x = Species, y = biomass, fill = fill_group)) +
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::labs(x = "Species", y = "Biomass [g]") +
-    ggplot2::scale_fill_manual(values = c(
-      "Initial" = "#2FA4E766",
-      "Quarter" = "#2FA4E799",
-      "Half"    = "#2FA4E7cc",
-      "Full"    = "#2FA4E7"
-    )) +
+    ggplot2::scale_fill_manual(values = abs_colours()) +
     # ggplot2::scale_y_continuous(trans = "log10") +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
@@ -245,11 +226,11 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
   df1$sim <- "Sim 1"
   df2$sim <- "Sim 2"
   plot_df <- dplyr::bind_rows(df1, df2)
-  
+
   # Get unique gears and assign colors
   gears <- sort(unique(plot_df$Gear))
   n_gears <- length(gears)
-  
+
   # Generate colors for gears
   if (n_gears <= 8) {
     gear_colors <- RColorBrewer::brewer.pal(max(3, n_gears), "Set2")[1:n_gears]
@@ -257,7 +238,7 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
     gear_colors <- grDevices::rainbow(n_gears)
   }
   names(gear_colors) <- gears
-  
+
   # Define opacities for different time points
   opacity_values <- c(
     "Initial" = 0.4,
@@ -265,7 +246,7 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
     "Half"    = 0.8,
     "Full"    = 1.0
   )
-  
+
   # Calculate cumulative positions for stacking manually
   plot_df <- plot_df |>
     dplyr::arrange(sim, Species, class, Gear) |>
@@ -275,13 +256,13 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
       Ymax = cumsum(yield)
     ) |>
     dplyr::ungroup()
-  
+
   # Create position offsets for dodging bars by time
   time_levels <- c("initial", "quarter", "half", "full")
   n_times <- length(unique(plot_df$class))
   dodge_width <- 0.8
   dodge_offset <- (seq_len(n_times) - (n_times + 1) / 2) * dodge_width / n_times
-  
+
   plot_df <- plot_df |>
     dplyr::mutate(
       TimeNum = as.numeric(factor(class, levels = time_levels)),
@@ -290,15 +271,15 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
       BarWidth = dodge_width / n_times,
       TimeClass = fill_group
     )
-  
+
   # Get unique species in order for labeling
   species_order <- unique(plot_df$Species)
-  
+
   # Use geom_rect for manual stacking and dodging
   p <- ggplot2::ggplot(plot_df) +
-    ggplot2::geom_rect(ggplot2::aes(xmin = XPos - BarWidth/2, 
+    ggplot2::geom_rect(ggplot2::aes(xmin = XPos - BarWidth/2,
                   xmax = XPos + BarWidth/2,
-                  ymin = Ymin, ymax = Ymax, 
+                  ymin = Ymin, ymax = Ymax,
                   fill = Gear, alpha = TimeClass)) +
     ggplot2::scale_x_continuous(breaks = seq_along(species_order),
                        labels = species_order) +
@@ -314,7 +295,7 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
                    axis.title.y = ggplot2::element_text(size = 16),
                    panel.spacing.y = grid::unit(2, "lines")) +
     ggplot2::facet_wrap(~ sim, nrow = 2)
-  
+
   p
 }
 
@@ -344,14 +325,7 @@ plotSpeciesYieldChange2 <- function(harvestedprojection1, harvestedprojection2,
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
     ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
     ggplot2::labs(x = "Species", y = "Yield % Change") +
-    ggplot2::scale_fill_manual(values = c(
-      "Quarter, Negative"  = "#F2A488",
-      "Quarter, Positive"  = "#2FA4E799",
-      "Half, Negative"     = "#E98C6B",
-      "Half, Positive"     = "#2FA4E7cc",
-      "Full, Negative"     = "#E76F51",
-      "Full, Positive"     = "#2FA4E7"
-    )) +
+    ggplot2::scale_fill_manual(values = change_colours()) +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
                    axis.text.y = ggplot2::element_text(size = 14),

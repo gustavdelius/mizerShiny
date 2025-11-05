@@ -108,14 +108,7 @@ plotSpeciesWithTimeRange <- function(harvestedprojection, unharvestedprojection,
     geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
     geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
     labs(x = "Species", y = "Biomass % Change") +
-    scale_fill_manual(values = c(
-      "Quarter, Negative" = "#F2A488",
-      "Quarter, Positive" = "#2FA4E799",
-      "Half, Negative"    = "#E98C6B",
-      "Half, Positive"    = "#2FA4E7cc",
-      "Full, Negative"    = "#E76F51",
-      "Full, Positive"    = "#2FA4E7"
-    )) +
+    scale_fill_manual(values = change_colours()) +
     theme_minimal() +
     theme(
       axis.text.x   = element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
@@ -211,12 +204,7 @@ plotSpeciesActualBiomass <- function(harvestedprojection, chosenyear,
   ggplot(biomass_data, aes(x = Species, y = Biomass, fill = Class)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
     labs(x = "Species", y = "Biomass [g]") +
-    scale_fill_manual(values = c(
-      "Initial" = "#2FA4E766",
-      "Quarter" = "#2FA4E799",
-      "Half"    = "#2FA4E7cc",
-      "Full"    = "#2FA4E7"
-    )) +
+    scale_fill_manual(values = abs_colours()) +
     # scale_y_continuous(trans = "log10") +
     theme_minimal() +
     theme(
@@ -312,11 +300,11 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
   yield_data <- process_sim_shared_actual_yield(harvestedprojection, chosenyear, mode)
   yield_data$Yield <- yield_data$yield
   yield_data$TimeClass <- yield_data$fill_group
-  
+
   # Get unique gears and assign colors
   gears <- sort(unique(yield_data$Gear))
   n_gears <- length(gears)
-  
+
   # Generate colors for gears (using a color palette)
   if (n_gears <= 8) {
     gear_colors <- RColorBrewer::brewer.pal(max(3, n_gears), "Set2")[1:n_gears]
@@ -324,7 +312,7 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
     gear_colors <- grDevices::rainbow(n_gears)
   }
   names(gear_colors) <- gears
-  
+
   # Define opacities for different time points
   opacity_values <- c(
     "Initial" = 0.4,
@@ -332,7 +320,7 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
     "Half"    = 0.8,
     "Full"    = 1.0
   )
-  
+
   # Calculate cumulative positions for stacking manually
   # Sort by Species, then by Time, then by Gear (for consistent stacking order)
   yield_data <- yield_data |>
@@ -343,13 +331,13 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
       Ymax = cumsum(Yield)
     ) |>
     dplyr::ungroup()
-  
+
   # Create position offsets for dodging bars by time
   time_levels <- c("initial", "quarter", "half", "full")
   n_times <- length(unique(yield_data$class))
   dodge_width <- 0.8
   dodge_offset <- (seq_len(n_times) - (n_times + 1) / 2) * dodge_width / n_times
-  
+
   yield_data <- yield_data |>
     dplyr::mutate(
       TimeNum = as.numeric(factor(class, levels = time_levels)),
@@ -357,17 +345,17 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
       XPos = SpeciesNum + dodge_offset[TimeNum],
       BarWidth = dodge_width / n_times
     )
-  
+
   # Convert Species to factor to use discrete scale
   # This allows the module to override with scale_x_discrete(limits = ...)
   yield_data$Species <- factor(yield_data$Species, levels = unique(yield_data$Species))
-  
+
   # Use geom_rect for manual stacking and dodging
   # Map Species to numeric positions but keep as factor for discrete scale
   p <- ggplot(yield_data) +
-    geom_rect(aes(xmin = XPos - BarWidth/2, 
+    geom_rect(aes(xmin = XPos - BarWidth/2,
                   xmax = XPos + BarWidth/2,
-                  ymin = Ymin, ymax = Ymax, 
+                  ymin = Ymin, ymax = Ymax,
                   fill = Gear, alpha = TimeClass)) +
     scale_x_continuous(breaks = seq_along(levels(yield_data$Species)),
                        labels = levels(yield_data$Species)) +
@@ -383,7 +371,7 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
       axis.title.x  = element_text(size = 16),
       axis.title.y  = element_text(size = 16)
     )
-  
+
   p
 }
 
@@ -416,7 +404,7 @@ process_sim_shared_yield <- function(harvestedprojection, unharvestedprojection,
     dplyr::summarise(value = mean(value, na.rm = TRUE))
 
   percentage_diff_full <- dplyr::left_join(harvestedyield_full, unharvestedyield_full, by = "sp") |>
-    dplyr::mutate(percentage_diff = ifelse(value.y == 0, 
+    dplyr::mutate(percentage_diff = ifelse(value.y == 0,
                                            ifelse(value.x == 0, 0, Inf),
                                            ((value.x - value.y) / value.y) * 100),
                   Species = sp) |>
@@ -436,7 +424,7 @@ process_sim_shared_yield <- function(harvestedprojection, unharvestedprojection,
       dplyr::summarise(value = mean(value, na.rm = TRUE))
 
     percentage_diff_quarter <- dplyr::left_join(harvestedyield_quarter, unharvestedyield_quarter, by = "sp") |>
-      dplyr::mutate(percentage_diff = ifelse(value.y == 0, 
+      dplyr::mutate(percentage_diff = ifelse(value.y == 0,
                                              ifelse(value.x == 0, 0, Inf),
                                              ((value.x - value.y) / value.y) * 100),
                     Species = sp) |>
@@ -455,7 +443,7 @@ process_sim_shared_yield <- function(harvestedprojection, unharvestedprojection,
       dplyr::summarise(value = mean(value, na.rm = TRUE))
 
     percentage_diff_half <- dplyr::left_join(harvestedyield_half, unharvestedyield_half, by = "sp") |>
-      dplyr::mutate(percentage_diff = ifelse(value.y == 0, 
+      dplyr::mutate(percentage_diff = ifelse(value.y == 0,
                                              ifelse(value.x == 0, 0, Inf),
                                              ((value.x - value.y) / value.y) * 100),
                     Species = sp) |>
@@ -501,14 +489,7 @@ plotSpeciesYieldChange <- function(harvestedprojection, unharvestedprojection, c
     geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
     geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
     labs(x = "Species", y = "Yield % Change") +
-    scale_fill_manual(values = c(
-      "Quarter, Negative" = "#F2A488",
-      "Quarter, Positive" = "#2FA4E799",
-      "Half, Negative"    = "#E98C6B",
-      "Half, Positive"    = "#2FA4E7cc",
-      "Full, Negative"    = "#E76F51",
-      "Full, Positive"    = "#2FA4E7"
-    )) +
+    scale_fill_manual(values = change_colours()) +
     theme_minimal() +
     theme(
       axis.text.x   = element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
