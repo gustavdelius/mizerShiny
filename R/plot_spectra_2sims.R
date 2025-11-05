@@ -1,3 +1,14 @@
+#' Plot size spectra for two harvested simulations
+#'
+#' Produces log-log spectra lines comparing two harvested projections over a
+#' time range, distinguishing simulations by linetype.
+#'
+#' @param harvestedprojection First harvested mizer projection
+#' @param harvestedprojection2 Second harvested mizer projection
+#' @param time1,end1 Integer start and end time for both simulations
+#' @param time2,end2 Unused; kept for compatibility
+#' @return A ggplot object
+#' @keywords internal
 plotSpectra2 <- function(harvestedprojection, harvestedprojection2, time1, end1, time2, end2) {
   data1 <- plotSpectra(harvestedprojection, time_range = time1:end1, return_data = TRUE) |>
     dplyr::mutate(sim = "Sim 1")

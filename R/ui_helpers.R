@@ -1,6 +1,13 @@
 # UI and server helpers used by the Shiny app
 
 #' Legend popover button
+#'
+#' Creates a small info-styled button that triggers a Bootstrap popover showing
+#' explanatory legend text.
+#'
+#' @param id Element id used for the popover button
+#' @param text HTML string to display inside the popover
+#' @return A Shiny tag
 #' @keywords internal
 legendUI <- function(id, text) {
   h4(
@@ -20,6 +27,16 @@ legendUI <- function(id, text) {
 }
 
 #' Setup +/- year controls associated with a slider
+#'
+#' Attaches observers to increment/decrement a slider input and dynamically cap
+#' its maximum to twice the selected value within the range from 12 to 100.
+#'
+#' @param input Shiny input
+#' @param session Shiny session
+#' @param sliderId Id of the slider input
+#' @param minusId Id of the "-" button
+#' @param plusId Id of the "+" button
+#' @return Invisibly, NULL
 #' @keywords internal
 setupYearControls <- function(input, session,
                               sliderId,

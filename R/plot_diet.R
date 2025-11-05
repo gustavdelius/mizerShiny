@@ -1,5 +1,15 @@
 # Diet plotting helper used in Shiny app
 
+#' Plot diet composition comparison across one or two simulations
+#'
+#' Builds stacked area plots of prey composition by predator size for selected
+#' species from one or more mizer projections, arranging panels per simulation.
+#'
+#' @param objects A list of one or two mizer projection objects
+#' @param species Character vector of species names to include
+#' @param sim_names Optional character vector of labels for simulations
+#' @return A plotly object
+#' @keywords internal
 plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
 
   diet_long <- function(obj, idx, species) {

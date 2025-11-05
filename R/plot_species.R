@@ -1,6 +1,15 @@
 # Helpers for species-level plots
 
 #' Shared processing for species biomass plots
+#'
+#' Computes percentage biomass differences per species between harvested and
+#' unharvested projections at one or three time ranges.
+#'
+#' @param harvestedprojection Harvested mizer projection
+#' @param unharvestedprojection Unharvested mizer projection
+#' @param chosenyear Integer defining the full period; quarter/half derived
+#' @param mode Either "triple" or "chosen"
+#' @return A data frame with Species, percentage_diff and class/fill_group columns
 #' @keywords internal
 process_sim_shared <- function(harvestedprojection, unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
@@ -81,6 +90,12 @@ process_sim_shared <- function(harvestedprojection, unharvestedprojection, chose
 }
 
 #' Plot species biomass change at selected times
+#'
+#' Renders a bar chart of species biomass percentage change at selected times for
+#' a single harvested vs unharvested comparison.
+#'
+#' @inheritParams process_sim_shared
+#' @return A ggplot object
 #' @keywords internal
 plotSpeciesWithTimeRange <- function(harvestedprojection, unharvestedprojection, chosenyear,
                                      mode = c("triple", "chosen")) {

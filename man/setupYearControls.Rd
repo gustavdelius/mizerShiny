@@ -6,7 +6,22 @@
 \usage{
 setupYearControls(input, session, sliderId, minusId, plusId)
 }
+\arguments{
+\item{input}{Shiny input}
+
+\item{session}{Shiny session}
+
+\item{sliderId}{Id of the slider input}
+
+\item{minusId}{Id of the "-" button}
+
+\item{plusId}{Id of the "+" button}
+}
+\value{
+Invisibly, NULL
+}
 \description{
-Setup +/- year controls associated with a slider
+Attaches observers to increment/decrement a slider input and dynamically cap
+its maximum to twice the selected value within the range from 12 to 100.
 }
 \keyword{internal}

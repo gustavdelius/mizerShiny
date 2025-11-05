@@ -1,5 +1,9 @@
 #' Compute ordered species list for axis
 #'
+#' Returns an ordered vector of species names based on a selected strategy:
+#' custom order, size-based, or guild-based (falling back to default species list
+#' if no `guildparams` provided). Always excludes the "Resource" row.
+#'
 #' @param default_params Mizer params object containing species_params
 #' @param guildparams Optional data.frame with columns Species, Feeding.guild, maxw
 #' @param choice One of "Custom", "Size", "Guild"

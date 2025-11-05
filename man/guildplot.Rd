@@ -13,7 +13,24 @@ guildplot(
   mode = c("chosen", "triple")
 )
 }
+\arguments{
+\item{harvestedprojection}{A mizer projection with harvesting}
+
+\item{unharvestedprojection}{A mizer projection without harvesting}
+
+\item{chosenyear}{Integer year index defining the full period; quarter/half derived}
+
+\item{guildparams}{Data frame with guild assignment rules per species}
+
+\item{celticsim}{Unused; kept for backward compatibility}
+
+\item{mode}{Either "chosen" for full only or "triple" for quarter/half/full}
+}
+\value{
+A ggplot object
+}
 \description{
-Plot guild biomass change
+Computes mean biomass within guilds over selected time ranges and visualizes
+percentage differences between harvested and unharvested projections.
 }
 \keyword{internal}

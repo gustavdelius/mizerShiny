@@ -6,7 +6,18 @@
 \usage{
 plotSpectraRelative(object1, object2, time1, time2)
 }
+\arguments{
+\item{object1}{Baseline mizer projection}
+
+\item{object2}{Comparison mizer projection}
+
+\item{time1, time2}{Integer start and end time indices}
+}
+\value{
+A ggplot object
+}
 \description{
-Relative community size spectrum (single vs baseline)
+Computes percent change in the community spectrum of one simulation relative
+to a baseline over a time range and draws a line plot.
 }
 \keyword{internal}

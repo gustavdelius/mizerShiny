@@ -1,3 +1,13 @@
+#' Compare predator-prey diet matrices between two projections
+#'
+#' Computes average diet proportions over a `timerange` for unharvested and
+#' harvested projections and visualizes percentage differences as a heatmap.
+#'
+#' @param unharvestedprojection A mizer projection without harvesting
+#' @param harvestedprojection A mizer projection with harvesting
+#' @param timerange Integer vector of time indices to average over
+#' @return A ggplot heatmap of percentage differences by predator and prey
+#' @keywords internal
 comparedietmatrix <- function(unharvestedprojection, harvestedprojection, timerange){
   dietunharv <- getDiet(unharvestedprojection@params,
                         n = apply(unharvestedprojection@n[timerange,,], c(2, 3), mean),

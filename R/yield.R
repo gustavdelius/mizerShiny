@@ -1,5 +1,15 @@
 # Yield dashboard helper used in Shiny app
 
+#' Generate a multi-panel yield dashboard as plotly subplots
+#'
+#' Builds species-level, gear-level, composition and total-yield plots for one
+#' or two simulations, optionally focusing on a highlighted time window.
+#'
+#' @param NS_sim List of one or two mizer projections
+#' @param highlight_times Optional numeric length-2 vector for x-axis zoom
+#' @param params Optional MizerParams to derive species colours
+#' @return A plotly subplot object
+#' @keywords internal
 generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL) {
   nSim <- length(NS_sim)
   yieldList     <- lapply(NS_sim, getYield)

@@ -24,6 +24,8 @@ compute_ordered_species(
 Character vector of ordered species (excluding "Resource")
 }
 \description{
-Compute ordered species list for axis
+Returns an ordered vector of species names based on a selected strategy:
+custom order, size-based, or guild-based (falling back to default species list
+if no \code{guildparams} provided). Always excludes the "Resource" row.
 }
 \keyword{internal}

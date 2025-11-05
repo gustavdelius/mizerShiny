@@ -11,7 +11,20 @@ plotSpeciesWithTimeRange(
   mode = c("triple", "chosen")
 )
 }
+\arguments{
+\item{harvestedprojection}{Harvested mizer projection}
+
+\item{unharvestedprojection}{Unharvested mizer projection}
+
+\item{chosenyear}{Integer defining the full period; quarter/half derived}
+
+\item{mode}{Either "triple" or "chosen"}
+}
+\value{
+A ggplot object
+}
 \description{
-Plot species biomass change at selected times
+Renders a bar chart of species biomass percentage change at selected times for
+a single harvested vs unharvested comparison.
 }
 \keyword{internal}

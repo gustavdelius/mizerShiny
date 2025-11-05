@@ -14,7 +14,26 @@ guildplot_both(
   mode = c("chosen", "triple")
 )
 }
+\arguments{
+\item{harvestedprojection1}{First harvested mizer projection}
+
+\item{harvestedprojection2}{Second harvested mizer projection}
+
+\item{unharvestedprojection}{Baseline unharvested mizer projection}
+
+\item{chosenyear}{Integer defining full period; quarter/half derived}
+
+\item{guildparams}{Data frame of guild rules}
+
+\item{celticsim}{Unused; present for compatibility}
+
+\item{mode}{Either "chosen" or "triple"}
+}
+\value{
+A ggplot object
+}
 \description{
-Plot guild biomass change for two simulations
+Compares guild-level biomass between each harvested projection and a common
+unharvested baseline at one or three time ranges.
 }
 \keyword{internal}

@@ -1,3 +1,9 @@
+#' Create a simple species-level bar plot from normalized values
+#'
+#' @param data Data frame with columns `Species` and `normalized_value`
+#' @param plot_title Title for the plot
+#' @return A ggplot object
+#' @keywords internal
 create_species_level_plot <- function(data, plot_title) {
   data$Class <- if_else(data$normalized_value<0, "Negative", "Positive")
   ggplot(data, aes(x = Species, y = normalized_value, fill = Class)) +

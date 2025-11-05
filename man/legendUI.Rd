@@ -6,7 +6,16 @@
 \usage{
 legendUI(id, text)
 }
+\arguments{
+\item{id}{Element id used for the popover button}
+
+\item{text}{HTML string to display inside the popover}
+}
+\value{
+A Shiny tag
+}
 \description{
-Legend popover button
+Creates a small info-styled button that triggers a Bootstrap popover showing
+explanatory legend text.
 }
 \keyword{internal}

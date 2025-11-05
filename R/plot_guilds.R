@@ -1,6 +1,17 @@
 # Guild plots
 
 #' Plot guild biomass change
+#'
+#' Computes mean biomass within guilds over selected time ranges and visualizes
+#' percentage differences between harvested and unharvested projections.
+#'
+#' @param harvestedprojection A mizer projection with harvesting
+#' @param unharvestedprojection A mizer projection without harvesting
+#' @param chosenyear Integer year index defining the full period; quarter/half derived
+#' @param guildparams Data frame with guild assignment rules per species
+#' @param celticsim Unused; kept for backward compatibility
+#' @param mode Either "chosen" for full only or "triple" for quarter/half/full
+#' @return A ggplot object
 #' @keywords internal
 guildplot <- function(harvestedprojection, unharvestedprojection, chosenyear, guildparams, celticsim,
                       mode = c("chosen", "triple")) {

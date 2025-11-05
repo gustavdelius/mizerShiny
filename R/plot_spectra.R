@@ -1,6 +1,14 @@
 # Spectra-related plots used in Shiny app
 
 #' Relative community size spectrum (single vs baseline)
+#'
+#' Computes percent change in the community spectrum of one simulation relative
+#' to a baseline over a time range and draws a line plot.
+#'
+#' @param object1 Baseline mizer projection
+#' @param object2 Comparison mizer projection
+#' @param time1,time2 Integer start and end time indices
+#' @return A ggplot object
 #' @keywords internal
 plotSpectraRelative <- function(object1, object2, time1, time2) {
   sf1 <- mizer::plotSpectra(object1, return_data = TRUE,
@@ -30,6 +38,15 @@ plotSpectraRelative <- function(object1, object2, time1, time2) {
 }
 
 #' Relative spectra for two sims vs baseline
+#'
+#' Compares each of two simulations to a baseline and overlays two lines showing
+#' percent change of community spectra over a time range.
+#'
+#' @param object1 Baseline mizer projection
+#' @param object2 First comparison projection
+#' @param object3 Second comparison projection
+#' @inheritParams plotSpectraRelative
+#' @return A ggplot object
 #' @keywords internal
 plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
   sf1 <- mizer::plotSpectra(object1, return_data = TRUE,

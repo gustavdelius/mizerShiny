@@ -1,5 +1,16 @@
 # Nutrition plot helper and data loading
 
+#' Plot relative nutritional output compared to a reference simulation
+#'
+#' Aggregates nutrient yields from simulations at a given time `step` and
+#' compares each to a reference, returning a grouped bar plot of percentage
+#' differences per nutrient.
+#'
+#' @param sims List of mizer projection objects to compare
+#' @param ref Reference mizer projection
+#' @param step Integer time index to evaluate
+#' @return A ggplot object
+#' @keywords internal
 plotNutrition <- function(sims, ref, step) {
   nut_cols <- setdiff(names(nut), "species")
 
@@ -42,12 +53,22 @@ plotNutrition <- function(sims, ref, step) {
 }
 
 # Data loading helpers (on package load, mirror previous behavior)
+#' Locate app files from installed package or development tree
+#'
+#' @param ... Path components under the app directory
+#' @return A character path, preferring installed package, falling back to `inst/app`
+#' @keywords internal
 app_path <- function(...) {
   p <- system.file("app", ..., package = "mizerShiny")
   if (p == "") p <- file.path("inst", "app", ...)
   p
 }
 
+#' Initialize nutrition data on package load
+#'
+#' Populates internal datasets `nut` and `all_matches` used by nutrition plots.
+#' Not part of the public API.
+#' @keywords internal
 .onLoad <- function(libname, pkgname) {
   nutrition_file <- app_path("Including", "Nutrition", "checkNutrition", "nutrition.csv")
   if (file.exists(nutrition_file)) {

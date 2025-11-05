@@ -1,6 +1,16 @@
 # Two-simulation variants of species/guild plots
 
 #' Plot species biomass change for two simulations
+#'
+#' Uses shared processing to compute percentage biomass changes for each species
+#' at selected times, and renders separate facets for two simulations.
+#'
+#' @param harvestedprojection1 First harvested mizer projection
+#' @param harvestedprojection2 Second harvested mizer projection
+#' @param unharvestedprojection Baseline unharvested mizer projection
+#' @param chosenyear Integer defining full period; quarter/half derived
+#' @param mode Either "triple" or "chosen"
+#' @return A ggplot object
 #' @keywords internal
 plotSpeciesWithTimeRange2 <- function(harvestedprojection1, harvestedprojection2,
                                       unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
@@ -35,6 +45,15 @@ plotSpeciesWithTimeRange2 <- function(harvestedprojection1, harvestedprojection2
 }
 
 #' Plot guild biomass change for two simulations
+#'
+#' Compares guild-level biomass between each harvested projection and a common
+#' unharvested baseline at one or three time ranges.
+#'
+#' @inheritParams plotSpeciesWithTimeRange2
+#' @param guildparams Data frame of guild rules
+#' @param celticsim Unused; present for compatibility
+#' @param mode Either "chosen" or "triple"
+#' @return A ggplot object
 #' @keywords internal
 guildplot_both <- function(harvestedprojection1, harvestedprojection2,
                            unharvestedprojection, chosenyear, guildparams, celticsim,

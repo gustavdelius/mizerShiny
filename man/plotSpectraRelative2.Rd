@@ -6,7 +6,20 @@
 \usage{
 plotSpectraRelative2(object1, object2, object3, time1, time2)
 }
+\arguments{
+\item{object1}{Baseline mizer projection}
+
+\item{object2}{First comparison projection}
+
+\item{object3}{Second comparison projection}
+
+\item{time1, time2}{Integer start and end time indices}
+}
+\value{
+A ggplot object
+}
 \description{
-Relative spectra for two sims vs baseline
+Compares each of two simulations to a baseline and overlays two lines showing
+percent change of community spectra over a time range.
 }
 \keyword{internal}

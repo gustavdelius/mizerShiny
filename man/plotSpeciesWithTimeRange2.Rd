@@ -12,7 +12,22 @@ plotSpeciesWithTimeRange2(
   mode = c("triple", "chosen")
 )
 }
+\arguments{
+\item{harvestedprojection1}{First harvested mizer projection}
+
+\item{harvestedprojection2}{Second harvested mizer projection}
+
+\item{unharvestedprojection}{Baseline unharvested mizer projection}
+
+\item{chosenyear}{Integer defining full period; quarter/half derived}
+
+\item{mode}{Either "triple" or "chosen"}
+}
+\value{
+A ggplot object
+}
 \description{
-Plot species biomass change for two simulations
+Uses shared processing to compute percentage biomass changes for each species
+at selected times, and renders separate facets for two simulations.
 }
 \keyword{internal}

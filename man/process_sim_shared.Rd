@@ -11,7 +11,20 @@ process_sim_shared(
   mode = c("triple", "chosen")
 )
 }
+\arguments{
+\item{harvestedprojection}{Harvested mizer projection}
+
+\item{unharvestedprojection}{Unharvested mizer projection}
+
+\item{chosenyear}{Integer defining the full period; quarter/half derived}
+
+\item{mode}{Either "triple" or "chosen"}
+}
+\value{
+A data frame with Species, percentage_diff and class/fill_group columns
+}
 \description{
-Shared processing for species biomass plots
+Computes percentage biomass differences per species between harvested and
+unharvested projections at one or three time ranges.
 }
 \keyword{internal}

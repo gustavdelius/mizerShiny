@@ -1,3 +1,20 @@
+#' Plot biomass time series for one species across two simulations
+#'
+#' Produces a log-scale biomass time series for a selected `specie` from two
+#' simulations, with linetype distinguishing simulations. If `specie` is NULL,
+#' uses all species from the params object. Mostly used internally by the Shiny app.
+#'
+#' @param sim A mizer projection object for simulation 1
+#' @param sim2 A mizer projection object for simulation 2
+#' @param specie Optional character scalar of species to highlight; if NULL plots all
+#' @param start_time,end_time Integer time indices for `sim`
+#' @param start_time2,end_time2 Integer time indices for `sim2`
+#' @param y_ticks Number of ticks on the y-axis
+#' @param ylim Numeric vector of length 2 with y limits (log-scale)
+#' @param highlight Optional species name to emphasize (unused currently)
+#' @param ... Passed to ggplot2 theme functions
+#' @return A ggplot object
+#' @keywords internal
 plotbothbiomass <- function(sim, sim2, specie = NULL, 
                             start_time, end_time, 
                             start_time2, end_time2,
