@@ -90,7 +90,7 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
           condition = paste0("input['", ns("plotTabs"), "'] == 'Biomass'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$biomass_species)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$biomass_species)
               ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
@@ -124,7 +124,7 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
           condition = paste0("input['", ns("plotTabs"), "'] == 'Size'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$biomass_size)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$biomass_size)
               ),
               div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
                   materialSwitch(
@@ -141,7 +141,7 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
           condition = paste0("input['", ns("plotTabs"), "'] == 'Guilds'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$biomass_guild)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$biomass_guild)
               ),
               div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                   materialSwitch(
@@ -157,7 +157,7 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
           condition = paste0("input['", ns("plotTabs"), "'] == 'Diet'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonDietBio"), legends$fishery_diet_single)
+                  mizerShiny:::legendUI(ns("infoButtonDietBio"), legends$fishery_diet_single)
               ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
@@ -180,7 +180,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
   moduleServer(id, function(input, output, session) {
     
     # Setup year controls
-    setupYearControls(
+    mizerShiny:::setupYearControls(
       input, session,
       sliderId = "year",
       minusId  = "decYear_bio",

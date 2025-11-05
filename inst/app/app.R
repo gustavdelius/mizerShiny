@@ -53,14 +53,12 @@ nut_file <- app_path("Including", "Nutrition", "checkNutrition", "nutrition.csv"
 have_nutrition_file <- file.exists(nut_file)
 #Loading in text for legends and the code to generate them
 source(app_path("www", "legendsTXT.R"), local = TRUE)
-source(app_path("Functions", "legendUI.R"), local = TRUE)
 
 # Load modules
 source(app_path("modules", "species_role_module.R"), local = TRUE)
 source(app_path("modules", "fishery_strategy_module.R"), local = TRUE)
 
 # Make helper functions available to modules (source at top-level)
-source(app_path("Functions", "yearControls.R"), local = TRUE)
 source(app_path("Functions", "plotSpectraRelative.R"), local = TRUE)
 source(app_path("Functions", "percentdiff.R"), local = TRUE)
 source(app_path("Functions", "plotSpeciesWithTimeRange.R"), local = TRUE)

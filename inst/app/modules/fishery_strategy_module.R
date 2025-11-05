@@ -116,7 +116,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Yield Composition'"),
           div(style = "margin-bottom:1.5rem;",
-              legendUI(ns("infoButtonOrder"), legends$fishery_yield)
+              mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_yield)
           ),
           div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
               HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Yield Time Range</span>"),
@@ -135,7 +135,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$fishery_species)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_species)
               ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
@@ -168,7 +168,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Size'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$fishery_size)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_size)
               ),
               div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
                   materialSwitch(
@@ -184,7 +184,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Guild'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$fishery_guild)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_guild)
               ),
               div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                   materialSwitch(
@@ -200,7 +200,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Spectra'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$fishery_spectra)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_spectra)
               ),
               div(style = "padding: 10px; background-color: #fce4ec; border-radius: 5px; border: 1px solid #f8bbd9;",
                   materialSwitch(
@@ -216,7 +216,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Diet'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$fishery_diet_single)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_diet_single)
               ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
@@ -233,7 +233,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Nutrition'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
               div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  legendUI(ns("infoButtonOrder"), legends$nutrition)
+                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$nutrition)
               )
           )
         )
@@ -401,7 +401,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
     })
     
     # Setup year controls
-    setupYearControls(
+    mizerShiny:::setupYearControls(
       input, session,
       sliderId  = "fishyear",
       minusId   = "decYear_fish",
