@@ -315,10 +315,10 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
 
   # Define opacities for different time points
   opacity_values <- c(
-    "Initial" = 0.4,
-    "Quarter" = 0.6,
-    "Half"    = 0.8,
-    "Full"    = 1.0
+    "Initial" = 1.0,
+    "Quarter" = 0.8,
+    "Half"    = 0.6,
+    "Full"    = 0.4
   )
 
   # Calculate cumulative positions for stacking manually
