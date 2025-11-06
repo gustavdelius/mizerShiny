@@ -381,8 +381,18 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
     # Reactive observer that runs when time range changes
     observe({
       sims <- isolate(fishSimData())
-      max_year <- dim(sims$sim1@n)[1] - 1
-      if (input$fishyear <= max_year) return()
+
+      target_year <- input$fishyear
+      # Determine current max years for each sim (years start at 0, so subtract 1)
+      max_sim1   <- dim(sims$sim1@n)[1] - 1
+      max_sim2   <- if (!is.null(sims$sim2)) dim(sims$sim2@n)[1] - 1 else NA_integer_
+      max_unharv <- dim(sims$unharv@n)[1] - 1
+
+      need_sim1   <- target_year > max_sim1
+      need_sim2   <- !is.null(sims$sim2) && target_year > max_sim2
+      need_unharv <- target_year > max_unharv
+
+      if (!need_sim1 && !need_sim2 && !need_unharv) return()
 
       notif_id <- shiny::showNotification(
         "Extending simulation …",
@@ -392,36 +402,43 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
       on.exit(shiny::removeNotification(id = notif_id, session = session), add = TRUE)
 
+      # Count how many projections we will run
+      steps <- sum(c(need_sim1, need_sim2, need_unharv))
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
-      total_steps <- 3
       pb$set(message = "Running simulation …", value = 0)
 
-      t_max <- input$fishyear - max_year + 5
-      pb$inc(1/total_steps, "Projecting …")
-      sim1 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(sims$sim1, t_max = t_max),
-        context = "fishery_time_range_sim1"
-      )
+      sim1   <- sims$sim1
+      sim2   <- sims$sim2
+      unharv <- sims$unharv
 
-      pb$inc(1/total_steps, "Projecting …")
-      sim2 <- if (!is.null(sims$sim2)) {
-        mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims$sim2, t_max = t_max),
+      if (need_sim1) {
+        t_max1 <- target_year - max_sim1 + 5
+        pb$inc(1/steps, "Projecting Sim 1 …")
+        sim1 <- mizerShiny:::runSimulationWithErrorHandling(
+          function() project(sims$sim1, t_max = t_max1),
+          context = "fishery_time_range_sim1"
+        )
+      }
+
+      if (need_sim2) {
+        t_max2 <- target_year - max_sim2 + 5
+        pb$inc(1/steps, "Projecting Sim 2 …")
+        sim2 <- mizerShiny:::runSimulationWithErrorHandling(
+          function() project(sims$sim2, t_max = t_max2),
           context = "fishery_time_range_sim2"
         )
-      } else NULL
+      }
 
-      pb$inc(1/total_steps, "Projecting …")
-      unharv <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(sims$unharv, t_max = t_max),
-        context = "fishery_time_range_unharv"
-      )
+      if (need_unharv) {
+        t_maxu <- target_year - max_unharv + 5
+        pb$inc(1/steps, "Projecting base …")
+        unharv <- mizerShiny:::runSimulationWithErrorHandling(
+          function() project(sims$unharv, t_max = t_maxu),
+          context = "fishery_time_range_unharv"
+        )
+      }
 
-      pb$inc(1/total_steps, "Done")
-
-      fishSimData(list(sim1 = sim1,
-                      sim2 = sim2,
-                      unharv = unharv))
+      fishSimData(list(sim1 = sim1, sim2 = sim2, unharv = unharv))
     })
 
     # Re-run only Sim 1 when Sim 1 effort sliders change
@@ -438,7 +455,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
       pb$inc(1, "Projecting Sim 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(default_params, effort = effort1, t_max = max_year * 2 + 2),
+        function() project(default_params, effort = effort1, t_max = max_year + 5),
         context = "fishery_sim1"
       )
 
@@ -460,7 +477,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
       pb$inc(1, "Projecting Sim 2 …")
       sim2 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(default_params, effort = effort2, t_max = max_year * 2 + 2),
+        function() project(default_params, effort = effort2, t_max = max_year + 5),
         context = "fishery_sim2"
       )
 
