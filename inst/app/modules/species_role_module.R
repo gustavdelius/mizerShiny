@@ -204,7 +204,7 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
   )
 }
 
-species_role_server <- function(id, default_params, unharvestedprojection,
+species_role_server <- function(id, params, unharvestedprojection,
                                 guildparams, ordered_species_reactive, species_list) {
   moduleServer(id, function(input, output, session) {
 
@@ -290,7 +290,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       input$mortspecies
       input$species_name_select
 
-      changed_params <- default_params
+      changed_params <- params
 
       pb <- shiny::Progress$new(); on.exit(pb$close())
       total_steps <- 4
@@ -299,11 +299,11 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       pb$inc(1/total_steps, "Adjusting biomass …")
 
       changed_params@initial_n[input$species_name_select, ] <-
-        default_params@initial_n[input$species_name_select, ] * (1 + input$species / 100)
+        params@initial_n[input$species_name_select, ] * (1 + input$species / 100)
 
       pb$inc(1/total_steps, "Updating mortality …")
-      extmort   <- getExtMort(default_params)
-      totalmort <- getMort(default_params)
+      extmort   <- getExtMort(params)
+      totalmort <- getMort(params)
 
       extmort[input$species_name_select, ] <-
         extmort[input$species_name_select, ] +
@@ -392,7 +392,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
             mizerShiny:::guildplot(
               bioSimData()$harvested, bioSimData()$unharvested,
               chosen_year,
-              guildparams, default_params,
+              guildparams, params,
               mode = mode
             )
           )

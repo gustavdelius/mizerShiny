@@ -15,16 +15,17 @@ library(plotly)
 # Mizer ecosystem package
 library(mizer)
 
-default_params <- getShinyOption("default_params")
-if (is.null(default_params)) {
-  default_params <- readRDS("default_params.rds")
+params <- getShinyOption("default_params")
+if (is.null(params)) {
+    # Use the packaged default_params
+    params <- default_params
 }
 
 fishery_strategy_tabs <- getShinyOption("fishery_strategy_tabs")
 species_role_tabs <- getShinyOption("species_role_tabs")
 
-unharvestedprojection <- project(default_params, t_max = 12)
-unfishedprojection <- project(default_params, t_max = 12)
+unharvestedprojection <- project(params, t_max = 12)
+unfishedprojection <- project(params, t_max = 12)
 
 #Find years for the Time Range
 sp_max_year   <- max(16, floor((dim(unharvestedprojection@n)[1] - 2) / 2))
@@ -79,7 +80,7 @@ server <- function(input, output, session) {
 
   # Shared reactive for species list - used by modules
   species_list <- reactive({
-    species <- setdiff(unique(default_params@species_params$species),
+    species <- setdiff(unique(params@species_params$species),
             ("Resource"))
     species
   })
@@ -131,7 +132,7 @@ server <- function(input, output, session) {
   #sets the order chosen by the user
   ordered_species <- reactive({
     mizerShiny:::compute_ordered_species(
-      default_params = default_params,
+      params = params,
       guildparams    = if (exists("guildparams", inherits = TRUE)) guildparams else NULL,
       choice         = species_order_choice(),
       custom_order   = custom_species_order()
@@ -148,7 +149,7 @@ server <- function(input, output, session) {
   # Species Role module
   species_role_server(
     "species",
-    default_params = default_params,
+    params = params,
     unharvestedprojection = unharvestedprojection,
     guildparams = guildparams_for_modules,
     ordered_species_reactive = ordered_species_reactive,
@@ -158,7 +159,7 @@ server <- function(input, output, session) {
   # Fishery Strategy module
   fishery_strategy_server(
     "fishery",
-    default_params = default_params,
+    params = params,
     unfishedprojection = unfishedprojection,
     guildparams = guildparams_for_modules,
     ordered_species_reactive = ordered_species_reactive,

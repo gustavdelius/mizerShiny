@@ -5,14 +5,14 @@
 \title{Compute ordered species list for axis}
 \usage{
 compute_ordered_species(
-  default_params,
+  params,
   guildparams = NULL,
   choice = c("Custom", "Size", "Guild"),
   custom_order = NULL
 )
 }
 \arguments{
-\item{default_params}{Mizer params object containing species_params}
+\item{params}{Mizer params object containing species_params}
 
 \item{guildparams}{Optional data.frame with columns Species, Feeding.guild, maxw}
 

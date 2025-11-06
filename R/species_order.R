@@ -4,13 +4,13 @@
 #' custom order, size-based, or guild-based (falling back to default species list
 #' if no `guildparams` provided). Always excludes the "Resource" row.
 #'
-#' @param default_params Mizer params object containing species_params
+#' @param params Mizer params object containing species_params
 #' @param guildparams Optional data.frame with columns Species, Feeding.guild, maxw
 #' @param choice One of "Custom", "Size", "Guild"
 #' @param custom_order Optional character vector of species for custom choice
 #' @return Character vector of ordered species (excluding "Resource")
 #' @keywords internal
-compute_ordered_species <- function(default_params, guildparams = NULL,
+compute_ordered_species <- function(params, guildparams = NULL,
                                     choice = c("Custom", "Size", "Guild"),
                                     custom_order = NULL) {
   choice <- match.arg(choice)
@@ -25,9 +25,9 @@ compute_ordered_species <- function(default_params, guildparams = NULL,
                                levels = unique(.data$Feeding.guild))) |>
         dplyr::pull(.data$Species) |>
         unique()
-      return(intersect(guild_order, default_params@species_params$species))
+      return(intersect(guild_order, params@species_params$species))
     } else {
-      return(as.data.frame(default_params@species_params$species) |>
+      return(as.data.frame(params@species_params$species) |>
                stats::setNames("sp") |>
                dplyr::filter(.data$sp != "Resource") |>
                dplyr::pull(.data$sp))
@@ -35,7 +35,7 @@ compute_ordered_species <- function(default_params, guildparams = NULL,
   }
 
   if (identical(choice, "Size")) {
-    return(default_params@species_params |>
+    return(params@species_params |>
              dplyr::filter(.data$species != "Resource") |>
              dplyr::arrange(.data$w_mat) |>
              dplyr::pull(.data$species))
@@ -45,7 +45,7 @@ compute_ordered_species <- function(default_params, guildparams = NULL,
   if (!is.null(custom_order) && length(custom_order)) {
     return(custom_order)
   }
-  as.data.frame(default_params@species_params$species) |>
+  as.data.frame(params@species_params$species) |>
     stats::setNames("sp") |>
     dplyr::filter(.data$sp != "Resource") |>
     dplyr::pull(.data$sp)

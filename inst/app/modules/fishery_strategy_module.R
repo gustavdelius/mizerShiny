@@ -343,7 +343,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
   )
 }
 
-fishery_strategy_server <- function(id, default_params, unfishedprojection,
+fishery_strategy_server <- function(id, params, unfishedprojection,
                                    guildparams, ordered_species_reactive, species_list,
                                    fish_max_year) {
   moduleServer(id, function(input, output, session) {
@@ -355,17 +355,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
     # Dynamic fishery effort sliders for Sim 1
     output$fishery_sliders_ui <- renderUI({
-      effort <- default_params@initial_effort
-      gears <- unique(default_params@gear_params$gear)
+      effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
       slider_list <- lapply(gears, function(gear) {
         sliderInput(
           inputId = session$ns(paste0("effort_", gear)),
           label = paste("Effort for", gear),
           min = 0,
-          max = if(default_params@initial_effort[gear]==0){
+          max = if(params@initial_effort[gear]==0){
             2
-          }else(default_params@initial_effort[gear]*2),
-          value = default_params@initial_effort[gear],
+          }else(params@initial_effort[gear]*2),
+          value = params@initial_effort[gear],
           step = 0.05,
           width = "100%"
         )
@@ -375,17 +375,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
     # Dynamic fishery effort sliders for Sim 2
     output$fishery_sliders_ui2 <- renderUI({
-      effort <- default_params@initial_effort
-      gears <- unique(default_params@gear_params$gear)
+      effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
       slider_list <- lapply(gears, function(gear) {
         sliderInput(
           inputId = session$ns(paste0("effort2_", gear)),
           label = paste("Effort for", gear),
           min = 0,
-          max = if(default_params@initial_effort[gear]==0){
+          max = if(params@initial_effort[gear]==0){
             2
-          }else(default_params@initial_effort[gear]*2),
-          value = default_params@initial_effort[gear],
+          }else(params@initial_effort[gear]*2),
+          value = params@initial_effort[gear],
           step = 0.05,
           width = "100%"
         )
@@ -426,7 +426,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
     # Observer to automatically switch to "Both" when Sim 2 sliders are changed
     observeEvent({
-      gears <- unique(default_params@gear_params$gear)
+      gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) {
         input[[paste0("effort2_", gear)]]
       })
@@ -509,11 +509,11 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
     # Re-run only Sim 1 when Sim 1 effort sliders change
     observeEvent({
-      gears <- unique(default_params@gear_params$gear)
+      gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) input[[paste0("effort_", gear)]])
     }, {
-      gears <- unique(default_params@gear_params$gear)
-      effort1 <- makeEffort("effort_" , gears, default_params@initial_effort)
+      gears <- unique(params@gear_params$gear)
+      effort1 <- makeEffort("effort_" , gears, params@initial_effort)
       max_year <- isolate(input$fishyear)
 
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
@@ -521,7 +521,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
       pb$inc(1, "Projecting Sim 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(default_params, effort = effort1, t_max = max_year + 5),
+        function() project(params, effort = effort1, t_max = max_year + 5),
         context = "fishery_sim1"
       )
 
@@ -531,11 +531,11 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
     # Re-run only Sim 2 when Sim 2 effort sliders change
     observeEvent({
-      gears <- unique(default_params@gear_params$gear)
+      gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) input[[paste0("effort2_", gear)]])
     }, {
-      gears <- unique(default_params@gear_params$gear)
-      effort2 <- makeEffort("effort2_", gears, default_params@initial_effort)
+      gears <- unique(params@gear_params$gear)
+      effort2 <- makeEffort("effort2_", gears, params@initial_effort)
       max_year <- isolate(input$fishyear)
 
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
@@ -543,7 +543,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
       pb$inc(1, "Projecting Sim 2 …")
       sim2 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(default_params, effort = effort2, t_max = max_year + 5),
+        function() project(params, effort = effort2, t_max = max_year + 5),
         context = "fishery_sim2"
       )
 
@@ -588,7 +588,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
           mizerShiny:::generateYieldDashboard(
             NS_sim          = sims,
             highlight_times = input$fishyear2_yield,
-            params          = default_params
+            params          = params
           )
         },
         last_plot_reactive = lastYieldPlot,
@@ -877,7 +877,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
               mizerShiny:::guildplot_both(
                 fishSimData()$sim1, fishSimData()$sim2, fishSimData()$unharv,
                 chosen_year,
-                guildparams, default_params,
+                guildparams, params,
                 mode = mode
               )
             )
@@ -886,7 +886,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
               mizerShiny:::guildplot(
                 fishSimData()$sim1, fishSimData()$unharv,
                 chosen_year,
-                guildparams, default_params,
+                guildparams, params,
                 mode = mode
               )
             )
@@ -895,7 +895,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
               mizerShiny:::guildplot(
                 fishSimData()$sim2, fishSimData()$unharv,
                 chosen_year,
-                guildparams, default_params,
+                guildparams, params,
                 mode = mode
               )
             )
