@@ -1,8 +1,8 @@
 # Species Role Module
 # Handles the Species Role tab UI and server logic
 
-species_role_ui <- function(id, sp_max_year, have_guild_file,
-                            app_exists, species_role_tabs) {
+species_role_ui <- function(id, config, legends, have_guild_file,
+                            species_role_tabs) {
   ns <- NS(id)
 
   grid_container(
@@ -50,8 +50,8 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
         sliderInput(
           inputId = ns("year"),
           label   = "Time Range",
-          min     = 1,
-          max     = sp_max_year,
+          min     = 3,
+          max     = config$max_year,
           value   = 5,
           step    = 1,
           width   = "100%"
@@ -204,8 +204,9 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
   )
 }
 
-species_role_server <- function(id, params, unharvestedprojection,
+species_role_server <- function(id, sim_0,
                                 guildparams, ordered_species_reactive, species_list) {
+    params <- sim_0@params
   moduleServer(id, function(input, output, session) {
 
     # Setup year controls
@@ -218,15 +219,15 @@ species_role_server <- function(id, params, unharvestedprojection,
 
     # Update species select inputs
     observe({
-      updateSelectInput(session, "species_name_select", choices = species_list())
-      updateSelectInput(session, "diet_species_select", choices = species_list())
+      updateSelectInput(session, "species_name_select", choices = species_list)
+      updateSelectInput(session, "diet_species_select", choices = species_list)
     })
 
     # Initialize species selection when app starts
     observe({
-      req(species_list())
-      if (length(species_list()) > 0 && (is.null(input$species_name_select) || input$species_name_select == "")) {
-        updateSelectInput(session, "species_name_select", selected = species_list()[1])
+      req(species_list)
+      if (length(species_list) > 0 && (is.null(input$species_name_select) || input$species_name_select == "")) {
+        updateSelectInput(session, "species_name_select", selected = species_list[1])
       }
     })
 
@@ -239,8 +240,8 @@ species_role_server <- function(id, params, unharvestedprojection,
 
     # Initialize bioSimData as a reactive value
     bioSimData <- reactiveVal(list(
-      harvested = unharvestedprojection,
-      unharvested = unharvestedprojection
+      harvested = sim_0,
+      unharvested = sim_0
     ))
 
     # Reactive observer that runs when time range changes
@@ -326,7 +327,7 @@ species_role_server <- function(id, params, unharvestedprojection,
 
       # Update the reactive value
       bioSimData(list(harvested = harvested,
-                      unharvested = unharvestedprojection))
+                      unharvested = sim_0))
     })
 
     # Store last successful plots for error recovery

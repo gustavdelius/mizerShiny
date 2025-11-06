@@ -7,16 +7,16 @@
 #'
 #' @param harvestedprojection1 First harvested mizer projection
 #' @param harvestedprojection2 Second harvested mizer projection
-#' @param unharvestedprojection Baseline unharvested mizer projection
+#' @param sim_0 Baseline unharvested mizer projection
 #' @param chosenyear Integer defining full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
 #' @return A ggplot object
 #' @keywords internal
 plotSpeciesWithTimeRange2 <- function(harvestedprojection1, harvestedprojection2,
-                                      unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+                                      sim_0, chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
-  df1 <- process_sim_shared(harvestedprojection1, unharvestedprojection, chosenyear, mode)
-  df2 <- process_sim_shared(harvestedprojection2, unharvestedprojection, chosenyear, mode)
+  df1 <- process_sim_shared(harvestedprojection1, sim_0, chosenyear, mode)
+  df2 <- process_sim_shared(harvestedprojection2, sim_0, chosenyear, mode)
 
   df1$sim <- "Sim 1"
   df2$sim <- "Sim 2"
@@ -49,7 +49,7 @@ plotSpeciesWithTimeRange2 <- function(harvestedprojection1, harvestedprojection2
 #' @return A ggplot object
 #' @keywords internal
 guildplot_both <- function(harvestedprojection1, harvestedprojection2,
-                           unharvestedprojection, chosenyear, guildparams, celticsim,
+                           sim_0, chosenyear, guildparams, celticsim,
                            mode = c("chosen", "triple")) {
   mode <- match.arg(mode)
 
@@ -88,7 +88,7 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
   if (mode == "chosen") {
     harvested_full1   <- plotSpectra(harvestedprojection1,   time_range = full_year, return_data = TRUE)
     harvested_full2   <- plotSpectra(harvestedprojection2,   time_range = full_year, return_data = TRUE)
-    unharvested_full  <- plotSpectra(unharvestedprojection, time_range = full_year,  return_data = TRUE)
+    unharvested_full  <- plotSpectra(sim_0, time_range = full_year,  return_data = TRUE)
 
     sim1_final <- process_guilds(harvested_full1)  |> dplyr::mutate(time = "full") |>
       dplyr::full_join(process_guilds(unharvested_full) |> dplyr::mutate(time = "full"), by = c("Guild", "time")) |>
@@ -111,9 +111,9 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
     hs_quarter2 <- plotSpectra(harvestedprojection2, time_range = quarter_year, return_data = TRUE)
     hs_half2    <- plotSpectra(harvestedprojection2, time_range = half_year,    return_data = TRUE)
     hs_full2    <- plotSpectra(harvestedprojection2, time_range = full_year,    return_data = TRUE)
-    us_quarter  <- plotSpectra(unharvestedprojection, time_range = quarter_year, return_data = TRUE)
-    us_half     <- plotSpectra(unharvestedprojection, time_range = half_year,    return_data = TRUE)
-    us_full     <- plotSpectra(unharvestedprojection, time_range = full_year,    return_data = TRUE)
+    us_quarter  <- plotSpectra(sim_0, time_range = quarter_year, return_data = TRUE)
+    us_half     <- plotSpectra(sim_0, time_range = half_year,    return_data = TRUE)
+    us_full     <- plotSpectra(sim_0, time_range = full_year,    return_data = TRUE)
 
     guilds1 <- dplyr::bind_rows(
       process_guilds(hs_quarter1) |> dplyr::mutate(time = "quarter"),
@@ -319,16 +319,16 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
 #'
 #' @param harvestedprojection1 First harvested mizer projection
 #' @param harvestedprojection2 Second harvested mizer projection
-#' @param unharvestedprojection Baseline unharvested mizer projection
+#' @param sim_0 Baseline unharvested mizer projection
 #' @param chosenyear Integer defining full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
 #' @return A ggplot object
 #' @keywords internal
 plotSpeciesYieldChange2 <- function(harvestedprojection1, harvestedprojection2,
-                                      unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+                                      sim_0, chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
-  df1 <- process_sim_shared_yield(harvestedprojection1, unharvestedprojection, chosenyear, mode)
-  df2 <- process_sim_shared_yield(harvestedprojection2, unharvestedprojection, chosenyear, mode)
+  df1 <- process_sim_shared_yield(harvestedprojection1, sim_0, chosenyear, mode)
+  df2 <- process_sim_shared_yield(harvestedprojection2, sim_0, chosenyear, mode)
 
   df1$sim <- "Sim 1"
   df2$sim <- "Sim 2"

@@ -7,7 +7,7 @@
 guildplot_both(
   harvestedprojection1,
   harvestedprojection2,
-  unharvestedprojection,
+  sim_0,
   chosenyear,
   guildparams,
   celticsim,
@@ -19,7 +19,7 @@ guildplot_both(
 
 \item{harvestedprojection2}{Second harvested mizer projection}
 
-\item{unharvestedprojection}{Baseline unharvested mizer projection}
+\item{sim_0}{Baseline unharvested mizer projection}
 
 \item{chosenyear}{Integer defining full period; quarter/half derived}
 

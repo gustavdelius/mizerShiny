@@ -4,10 +4,21 @@
 \alias{mizerShinyAllTabs}
 \title{Launch mizerShiny with all tabs enabled}
 \usage{
-mizerShinyAllTabs(params = default_params, ...)
+mizerShinyAllTabs(
+  params = default_params,
+  guildparams = NULL,
+  nutrition = NULL,
+  ...
+)
 }
 \arguments{
 \item{params}{A MizerParams object. Defaults to NS_params.}
+
+\item{guildparams}{An optional data frame defining guilds for the model.
+See the 'Guilds' section of the package vignette for details.}
+
+\item{nutrition}{An optional data frame defining nutritional values
+for the model. See the 'Nutrition' section of the package vignette for details.}
 
 \item{...}{further arguments passed on to \code{shiny::runApp()}
 (e.g. \code{host}, \code{port}, \code{launch.browser}).}

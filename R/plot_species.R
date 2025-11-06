@@ -6,19 +6,19 @@
 #' unharvested projections at one or three time ranges.
 #'
 #' @param harvestedprojection Harvested mizer projection
-#' @param unharvestedprojection Unharvested mizer projection
+#' @param sim_0 Unharvested mizer projection
 #' @param chosenyear Integer defining the full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
 #' @return A data frame with Species, percentage_diff and class/fill_group columns
 #' @keywords internal
-process_sim_shared <- function(harvestedprojection, unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+process_sim_shared <- function(harvestedprojection, sim_0, chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
 
   quarter_year <- max(1, ceiling(chosenyear * 0.25))
   half_year    <- max(1, ceiling(chosenyear * 0.5))
   full_year    <- chosenyear
 
-  unharvestedbio_full <- getBiomass(unharvestedprojection)[full_year, , drop = FALSE] |>
+  unharvestedbio_full <- getBiomass(sim_0)[full_year, , drop = FALSE] |>
     melt() |>
     dplyr::group_by(sp) |>
     dplyr::summarise(value = mean(value, na.rm = TRUE))
@@ -36,7 +36,7 @@ process_sim_shared <- function(harvestedprojection, unharvestedprojection, chose
     dplyr::mutate(class = "full")
 
   if (mode == "triple") {
-    unharvestedbio_quarter <- getBiomass(unharvestedprojection)[quarter_year, , drop = FALSE] |>
+    unharvestedbio_quarter <- getBiomass(sim_0)[quarter_year, , drop = FALSE] |>
       melt() |>
       dplyr::group_by(sp) |>
       dplyr::summarise(value = mean(value, na.rm = TRUE))
@@ -53,7 +53,7 @@ process_sim_shared <- function(harvestedprojection, unharvestedprojection, chose
       dplyr::filter(!Species %in% "Resource") |>
       dplyr::mutate(class = "quarter")
 
-    unharvestedbio_half <- getBiomass(unharvestedprojection)[half_year, , drop = FALSE] |>
+    unharvestedbio_half <- getBiomass(sim_0)[half_year, , drop = FALSE] |>
       melt() |>
       dplyr::group_by(sp) |>
       dplyr::summarise(value = mean(value, na.rm = TRUE))
@@ -97,10 +97,10 @@ process_sim_shared <- function(harvestedprojection, unharvestedprojection, chose
 #' @inheritParams process_sim_shared
 #' @return A ggplot object
 #' @keywords internal
-plotSpeciesWithTimeRange <- function(harvestedprojection, unharvestedprojection, chosenyear,
+plotSpeciesWithTimeRange <- function(harvestedprojection, sim_0, chosenyear,
                                      mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
-  percentage_diff <- process_sim_shared(harvestedprojection, unharvestedprojection, chosenyear, mode)
+  percentage_diff <- process_sim_shared(harvestedprojection, sim_0, chosenyear, mode)
   percentage_diff$Percentage <- percentage_diff$percentage_diff
   percentage_diff$Class      <- percentage_diff$fill_group
 
@@ -394,19 +394,19 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
 #' unharvested projections at one or three time ranges.
 #'
 #' @param harvestedprojection Harvested mizer projection
-#' @param unharvestedprojection Unharvested mizer projection
+#' @param sim_0 Unharvested mizer projection
 #' @param chosenyear Integer defining the full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
 #' @return A data frame with Species, percentage_diff and class/fill_group columns
 #' @keywords internal
-process_sim_shared_yield <- function(harvestedprojection, unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+process_sim_shared_yield <- function(harvestedprojection, sim_0, chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
 
   quarter_year <- max(1, ceiling(chosenyear * 0.25))
   half_year    <- max(1, ceiling(chosenyear * 0.5))
   full_year    <- chosenyear
 
-  unharvestedyield_full <- getYield(unharvestedprojection)[full_year, , drop = FALSE] |>
+  unharvestedyield_full <- getYield(sim_0)[full_year, , drop = FALSE] |>
     melt() |>
     dplyr::group_by(sp) |>
     dplyr::summarise(value = mean(value, na.rm = TRUE))
@@ -426,7 +426,7 @@ process_sim_shared_yield <- function(harvestedprojection, unharvestedprojection,
     dplyr::mutate(class = "full")
 
   if (mode == "triple") {
-    unharvestedyield_quarter <- getYield(unharvestedprojection)[quarter_year, , drop = FALSE] |>
+    unharvestedyield_quarter <- getYield(sim_0)[quarter_year, , drop = FALSE] |>
       melt() |>
       dplyr::group_by(sp) |>
       dplyr::summarise(value = mean(value, na.rm = TRUE))
@@ -445,7 +445,7 @@ process_sim_shared_yield <- function(harvestedprojection, unharvestedprojection,
       dplyr::filter(!Species %in% "Resource") |>
       dplyr::mutate(class = "quarter")
 
-    unharvestedyield_half <- getYield(unharvestedprojection)[half_year, , drop = FALSE] |>
+    unharvestedyield_half <- getYield(sim_0)[half_year, , drop = FALSE] |>
       melt() |>
       dplyr::group_by(sp) |>
       dplyr::summarise(value = mean(value, na.rm = TRUE))
@@ -491,10 +491,10 @@ process_sim_shared_yield <- function(harvestedprojection, unharvestedprojection,
 #' @inheritParams process_sim_shared_yield
 #' @return A ggplot object
 #' @keywords internal
-plotSpeciesYieldChange <- function(harvestedprojection, unharvestedprojection, chosenyear,
+plotSpeciesYieldChange <- function(harvestedprojection, sim_0, chosenyear,
                                      mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
-  percentage_diff <- process_sim_shared_yield(harvestedprojection, unharvestedprojection, chosenyear, mode)
+  percentage_diff <- process_sim_shared_yield(harvestedprojection, sim_0, chosenyear, mode)
   percentage_diff$Percentage <- percentage_diff$percentage_diff
   percentage_diff$Class      <- percentage_diff$fill_group
 

@@ -29,12 +29,12 @@ calc_nutrition_totals <- function(sim, steps) {
 #' unharvested projections at one or three time ranges.
 #'
 #' @param harvestedprojection Harvested mizer projection
-#' @param unharvestedprojection Unharvested mizer projection
+#' @param sim_0 Unharvested mizer projection
 #' @param chosenyear Integer defining the full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
 #' @return A data frame with Nutrient, percentage_diff and class/fill_group columns
 #' @keywords internal
-process_nutrition_change <- function(harvestedprojection, unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+process_nutrition_change <- function(harvestedprojection, sim_0, chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
   nut_cols <- setdiff(names(nut), "species")
 
@@ -43,7 +43,7 @@ process_nutrition_change <- function(harvestedprojection, unharvestedprojection,
   full_year    <- chosenyear
 
   # Calculate nutrition totals for full year
-  unharvested_nut_full <- calc_nutrition_totals(unharvestedprojection, full_year)
+  unharvested_nut_full <- calc_nutrition_totals(sim_0, full_year)
   harvested_nut_full <- calc_nutrition_totals(harvestedprojection, full_year)
 
   percentage_diff_full <- tibble(
@@ -62,7 +62,7 @@ process_nutrition_change <- function(harvestedprojection, unharvestedprojection,
 
   if (mode == "triple") {
     # Calculate nutrition totals for quarter year
-    unharvested_nut_quarter <- calc_nutrition_totals(unharvestedprojection, quarter_year)
+    unharvested_nut_quarter <- calc_nutrition_totals(sim_0, quarter_year)
     harvested_nut_quarter <- calc_nutrition_totals(harvestedprojection, quarter_year)
 
     percentage_diff_quarter <- tibble(
@@ -80,7 +80,7 @@ process_nutrition_change <- function(harvestedprojection, unharvestedprojection,
       dplyr::filter(!is.na(percentage_diff))
 
     # Calculate nutrition totals for half year
-    unharvested_nut_half <- calc_nutrition_totals(unharvestedprojection, half_year)
+    unharvested_nut_half <- calc_nutrition_totals(sim_0, half_year)
     harvested_nut_half <- calc_nutrition_totals(harvestedprojection, half_year)
 
     percentage_diff_half <- tibble(
@@ -124,10 +124,10 @@ process_nutrition_change <- function(harvestedprojection, unharvestedprojection,
 #' @inheritParams process_nutrition_change
 #' @return A ggplot object
 #' @keywords internal
-plotNutritionChange <- function(harvestedprojection, unharvestedprojection, chosenyear,
+plotNutritionChange <- function(harvestedprojection, sim_0, chosenyear,
                                  mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
-  percentage_diff <- process_nutrition_change(harvestedprojection, unharvestedprojection, chosenyear, mode)
+  percentage_diff <- process_nutrition_change(harvestedprojection, sim_0, chosenyear, mode)
   percentage_diff$Percentage <- percentage_diff$percentage_diff
   percentage_diff$Class      <- percentage_diff$fill_group
 
@@ -153,16 +153,16 @@ plotNutritionChange <- function(harvestedprojection, unharvestedprojection, chos
 #'
 #' @param harvestedprojection1 First harvested mizer projection
 #' @param harvestedprojection2 Second harvested mizer projection
-#' @param unharvestedprojection Baseline unharvested mizer projection
+#' @param sim_0 Baseline unharvested mizer projection
 #' @param chosenyear Integer defining full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
 #' @return A ggplot object
 #' @keywords internal
 plotNutritionChange2 <- function(harvestedprojection1, harvestedprojection2,
-                                  unharvestedprojection, chosenyear, mode = c("triple", "chosen")) {
+                                  sim_0, chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
-  df1 <- process_nutrition_change(harvestedprojection1, unharvestedprojection, chosenyear, mode)
-  df2 <- process_nutrition_change(harvestedprojection2, unharvestedprojection, chosenyear, mode)
+  df1 <- process_nutrition_change(harvestedprojection1, sim_0, chosenyear, mode)
+  df2 <- process_nutrition_change(harvestedprojection2, sim_0, chosenyear, mode)
 
   df1$sim <- "Sim 1"
   df2$sim <- "Sim 2"

@@ -10,13 +10,13 @@ test_that("guildplot works with default_sim", {
   )
 
   harvestedprojection <- default_sim
-  unharvestedprojection <- mizer::project(params, t_max = 10, effort = 0)
+  sim_0 <- mizer::project(params, t_max = 10, effort = 0)
   chosenyear <- 10
   celticsim <- NULL
   mode <- "chosen"
 
   p <- mizerShiny:::guildplot(
-    harvestedprojection, unharvestedprojection, chosenyear, guildparams, celticsim, mode = mode
+    harvestedprojection, sim_0, chosenyear, guildparams, celticsim, mode = mode
   )
 
   expect_s3_class(p, "ggplot")
@@ -33,13 +33,13 @@ test_that("guildplot works with triple mode", {
   )
 
   harvestedprojection <- default_sim
-  unharvestedprojection <- mizer::project(params, t_max = 10, effort = 0)
+  sim_0 <- mizer::project(params, t_max = 10, effort = 0)
   chosenyear <- 10
   celticsim <- NULL
   mode <- "triple"
 
   p <- mizerShiny:::guildplot(
-    harvestedprojection, unharvestedprojection, chosenyear, guildparams, celticsim, mode = mode
+    harvestedprojection, sim_0, chosenyear, guildparams, celticsim, mode = mode
   )
 
   expect_s3_class(p, "ggplot")
@@ -56,10 +56,10 @@ test_that("guildplot snapshot test", {
   )
 
   harvestedprojection <- default_sim
-  unharvestedprojection <- mizer::project(params, t_max = 10, effort = 0)
+  sim_0 <- mizer::project(params, t_max = 10, effort = 0)
 
   p <- mizerShiny:::guildplot(
-    harvestedprojection, unharvestedprojection, chosenyear = 10,
+    harvestedprojection, sim_0, chosenyear = 10,
     guildparams, NULL, mode = "chosen"
   )
 

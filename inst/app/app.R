@@ -15,24 +15,24 @@ library(plotly)
 # Mizer ecosystem package
 library(mizer)
 
-params <- getShinyOption("default_params")
+guildparams <- getShinyOption("guildparams")
+nutrition <- getShinyOption("nutrition")
+params <- getShinyOption("params")
+
+# If no params provided, use defaults
 if (is.null(params)) {
-    # Use the packaged default_params
     params <- default_params
+    guildparams <- default_guilds
+    nutrition <- default_nutrition
 }
+
+sim_0 <- project(params, t_max = 12)
+
+have_guild_file <- !is.null(guildparams)
+have_nutrition_file <- !is.null(nutrition)
 
 fishery_strategy_tabs <- getShinyOption("fishery_strategy_tabs")
 species_role_tabs <- getShinyOption("species_role_tabs")
-
-unharvestedprojection <- project(params, t_max = 12)
-unfishedprojection <- project(params, t_max = 12)
-
-#Find years for the Time Range
-sp_max_year   <- max(16, floor((dim(unharvestedprojection@n)[1] - 2) / 2))
-fish_max_year <- max(16, floor((dim(unfishedprojection@n)[1] - 2) / 2))
-
-
-# Load guild & nutrition data ----
 
 # Functions to help load in files
 app_path <- function(...) {
@@ -40,30 +40,15 @@ app_path <- function(...) {
   if (p == "") p <- file.path("inst", "app", ...)
   p
 }
-app_exists <- function(...) file.exists(app_path(...))
 
-guild_file <- app_path("Including", "guilds_information", "checkGuilds",
-                       "guildparams_preprocessed.Rdata")
-have_guild_file <- file.exists(guild_file)
-if (have_guild_file) {
-  guild_env <- new.env(parent = emptyenv())
-  load(guild_file, envir = guild_env)
-  if (exists("guildparams", envir = guild_env, inherits = FALSE)) {
-    guildparams <- get("guildparams", envir = guild_env)
-  }
-}
-
-nut_file <- app_path("Including", "Nutrition", "checkNutrition", "nutrition.csv")
-have_nutrition_file <- file.exists(nut_file)
-#Loading in text for legends and the code to generate them
+# Loading in text for legends
 source(app_path("www", "legendsTXT.R"), local = TRUE)
+# Loading in configuration constants
+source(app_path("www", "config.R"), local = TRUE)
 
 # Load modules
 source(app_path("modules", "species_role_module.R"), local = TRUE)
 source(app_path("modules", "fishery_strategy_module.R"), local = TRUE)
-
-# Make helper functions available to modules (source at top-level)
-## plot helpers now come from package code (R/plot_*.R)
 
 # Server ----
 server <- function(input, output, session) {
@@ -78,20 +63,16 @@ server <- function(input, output, session) {
     }
   })
 
-  # Shared reactive for species list - used by modules
-  species_list <- reactive({
-    species <- setdiff(unique(params@species_params$species),
-            ("Resource"))
-    species
-  })
+  # Shared species list - used by modules
+  species_list <- setdiff(unique(params@species_params$species), "Resource")
 
-  #Having a custom order on the X axis
+  # Sharing the same ordering of species between the two modules
   # Map module names to context suffixes
   module_contexts <- list(species = "bio", fishery = "fish")
   custom_species_order <- reactiveVal(NULL)
   species_order_choice <- reactiveVal("Custom")
 
-  #add the ui to load when custom is pressed - watch for module namespaced inputs
+  # add the ui to load when custom is pressed - watch for module namespaced inputs
   lapply(names(module_contexts), function(mod_id) {
     ctx <- module_contexts[[mod_id]]
     observeEvent(input[[paste0(mod_id, "-customOrderInfo_", ctx)]], {
@@ -100,7 +81,7 @@ server <- function(input, output, session) {
         rank_list(
           input_id = paste0("custom_order_rank_", ctx),
           text     = "Drag the species into the order you want:",
-          labels   = species_list()
+          labels   = species_list
         ),
         footer = tagList(
           modalButton("Cancel"),
@@ -110,7 +91,7 @@ server <- function(input, output, session) {
       ))
     })
   })
-  #save this order and change the menu so Custom is first
+  # save this order and change the menu so Custom is first
   lapply(names(module_contexts), function(mod_id) {
     ctx <- module_contexts[[mod_id]]
     observeEvent(input[[paste0("save_custom_order_", ctx)]], {
@@ -122,54 +103,43 @@ server <- function(input, output, session) {
       removeModal()
     })
   })
-  #now the custom order thats been saved is made to be the species order - watch module inputs
+  # now the custom order thats been saved is made to be the species order - watch module inputs
   lapply(names(module_contexts), function(mod_id) {
     ctx <- module_contexts[[mod_id]]
     observeEvent(input[[paste0(mod_id, "-species_order_", ctx)]], {
       species_order_choice(input[[paste0(mod_id, "-species_order_", ctx)]])
     }, ignoreInit = TRUE)
   })
-  #sets the order chosen by the user
+  # sets the order chosen by the user
   ordered_species <- reactive({
     mizerShiny:::compute_ordered_species(
       params = params,
-      guildparams    = if (exists("guildparams", inherits = TRUE)) guildparams else NULL,
+      guildparams    = guildparams,
       choice         = species_order_choice(),
       custom_order   = custom_species_order()
     )
   })
 
   # Initialize modules ----
-  # Pass shared reactive for species ordering to modules
-  ordered_species_reactive <- ordered_species
-
-  # Handle guildparams - may not exist (check parent environments too)
-  guildparams_for_modules <- if (exists("guildparams", inherits = TRUE)) guildparams else NULL
-
   # Species Role module
   species_role_server(
     "species",
-    params = params,
-    unharvestedprojection = unharvestedprojection,
-    guildparams = guildparams_for_modules,
-    ordered_species_reactive = ordered_species_reactive,
+    sim_0 = sim_0,
+    guildparams = guildparams,
+    ordered_species_reactive = ordered_species,
     species_list = species_list
   )
 
   # Fishery Strategy module
   fishery_strategy_server(
     "fishery",
-    params = params,
-    unfishedprojection = unfishedprojection,
-    guildparams = guildparams_for_modules,
-    ordered_species_reactive = ordered_species_reactive,
-    species_list = species_list,
-    fish_max_year = fish_max_year
+    sim_0 = sim_0,
+    guildparams = guildparams,
+    ordered_species_reactive = ordered_species,
+    species_list = species_list
   )
 
 }
-
-
 
 
 # NOTE - FOR UI, all of the code has tagAppendAttributes, which makes it
@@ -210,13 +180,13 @@ ui <- fluidPage(
     # Fishery Strategy tab ----
     tabPanel(
       title = "Fishery Strategy",
-      fishery_strategy_ui("fishery", fish_max_year, have_guild_file, have_nutrition_file, app_exists, fishery_strategy_tabs)
+      fishery_strategy_ui("fishery", config, legends, have_guild_file, have_nutrition_file, fishery_strategy_tabs)
     ),
 
     # Species Role tab ----
     tabPanel(
       title = "Species Role",
-      species_role_ui("species", sp_max_year, have_guild_file, app_exists, species_role_tabs)
+      species_role_ui("species", config, legends, have_guild_file, species_role_tabs)
     ),
 
     # Page guide ----
@@ -229,4 +199,3 @@ ui <- fluidPage(
 )
 
 shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
-

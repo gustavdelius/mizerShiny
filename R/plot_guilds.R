@@ -6,14 +6,14 @@
 #' percentage differences between harvested and unharvested projections.
 #'
 #' @param harvestedprojection A mizer projection with harvesting
-#' @param unharvestedprojection A mizer projection without harvesting
+#' @param sim_0 A mizer projection without harvesting
 #' @param chosenyear Integer year index defining the full period; quarter/half derived
 #' @param guildparams Data frame with guild assignment rules per species
 #' @param celticsim Unused; kept for backward compatibility
 #' @param mode Either "chosen" for full only or "triple" for quarter/half/full
 #' @return A ggplot object
 #' @keywords internal
-guildplot <- function(harvestedprojection, unharvestedprojection, chosenyear, guildparams, celticsim,
+guildplot <- function(harvestedprojection, sim_0, chosenyear, guildparams, celticsim,
                       mode = c("chosen", "triple")) {
   mode <- match.arg(mode)
 
@@ -22,13 +22,13 @@ guildplot <- function(harvestedprojection, unharvestedprojection, chosenyear, gu
   full_year    <- chosenyear
 
   harvested_full   <- plotSpectra(harvestedprojection,   time_range = full_year,   return_data = TRUE)
-  unharvested_full <- plotSpectra(unharvestedprojection, time_range = full_year,   return_data = TRUE)
+  unharvested_full <- plotSpectra(sim_0, time_range = full_year,   return_data = TRUE)
 
   if (mode == "triple") {
     harvested_quarter   <- plotSpectra(harvestedprojection,   time_range = quarter_year, return_data = TRUE)
     harvested_half      <- plotSpectra(harvestedprojection,   time_range = half_year,    return_data = TRUE)
-    unharvested_quarter <- plotSpectra(unharvestedprojection, time_range = quarter_year, return_data = TRUE)
-    unharvested_half    <- plotSpectra(unharvestedprojection, time_range = half_year,    return_data = TRUE)
+    unharvested_quarter <- plotSpectra(sim_0, time_range = quarter_year, return_data = TRUE)
+    unharvested_half    <- plotSpectra(sim_0, time_range = half_year,    return_data = TRUE)
   }
 
   process_guilds <- function(mizerprojection) {

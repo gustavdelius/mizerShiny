@@ -1,8 +1,8 @@
 # Fishery Strategy Module
 # Handles the Fishery Strategy tab UI and server logic
 
-fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
-                                have_nutrition_file, app_exists,
+fishery_strategy_ui <- function(id, config, legends, have_guild_file,
+                                have_nutrition_file,
                                 fishery_strategy_tabs) {
   ns <- NS(id)
 
@@ -19,8 +19,8 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         sliderInput(
           inputId = ns("fishyear"),
           label   = "Time Range",
-          min     = 1,
-          max     = fish_max_year,
+          min     = 3,
+          max     = config$max_year,
           value   = 5,
           step    = 1,
           width   = "100%"
@@ -258,7 +258,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                 inputId = ns("fishyear2_yield"),
                 label   = NULL,
                 min     = 1,
-                max     = fish_max_year,
+                max     = config$max_year,
                 value   = c(1, 10),
                 step    = 1,
                 width   = "200px"
@@ -343,14 +343,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
   )
 }
 
-fishery_strategy_server <- function(id, params, unfishedprojection,
-                                   guildparams, ordered_species_reactive, species_list,
-                                   fish_max_year) {
+fishery_strategy_server <- function(id, sim_0,
+                                   guildparams, ordered_species_reactive, species_list) {
+    params <- sim_0@params
   moduleServer(id, function(input, output, session) {
 
     # Update species select input
     observe({
-      updateSelectInput(session, "fish_name_select", choices = species_list())
+      updateSelectInput(session, "fish_name_select", choices = species_list)
     })
 
     # Dynamic fishery effort sliders for Sim 1
@@ -439,9 +439,9 @@ fishery_strategy_server <- function(id, params, unfishedprojection,
 
     # Initialize fishSimData as a reactive value
     fishSimData <- reactiveVal(list(
-      sim1 = unfishedprojection,
-      sim2 = unfishedprojection,
-      unharv = unfishedprojection
+      sim1 = sim_0,
+      sim2 = sim_0,
+      unharv = sim_0
     ))
 
     # Reactive observer that runs when time range changes

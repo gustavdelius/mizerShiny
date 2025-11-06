@@ -6,7 +6,7 @@
 \usage{
 plotNutritionChange(
   harvestedprojection,
-  unharvestedprojection,
+  sim_0,
   chosenyear,
   mode = c("triple", "chosen")
 )
@@ -14,7 +14,7 @@ plotNutritionChange(
 \arguments{
 \item{harvestedprojection}{Harvested mizer projection}
 
-\item{unharvestedprojection}{Unharvested mizer projection}
+\item{sim_0}{Unharvested mizer projection}
 
 \item{chosenyear}{Integer defining the full period; quarter/half derived}
 

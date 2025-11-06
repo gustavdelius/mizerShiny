@@ -4,10 +4,10 @@
 \alias{comparedietmatrix}
 \title{Compare predator-prey diet matrices between two projections}
 \usage{
-comparedietmatrix(unharvestedprojection, harvestedprojection, timerange)
+comparedietmatrix(sim_0, harvestedprojection, timerange)
 }
 \arguments{
-\item{unharvestedprojection}{A mizer projection without harvesting}
+\item{sim_0}{A mizer projection without harvesting}
 
 \item{harvestedprojection}{A mizer projection with harvesting}
 

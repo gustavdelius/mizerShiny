@@ -6,6 +6,8 @@
 \usage{
 mizerShiny(
   params = default_params,
+  guildparams = default_guildparams,
+  nutrition = default_nutrition,
   fishery_strategy_tabs = c("Biomass", "Biomass \% Change", "Yield", "Yield \% Change",
     "Nutrition change", "Length", "Guild"),
   species_role_tabs = c("Biomass", "Size", "Guilds", "Diet"),
@@ -14,6 +16,12 @@ mizerShiny(
 }
 \arguments{
 \item{params}{A MizerParams object. Defaults to NS_params.}
+
+\item{guildparams}{An optional data frame defining guilds for the model.
+See the 'Guilds' section of the package vignette for details.}
+
+\item{nutrition}{An optional data frame defining nutritional values
+for the model. See the 'Nutrition' section of the package vignette for details.}
 
 \item{fishery_strategy_tabs}{A character vector specifying which tabs to include
 in the Fishery Strategy module. Tab names that don't correspond to existing

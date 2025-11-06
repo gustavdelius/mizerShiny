@@ -3,26 +3,26 @@
 #' Computes average diet proportions over a `timerange` for unharvested and
 #' harvested projections and visualizes percentage differences as a heatmap.
 #'
-#' @param unharvestedprojection A mizer projection without harvesting
+#' @param sim_0 A mizer projection without harvesting
 #' @param harvestedprojection A mizer projection with harvesting
 #' @param timerange Integer vector of time indices to average over
 #' @return A ggplot heatmap of percentage differences by predator and prey
 #' @keywords internal
-comparedietmatrix <- function(unharvestedprojection, harvestedprojection, timerange){
-  dietunharv <- getDiet(unharvestedprojection@params,
-                        n = apply(unharvestedprojection@n[timerange,,], c(2, 3), mean),
-                        n_pp = apply(unharvestedprojection@n_pp[timerange,], 2, mean),
-                        n_other = apply(unharvestedprojection@n_other[timerange,], 2, mean),
+comparedietmatrix <- function(sim_0, harvestedprojection, timerange){
+  dietunharv <- getDiet(sim_0@params,
+                        n = apply(sim_0@n[timerange,,], c(2, 3), mean),
+                        n_pp = apply(sim_0@n_pp[timerange,], 2, mean),
+                        n_other = apply(sim_0@n_other[timerange,], 2, mean),
                         proportion = TRUE) |>
     as.table()|>
     as.data.frame()|>
     dplyr::group_by(predator, prey)|>
     dplyr::summarise(Proportion=mean(Freq), .groups = "drop")
 
-  dietharv <- getDiet(unharvestedprojection@params,
-                      n = apply(unharvestedprojection@n[timerange,,], c(2, 3), mean),
-                      n_pp = apply(unharvestedprojection@n_pp[timerange,], 2, mean),
-                      n_other = apply(unharvestedprojection@n_other[timerange,], 2, mean),
+  dietharv <- getDiet(sim_0@params,
+                      n = apply(sim_0@n[timerange,,], c(2, 3), mean),
+                      n_pp = apply(sim_0@n_pp[timerange,], 2, mean),
+                      n_other = apply(sim_0@n_other[timerange,], 2, mean),
                       proportion = TRUE) |>
     as.table()|>
     as.data.frame()|>

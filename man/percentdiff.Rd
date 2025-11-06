@@ -2,25 +2,25 @@
 % Please edit documentation in R/percentdiff.R
 \name{percentdiff}
 \alias{percentdiff}
-\title{Percentage difference between harvested and unharvested values by species}
+\title{Percentage difference between two values by species}
 \usage{
-percentdiff(harvested, unharvested)
+percentdiff(df, df_0)
 }
 \arguments{
-\item{harvested}{Data frame with columns \code{Species} and \code{value} for harvested}
+\item{df}{Data frame with columns \code{Species} and \code{value}}
 
-\item{unharvested}{Data frame with columns \code{Species} and \code{value} for baseline}
+\item{df_0}{Data frame with columns \code{Species} and \code{value} for baseline}
 }
 \value{
 A data frame with columns \code{Species} and \code{percentage_diff}
 }
 \description{
 Joins two data frames by \code{Species} and returns percentage change of
-harvested relative to unharvested, excluding the \code{Resource} row.
+values in first data frame relative to the second, excluding the \code{Resource} row.
 }
 \examples{
 percentdiff(
-  harvested = data.frame(Species = c("A","B"), value = c(120, 80)),
-  unharvested = data.frame(Species = c("A","B"), value = c(100, 100))
+  df = data.frame(Species = c("A","B"), value = c(120, 80)),
+  df_0 = data.frame(Species = c("A","B"), value = c(100, 100))
 )
 }

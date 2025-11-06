@@ -6,7 +6,7 @@
 \usage{
 guildplot(
   harvestedprojection,
-  unharvestedprojection,
+  sim_0,
   chosenyear,
   guildparams,
   celticsim,
@@ -16,7 +16,7 @@ guildplot(
 \arguments{
 \item{harvestedprojection}{A mizer projection with harvesting}
 
-\item{unharvestedprojection}{A mizer projection without harvesting}
+\item{sim_0}{A mizer projection without harvesting}
 
 \item{chosenyear}{Integer year index defining the full period; quarter/half derived}
 
