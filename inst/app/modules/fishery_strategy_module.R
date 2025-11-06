@@ -81,11 +81,11 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                             )
                         )
                     },
-                    if ("Biomass change" %in% fishery_strategy_tabs) {
+                    if ("Biomass % Change" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            value = "Biomass change",
+                            value = "Biomass % Change",
                             title = span(
-                              "Biomass change",
+                              "Biomass % Change",
                               `data-bs-toggle` = "popover",
                               `data-bs-placement` = "bottom",
                               `data-bs-html` = "true",
@@ -113,11 +113,11 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                             )
                         )
                     },
-                    if ("Yield change" %in% fishery_strategy_tabs) {
+                    if ("Yield % Change" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            value = "Yield change",
+                            value = "Yield % Change",
                             title = span(
-                              "Yield change",
+                              "Yield % Change",
                               `data-bs-toggle` = "popover",
                               `data-bs-placement` = "bottom",
                               `data-bs-html` = "true",

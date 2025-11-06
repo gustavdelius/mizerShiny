@@ -25,8 +25,8 @@
 #' @export
 mizerShiny <-
     function(params = default_params,
-             fishery_strategy_tabs = c("Biomass", "Biomass change",
-                                       "Yield", "Yield change",
+             fishery_strategy_tabs = c("Biomass", "Biomass % Change",
+                                       "Yield", "Yield % Change",
                                        "Nutrition change", "Length",
                                        "Guild"),
              species_role_tabs = c("Biomass", "Size", "Guilds", "Diet"), ...) {
@@ -52,8 +52,8 @@ mizerShiny <-
 
 mizerShinyAllTabs <- function(params = default_params, ...) {
     mizerShiny(params,
-               fishery_strategy_tabs = c("Biomass", "Biomass change",
-                                       "Yield", "Yield change",
+               fishery_strategy_tabs = c("Biomass", "Biomass % Change",
+                                       "Yield", "Yield % Change",
                                        "Nutrition change", "Length",
                                        "Guild", "Yield Composition", "Size",
                                        "Spectra", "Diet"),
