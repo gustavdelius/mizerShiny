@@ -138,24 +138,27 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
         style = "flex: 1.46;",
 
         conditionalPanel(
-          condition = paste0("input['", ns("plotTabs"), "'] == 'Biomass'"),
+          condition = paste0("input['", ns("plotTabs"), "'] == 'Biomass' || input['", ns("plotTabs"), "'] == 'Guilds'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
-              div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                  HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
-                  selectInput(
-                    inputId = ns("species_order_bio"),
-                    label   = NULL,
-                    choices = c("Custom", "Size", "Guild"),
-                    width = "120px"
-                  ),
-                  HTML(
-                    "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
-                  ),
-                  actionButton(
-                    ns("customOrderInfo_bio"),
-                    label = HTML("<strong>customise</strong>"),
-                    class = "btn btn-info btn-xs no-focus-outline"
-                  )
+              conditionalPanel(
+                condition = paste0("input['", ns("plotTabs"), "'] == 'Biomass'"),
+                div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                    HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
+                    selectInput(
+                      inputId = ns("species_order_bio"),
+                      label   = NULL,
+                      choices = c("Custom", "Size", "Guild"),
+                      width = "120px"
+                    ),
+                    HTML(
+                      "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
+                    ),
+                    actionButton(
+                      ns("customOrderInfo_bio"),
+                      label = HTML("<strong>customise</strong>"),
+                      class = "btn btn-info btn-xs no-focus-outline"
+                    )
+                )
               ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
                   materialSwitch(
@@ -182,19 +185,6 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
           )
         ),
 
-        conditionalPanel(
-          condition = paste0("input['", ns("plotTabs"), "'] == 'Guilds'"),
-          div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
-                  materialSwitch(
-                    inputId = ns("triguildToggle"),
-                    label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
-                    value   = TRUE,
-                    status  = "info"
-                  )
-              )
-          )
-        ),
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Diet'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
@@ -397,7 +387,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
 
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
-          mode <- mizerShiny:::getModeFromToggle(input$triguildToggle)
+          mode <- mizerShiny:::getModeFromToggle(input$triplotToggle)
           ggplotly(
             mizerShiny:::guildplot(
               bioSimData()$harvested, bioSimData()$unharvested,

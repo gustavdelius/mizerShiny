@@ -266,24 +266,27 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
           )
         ),
         conditionalPanel(
-          condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield change'"),
+          condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield change' || input['", ns("fishy_plots"), "'] == 'Guild' || input['", ns("fishy_plots"), "'] == 'Nutrition'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
-              div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                  HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
-                  selectInput(
-                    inputId = ns("species_order_fish"),
-                    label   = NULL,
-                    choices = c("Custom", "Size", "Guild"),
-                    width = "120px"
-                  ),
-                  HTML(
-                    "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
-                  ),
-                  actionButton(
-                    ns("customOrderInfo_fish"),
-                    label = HTML("<strong>customise</strong>"),
-                    class = "btn btn-info btn-xs no-focus-outline"
-                  )
+              conditionalPanel(
+                condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield change'"),
+                div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                    HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
+                    selectInput(
+                      inputId = ns("species_order_fish"),
+                      label   = NULL,
+                      choices = c("Custom", "Size", "Guild"),
+                      width = "120px"
+                    ),
+                    HTML(
+                      "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
+                    ),
+                    actionButton(
+                      ns("customOrderInfo_fish"),
+                      label = HTML("<strong>customise</strong>"),
+                      class = "btn btn-info btn-xs no-focus-outline"
+                    )
+                )
               ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
                   materialSwitch(
@@ -302,19 +305,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                   materialSwitch(
                     inputId = ns("logToggle4"),
                     label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Log</span>"),
-                    value   = TRUE,
-                    status  = "info"
-                  )
-              )
-          )
-        ),
-        conditionalPanel(
-          condition = paste0("input['", ns("fishy_plots"), "'] == 'Guild'"),
-          div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
-                  materialSwitch(
-                    inputId = ns("triguildToggleFish"),
-                    label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
                     value   = TRUE,
                     status  = "info"
                   )
@@ -348,19 +338,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
               )
           )
         ),
-        conditionalPanel(
-          condition = paste0("input['", ns("fishy_plots"), "'] == 'Nutrition'"),
-          div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
-                  materialSwitch(
-                    inputId = ns("triplotToggleNutrition"),
-                    label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
-                    value   = TRUE,
-                    status  = "info"
-                  )
-              )
-          )
-        )
       )
     )
   )
@@ -884,7 +861,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
-          mode <- mizerShiny:::getModeFromToggle(input$triguildToggleFish)
+          mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
 
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
@@ -1132,7 +1109,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
-          mode <- mizerShiny:::getModeFromToggle(input$triplotToggleNutrition)
+          mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
 
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
