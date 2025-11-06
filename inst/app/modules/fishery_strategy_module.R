@@ -266,10 +266,10 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
           )
         ),
         conditionalPanel(
-          condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield change' || input['", ns("fishy_plots"), "'] == 'Guild' || input['", ns("fishy_plots"), "'] == 'Nutrition'"),
+          condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass % Change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield % Change' || input['", ns("fishy_plots"), "'] == 'Guild' || input['", ns("fishy_plots"), "'] == 'Nutrition'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
               conditionalPanel(
-                condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield change'"),
+                condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass % Change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield % Change'"),
                 div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
                     HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
                     selectInput(
