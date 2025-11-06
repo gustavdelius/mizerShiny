@@ -74,19 +74,62 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
         tabsetPanel(
           id = ns("plotTabs"),
           if ("Biomass" %in% species_role_tabs) {
-            tabPanel(title = "Biomass", plotlyOutput(ns("speciesPlot"), height = "55vh"))
+            tabPanel(
+              value = "Biomass",
+              title = span(
+                "Biomass",
+                `data-bs-toggle` = "popover",
+                `data-bs-placement` = "bottom",
+                `data-bs-html` = "true",
+                `data-bs-container` = "body",
+                `data-bs-title` = as.character(legends$role_biomass)
+              ),
+              plotlyOutput(ns("speciesPlot"), height = "55vh")
+            )
           },
           if ("Size" %in% species_role_tabs) {
-            tabPanel(title = "Size",     plotlyOutput(ns("sizePlot"),     height = "55vh"))
+            tabPanel(
+              value = "Size",
+              title = span(
+                "Size",
+                `data-bs-toggle` = "popover",
+                `data-bs-placement` = "bottom",
+                `data-bs-html` = "true",
+                `data-bs-container` = "body",
+                `data-bs-title` = as.character(legends$role_size)
+              ),
+              plotlyOutput(ns("sizePlot"), height = "55vh")
+            )
           },
           if (have_guild_file && ("Guilds" %in% species_role_tabs)) {
-            tabPanel(title = "Guilds",   plotlyOutput(ns("guildPlot"),    height = "55vh"))
+            tabPanel(
+              value = "Guilds",
+              title = span(
+                "Guilds",
+                `data-bs-toggle` = "popover",
+                `data-bs-placement` = "bottom",
+                `data-bs-html` = "true",
+                `data-bs-container` = "body",
+                `data-bs-title` = as.character(legends$role_guild)
+              ),
+              plotlyOutput(ns("guildPlot"), height = "55vh")
+            )
           },
           if ("Diet" %in% species_role_tabs) {
-            tabPanel(title = "Diet",
-                     div(style = "height:50vh; display:flex;",
-                         plotlyOutput(ns("dietplot"), height = "100%", width = "100%")
-                     ))
+            tabPanel(
+              value = "Diet",
+              title = span(
+                "Diet",
+                `data-bs-toggle` = "popover",
+                `data-bs-placement` = "bottom",
+                `data-bs-html` = "true",
+                `data-bs-container` = "body",
+                `data-bs-title` = as.character(legends$role_diet)
+              ),
+              div(style = "height:50vh; display:flex;",
+                  plotlyOutput(ns("dietplot"), height = "100%", width = "100%")
+              )
+            )
           }
         )
       ),
@@ -97,9 +140,6 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Biomass'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$biomass_species)
-              ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
                   selectInput(
@@ -131,9 +171,6 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Size'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$biomass_size)
-              ),
               div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
                   materialSwitch(
                     inputId = ns("logToggle"),
@@ -148,9 +185,6 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Guilds'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$biomass_guild)
-              ),
               div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                   materialSwitch(
                     inputId = ns("triguildToggle"),
@@ -164,9 +198,6 @@ species_role_ui <- function(id, sp_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Diet'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonDietBio"), legends$fishery_diet_single)
-              ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
                   selectInput(

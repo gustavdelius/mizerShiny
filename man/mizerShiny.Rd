@@ -4,10 +4,24 @@
 \alias{mizerShiny}
 \title{Launch mizerShiny}
 \usage{
-mizerShiny(params = default_params, ...)
+mizerShiny(
+  params = default_params,
+  fishery_strategy_tabs = c("Biomass", "Biomass change", "Yield", "Yield change",
+    "Nutrition change", "Length", "Guild"),
+  species_role_tabs = c("Biomass", "Size", "Guilds", "Diet"),
+  ...
+)
 }
 \arguments{
 \item{params}{A MizerParams object. Defaults to NS_params.}
+
+\item{fishery_strategy_tabs}{A character vector specifying which tabs to include
+in the Fishery Strategy module. Tab names that don't correspond to existing
+tabs will be ignored.}
+
+\item{species_role_tabs}{A character vector specifying which tabs to include
+in the Species Role module. Tab names that don't correspond to existing
+tabs will be ignored.}
 
 \item{...}{further arguments passed on to \code{shiny::runApp()}
 (e.g. \code{host}, \code{port}, \code{launch.browser}).}
@@ -22,5 +36,9 @@ mizerShiny()
 
 # Run with custom model
 mizerShiny(NS_params)
+
+# Run with only specific tabs
+mizerShiny(fishery_strategy_tabs = c("Biomass", "Yield"),
+           species_role_tabs = c("Biomass", "Diet"))
 }
 }

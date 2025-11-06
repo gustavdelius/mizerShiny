@@ -11,7 +11,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
     row_sizes = c("1fr"),
     col_sizes = c("0.3fr", "1.7fr"),
     gap_size  = "10px",
-
     # Controls ----
     grid_card(
       area = "area1",
@@ -67,7 +66,15 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     id = ns("fishy_plots"),
                     if ("Biomass" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Biomass",
+                            value = "Biomass",
+                            title = span(
+                              "Biomass",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-container` = "body",
+                              `data-bs-title` = as.character(legends$fishery_biomass)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("fishspeciesActualPlot"),
                                              height = "100%", width = "100%")
@@ -76,7 +83,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Biomass change" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Biomass change",
+                            value = "Biomass change",
+                            title = span(
+                              "Biomass change",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_biomass_change)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("fishspeciesPlot"),
                                              height = "100%", width = "100%")
@@ -85,7 +99,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Yield" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Yield",
+                            value = "Yield",
+                            title = span(
+                              "Yield",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_yield)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("fishspeciesYieldPlot"),
                                              height = "100%", width = "100%")
@@ -94,7 +115,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Yield change" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Yield change",
+                            value = "Yield change",
+                            title = span(
+                              "Yield change",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_yield_change)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("fishspeciesYieldChangePlot"),
                                              height = "100%", width = "100%")
@@ -104,7 +132,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     if (have_nutrition_file &&
                         ("Nutrition change" %in% fishery_strategy_tabs)) {
                         tabPanel(
-                            title = "Nutrition",
+                            value = "Nutrition",
+                            title = span(
+                              "Nutrition",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_nutrition)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("nutritionplot"),
                                              height = "100%", width = "100%")
@@ -113,7 +148,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Length" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Length",
+                            value = "Length",
+                            title = span(
+                              "Length",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_length)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("fishlengthPlot"),
                                              height = "100%", width = "100%")
@@ -123,7 +165,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     if (have_guild_file &&
                         ("Guild" %in% fishery_strategy_tabs)) {
                         tabPanel(
-                            title = "Guild",
+                            value = "Guild",
+                            title = span(
+                              "Guild",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_guild)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("fishguildPlot"),
                                              height = "100%", width = "100%")
@@ -132,7 +181,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Yield Composition" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Yield Composition",
+                            value = "Yield Composition",
+                            title = span(
+                              "Yield Composition",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_yield_composition)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("yieldPlot"),
                                              height = "100%", width = "100%")
@@ -141,7 +197,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Size" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Size",
+                            value = "Size",
+                            title = span(
+                              "Size",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_size)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("fishsizePlot"),
                                              height = "100%", width = "100%")
@@ -150,7 +213,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Spectra" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Spectra",
+                            value = "Spectra",
+                            title = span(
+                              "Spectra",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_spectra)
+                            ),
                             div(style = "flex:1; display:flex;",
                                 plotlyOutput(ns("spectrumPlot"),
                                              height = "100%", width = "100%")
@@ -159,7 +229,14 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
                     },
                     if ("Diet" %in% fishery_strategy_tabs) {
                         tabPanel(
-                            title = "Diet",
+                            value = "Diet",
+                            title = span(
+                              "Diet",
+                              `data-bs-toggle` = "popover",
+                              `data-bs-placement` = "bottom",
+                              `data-bs-html` = "true",
+                              `data-bs-title` = as.character(legends$fishery_diet)
+                            ),
                             div(style = "height:50vh; display:flex;",
                                 plotlyOutput(ns("fishdietsingleplot"),
                                              height = "100%", width = "100%")
@@ -175,9 +252,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         style = "flex: auto",
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Yield Composition'"),
-          div(style = "margin-bottom:1.5rem;",
-              mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_yield)
-          ),
           div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
               HTML("<span style='margin-top:0px; margin-bottom:0.5rem; font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Yield Time Range</span>"),
               sliderInput(
@@ -194,9 +268,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield change'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_species)
-              ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
                   selectInput(
@@ -227,9 +298,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Size'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_size)
-              ),
               div(style = "padding: 10px; background-color: #e8f5e8; border-radius: 5px; border: 1px solid #c8e6c9;",
                   materialSwitch(
                     inputId = ns("logToggle4"),
@@ -243,9 +311,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Guild'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_guild)
-              ),
               div(style = "padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffcc80;",
                   materialSwitch(
                     inputId = ns("triguildToggleFish"),
@@ -259,9 +324,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Spectra'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_spectra)
-              ),
               div(style = "padding: 10px; background-color: #fce4ec; border-radius: 5px; border: 1px solid #f8bbd9;",
                   materialSwitch(
                     inputId = ns("logToggle5"),
@@ -275,9 +337,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Diet'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$fishery_diet_single)
-              ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e0f2f1; border-radius: 5px; border: 1px solid #b2dfdb;",
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Select a Species:</span>"),
                   selectInput(
@@ -292,9 +351,6 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Nutrition'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
-              div(style = "padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
-                  mizerShiny:::legendUI(ns("infoButtonOrder"), legends$nutrition)
-              ),
               div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
                   materialSwitch(
                     inputId = ns("triplotToggleNutrition"),
