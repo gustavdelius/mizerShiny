@@ -221,7 +221,15 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       max_year <- dim(sims$harvested@n)[1] - 1
       if (input$year <= max_year) return()  # No need to re-run if within bounds
       
-      pb <- shiny::Progress$new(); on.exit(pb$close())
+      notif_id <- shiny::showNotification(
+        "Extending simulation …",
+        type = "message",
+        duration = NULL,
+        closeButton = TRUE
+      )
+      on.exit(shiny::removeNotification(id = notif_id, session = session), add = TRUE)
+
+      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       total_steps <- 3
       pb$set(message = "Running simulation …", value = 0)
       

@@ -384,7 +384,15 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       max_year <- dim(sims$sim1@n)[1] - 1
       if (input$fishyear <= max_year) return()
 
-      pb <- shiny::Progress$new(); on.exit(pb$close())
+      notif_id <- shiny::showNotification(
+        "Extending simulation …",
+        type = "message",
+        duration = NULL,
+        closeButton = TRUE
+      )
+      on.exit(shiny::removeNotification(id = notif_id, session = session), add = TRUE)
+
+      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       total_steps <- 3
       pb$set(message = "Running simulation …", value = 0)
 
@@ -416,44 +424,49 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
                       unharv = unharv))
     })
 
-    # Reactive observer that runs simulation when inputs change
-    observe({
-      input$fishyear
-
+    # Re-run only Sim 1 when Sim 1 effort sliders change
+    observeEvent({
+      gears <- unique(default_params@gear_params$gear)
+      lapply(gears, function(gear) input[[paste0("effort_", gear)]])
+    }, {
       gears <- unique(default_params@gear_params$gear)
       effort1 <- makeEffort("effort_" , gears, default_params@initial_effort)
-      effort2 <- makeEffort("effort2_", gears, default_params@initial_effort)
+      max_year <- isolate(input$fishyear)
 
-      max_year <- input$fishyear
-
-      pb <- shiny::Progress$new(); on.exit(pb$close())
-      total_steps <- 3
+      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       pb$set(message = "Running fishery simulation …", value = 0)
 
-      pb$inc(1/total_steps, "Projecting Sim 1 …")
+      pb$inc(1, "Projecting Sim 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(default_params, effort = effort1, t_max = max_year * 2 + 2),
         context = "fishery_sim1"
       )
 
-      pb$inc(1/total_steps, "Projecting Sim 2 …")
+      sims <- isolate(fishSimData())
+      fishSimData(list(sim1 = sim1, sim2 = sims$sim2, unharv = sims$unharv))
+    }, ignoreInit = TRUE)
+
+    # Re-run only Sim 2 when Sim 2 effort sliders change
+    observeEvent({
+      gears <- unique(default_params@gear_params$gear)
+      lapply(gears, function(gear) input[[paste0("effort2_", gear)]])
+    }, {
+      gears <- unique(default_params@gear_params$gear)
+      effort2 <- makeEffort("effort2_", gears, default_params@initial_effort)
+      max_year <- isolate(input$fishyear)
+
+      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
+      pb$set(message = "Running fishery simulation …", value = 0)
+
+      pb$inc(1, "Projecting Sim 2 …")
       sim2 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(default_params, effort = effort2, t_max = max_year * 2 + 2),
         context = "fishery_sim2"
       )
 
-      pb$inc(1/total_steps, "Projecting base …")
-      unharv <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(unfishedprojection, t_max = max_year * 2 + 2),
-        context = "fishery_sim_unharv"
-      )
-
-      pb$inc(1/total_steps, "Done")
-
-      fishSimData(list(sim1   = sim1,
-                      sim2   = sim2,
-                      unharv = unharv))
-    })
+      sims <- isolate(fishSimData())
+      fishSimData(list(sim1 = sims$sim1, sim2 = sim2, unharv = sims$unharv))
+    }, ignoreInit = TRUE)
 
     # Setup year controls
     mizerShiny:::setupYearControls(
