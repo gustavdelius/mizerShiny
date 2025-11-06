@@ -6,7 +6,7 @@ install.packages("shinytest2")
 
 To run all the tests do
 ``` r
-test_app("inst/app")
+shinytest2::test_app("inst/app")
 ```
 
 If any tests fail, run
@@ -19,6 +19,6 @@ After you have accepted changes, commit the changed snapshot files.
 
 To record a new test, you can use the `record_app` function:
 ``` r
-record_app("inst/app")
+shinytest2::record_test("inst/app")
 ```
 This will open the app in a browser window, where you can interact with it and add screenshots. When you are done, close the browser window and the test will be recorded. It will be added to the script in `inst/app/tests/testthat/test-shinytest2.R`. You can edit that file directly, for example to remove tests you no longer want.
