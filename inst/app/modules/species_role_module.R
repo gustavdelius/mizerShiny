@@ -242,7 +242,7 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       
       # Update the reactive value
       bioSimData(list(harvested = harvested,
-                      unharvested = unharvestedprojection))
+                      unharvested = unharvested))
     })
     
     # Reactive observer that runs simulation when inputs change

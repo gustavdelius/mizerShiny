@@ -403,11 +403,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         )
       } else NULL
 
+      pb$inc(1/total_steps, "Projecting …")
+      unharv <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(sims$unharv, t_max = t_max),
+        context = "fishery_time_range_unharv"
+      )
+
       pb$inc(1/total_steps, "Done")
 
       fishSimData(list(sim1 = sim1,
                       sim2 = sim2,
-                      unharv = unfishedprojection))
+                      unharv = unharv))
     })
 
     # Reactive observer that runs simulation when inputs change
@@ -436,11 +442,17 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
         context = "fishery_sim2"
       )
 
+      pb$inc(1/total_steps, "Projecting base …")
+      unharv <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(unfishedprojection, t_max = max_year * 2 + 2),
+        context = "fishery_sim_unharv"
+      )
+
       pb$inc(1/total_steps, "Done")
 
       fishSimData(list(sim1   = sim1,
                       sim2   = sim2,
-                      unharv = unfishedprojection))
+                      unharv = unharv))
     })
 
     # Setup year controls
