@@ -50,6 +50,14 @@ mizerShiny <-
   shiny::runApp(pkg_app, ...)
 }
 
+#' Launch mizerShiny with all tabs enabled
+#'
+#' A convenience wrapper around `mizerShiny()` that launches the app with all
+#' available tabs enabled in the Fishery Strategy module.
+#' @param params A MizerParams object. Defaults to NS_params.
+#' @param ... further arguments passed on to `shiny::runApp()`
+#'           (e.g. `host`, `port`, `launch.browser`).
+#' @export
 mizerShinyAllTabs <- function(params = default_params, ...) {
     mizerShiny(params,
                fishery_strategy_tabs = c("Biomass", "Biomass % Change",
