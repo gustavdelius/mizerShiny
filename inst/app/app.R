@@ -20,6 +20,9 @@ if (is.null(default_params)) {
   default_params <- readRDS("default_params.rds")
 }
 
+fishery_strategy_tabs <- getShinyOption("fishery_strategy_tabs")
+species_role_tabs <- getShinyOption("species_role_tabs")
+
 unharvestedprojection <- project(default_params, t_max = 12)
 unfishedprojection <- project(default_params, t_max = 12)
 
@@ -206,13 +209,13 @@ ui <- fluidPage(
     # Fishery Strategy tab ----
     tabPanel(
       title = "Fishery Strategy",
-      fishery_strategy_ui("fishery", fish_max_year, have_guild_file, have_nutrition_file, app_exists)
+      fishery_strategy_ui("fishery", fish_max_year, have_guild_file, have_nutrition_file, app_exists, fishery_strategy_tabs)
     ),
 
     # Species Role tab ----
     tabPanel(
       title = "Species Role",
-      species_role_ui("species", sp_max_year, have_guild_file, app_exists)
+      species_role_ui("species", sp_max_year, have_guild_file, app_exists, species_role_tabs)
     ),
 
     # Page guide ----

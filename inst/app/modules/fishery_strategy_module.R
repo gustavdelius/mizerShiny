@@ -1,7 +1,9 @@
 # Fishery Strategy Module
 # Handles the Fishery Strategy tab UI and server logic
 
-fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutrition_file, app_exists) {
+fishery_strategy_ui <- function(id, fish_max_year, have_guild_file,
+                                have_nutrition_file, app_exists,
+                                fishery_strategy_tabs) {
   ns <- NS(id)
 
   grid_container(
@@ -56,86 +58,117 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
 
     # Tabs ----
     grid_card(
-      area = "area0",
-      card_body(
-        div(
-          class = "plot-card",
-          style = "flex: 4.5; height:50vh; display:flex; flex-direction:column; overflow: hidden; margin-top: -0.5rem",
-          tabsetPanel(
-            id = ns("fishy_plots"),
-            tabPanel(
-              title = "Biomass",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("fishspeciesActualPlot"), height = "100%", width = "100%")
-              )
-            ),
-            tabPanel(
-              title = "Biomass change",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("fishspeciesPlot"), height = "100%", width = "100%")
-              )
-            ),
-            tabPanel(
-              title = "Yield",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("fishspeciesYieldPlot"), height = "100%", width = "100%")
-              )
-            ),
-            tabPanel(
-              title = "Yield change",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("fishspeciesYieldChangePlot"), height = "100%", width = "100%")
-              )
-            ),
-            tabPanel(
-              title = "Length",
-              div(style = "flex:1; display:flex;",
-                  plotlyOutput(ns("fishlengthPlot"), height = "100%", width = "100%")
-              )
-            ),
-            # tabPanel(
-            #   title = "Yield Composition",
-            #   div(style = "flex:1; display:flex;",
-            #       plotlyOutput(ns("yieldPlot"), height = "100%", width = "100%")
-            #   )
-            # ),
-            # tabPanel(
-            #   title = "Size",
-            #   div(style = "flex:1; display:flex;",
-            #       plotlyOutput(ns("fishsizePlot"), height = "100%", width = "100%")
-            #   )
-            # ),
-            if (have_guild_file) {
-              tabPanel(
-                title = "Guild",
-                div(style = "flex:1; display:flex;",
-                    plotlyOutput(ns("fishguildPlot"), height = "100%", width = "100%")
+        area = "area0",
+        card_body(
+            div(
+                class = "plot-card",
+                style = "flex: 4.5; height:50vh; display:flex; flex-direction:column; overflow: hidden; margin-top: -0.5rem",
+                tabsetPanel(
+                    id = ns("fishy_plots"),
+                    if ("Biomass" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Biomass",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("fishspeciesActualPlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Biomass change" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Biomass change",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("fishspeciesPlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Yield" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Yield",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("fishspeciesYieldPlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Yield change" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Yield change",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("fishspeciesYieldChangePlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if (have_nutrition_file &&
+                        ("Nutrition change" %in% fishery_strategy_tabs)) {
+                        tabPanel(
+                            title = "Nutrition",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("nutritionplot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Length" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Length",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("fishlengthPlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if (have_guild_file &&
+                        ("Guild" %in% fishery_strategy_tabs)) {
+                        tabPanel(
+                            title = "Guild",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("fishguildPlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Yield Composition" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Yield Composition",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("yieldPlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Size" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Size",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("fishsizePlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Spectra" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Spectra",
+                            div(style = "flex:1; display:flex;",
+                                plotlyOutput(ns("spectrumPlot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    },
+                    if ("Diet" %in% fishery_strategy_tabs) {
+                        tabPanel(
+                            title = "Diet",
+                            div(style = "height:50vh; display:flex;",
+                                plotlyOutput(ns("fishdietsingleplot"),
+                                             height = "100%", width = "100%")
+                            )
+                        )
+                    }
                 )
-              )
-            },
-            # tabPanel(
-            #   title = "Spectra",
-            #   div(style = "flex:1; display:flex;",
-            #       plotlyOutput(ns("spectrumPlot"), height = "100%", width = "100%")
-            #   )
-            # ),
-            # tabPanel(
-            #   title = "Diet",
-            #   div(style = "height:50vh; display:flex;",
-            #       plotlyOutput(ns("fishdietsingleplot"), height = "100%", width = "100%")
-            #   )
-            # ),
-            if (have_nutrition_file) {
-              tabPanel(
-                title = "Nutrition",
-                div(style = "flex:1; display:flex;",
-                    plotlyOutput(ns("nutritionplot"), height = "100%", width = "100%")
-                )
-              )
-            }
-          )
-        )
-      ),
+            )
+        ),
 
       # Conditional Panels ----
       card_body(

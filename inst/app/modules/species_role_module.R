@@ -1,15 +1,16 @@
 # Species Role Module
 # Handles the Species Role tab UI and server logic
 
-species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
+species_role_ui <- function(id, sp_max_year, have_guild_file,
+                            app_exists, species_role_tabs) {
   ns <- NS(id)
-  
+
   grid_container(
     layout    = c("area1 area0"),
     row_sizes = c("1fr"),
     col_sizes = c("0.3fr", "1.7fr"),
     gap_size  = "10px",
-    
+
     grid_card(
       area = "area1",
       card_body(
@@ -62,30 +63,37 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
         )
       )
     ),
-    
+
+    # Tabs ----
     grid_card(
       area = "area0",
-      
+
       card_body(
         class = "plot-card",
         style = "flex: 4; overflow: hidden; margin-top: -0.5rem",
         tabsetPanel(
           id = ns("plotTabs"),
-          tabPanel(title = "Biomass", plotlyOutput(ns("speciesPlot"), height = "55vh")),
-          tabPanel(title = "Size",     plotlyOutput(ns("sizePlot"),     height = "55vh")),
-          if (have_guild_file) {
+          if ("Biomass" %in% species_role_tabs) {
+            tabPanel(title = "Biomass", plotlyOutput(ns("speciesPlot"), height = "55vh"))
+          },
+          if ("Size" %in% species_role_tabs) {
+            tabPanel(title = "Size",     plotlyOutput(ns("sizePlot"),     height = "55vh"))
+          },
+          if (have_guild_file && ("Guilds" %in% species_role_tabs)) {
             tabPanel(title = "Guilds",   plotlyOutput(ns("guildPlot"),    height = "55vh"))
           },
-          tabPanel(title = "Diet",
-                   div(style = "height:50vh; display:flex;",
-                       plotlyOutput(ns("dietplot"), height = "100%", width = "100%")
-                   ))
+          if ("Diet" %in% species_role_tabs) {
+            tabPanel(title = "Diet",
+                     div(style = "height:50vh; display:flex;",
+                         plotlyOutput(ns("dietplot"), height = "100%", width = "100%")
+                     ))
+          }
         )
       ),
-      
+
       card_body(
         style = "flex: 1.46;",
-        
+
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Biomass'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
@@ -119,7 +127,7 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
               )
           )
         ),
-        
+
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Size'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
@@ -136,7 +144,7 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
               )
           )
         ),
-        
+
         conditionalPanel(
           condition = paste0("input['", ns("plotTabs"), "'] == 'Guilds'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
@@ -175,10 +183,10 @@ species_role_ui <- function(id, sp_max_year, have_guild_file, app_exists) {
   )
 }
 
-species_role_server <- function(id, default_params, unharvestedprojection, 
+species_role_server <- function(id, default_params, unharvestedprojection,
                                 guildparams, ordered_species_reactive, species_list) {
   moduleServer(id, function(input, output, session) {
-    
+
     # Setup year controls
     mizerShiny:::setupYearControls(
       input, session,
@@ -186,13 +194,13 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       minusId  = "decYear_bio",
       plusId   = "incYear_bio"
     )
-    
+
     # Update species select inputs
     observe({
       updateSelectInput(session, "species_name_select", choices = species_list())
       updateSelectInput(session, "diet_species_select", choices = species_list())
     })
-    
+
     # Initialize species selection when app starts
     observe({
       req(species_list())
@@ -200,27 +208,27 @@ species_role_server <- function(id, default_params, unharvestedprojection,
         updateSelectInput(session, "species_name_select", selected = species_list()[1])
       }
     })
-    
+
     # Reset sliders when species selection changes
     observe({
       req(input$species_name_select)
       updateSliderInput(session, "species", value = 0)
       updateSliderInput(session, "mortspecies", value = 0)
     })
-    
+
     # Initialize bioSimData as a reactive value
     bioSimData <- reactiveVal(list(
       harvested = unharvestedprojection,
       unharvested = unharvestedprojection
     ))
-    
+
     # Reactive observer that runs when time range changes
     # It checks whether the simulation needs to be extended
     observe({
       sims <- isolate(bioSimData())
       max_year <- dim(sims$harvested@n)[1] - 1
       if (input$year <= max_year) return()  # No need to re-run if within bounds
-      
+
       notif_id <- shiny::showNotification(
         "Extending simulation …",
         type = "message",
@@ -232,27 +240,27 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       total_steps <- 3
       pb$set(message = "Running simulation …", value = 0)
-      
+
       t_max <- input$year - max_year + 5  # Extend by 5 years
       pb$inc(1/total_steps, "Projecting …")
       unharvested <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(sims$unharvested, t_max = t_max),
         context = "species_role_time_range_unharvested"
       )
-      
+
       pb$inc(1/total_steps, "Projecting …")
       harvested <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(sims$harvested, t_max = t_max),
         context = "species_role_time_range_harvested"
       )
-      
+
       pb$inc(1/total_steps, "Done")
-      
+
       # Update the reactive value
       bioSimData(list(harvested = harvested,
                       unharvested = unharvested))
     })
-    
+
     # Reactive observer that runs simulation when inputs change
     observe({
       req(input$species_name_select)
@@ -260,28 +268,28 @@ species_role_server <- function(id, default_params, unharvestedprojection,
       input$species
       input$mortspecies
       input$species_name_select
-      
+
       changed_params <- default_params
-      
+
       pb <- shiny::Progress$new(); on.exit(pb$close())
       total_steps <- 4
       pb$set(message = "Running simulation …", value = 0)
-      
+
       pb$inc(1/total_steps, "Adjusting biomass …")
-      
+
       changed_params@initial_n[input$species_name_select, ] <-
         default_params@initial_n[input$species_name_select, ] * (1 + input$species / 100)
-      
+
       pb$inc(1/total_steps, "Updating mortality …")
       extmort   <- getExtMort(default_params)
       totalmort <- getMort(default_params)
-      
+
       extmort[input$species_name_select, ] <-
         extmort[input$species_name_select, ] +
         (input$mortspecies / 100) * totalmort[input$species_name_select, ]
-      
+
       ext_mort(changed_params) <- extmort
-      
+
       pb$inc(1/total_steps, "Projecting …")
       harvested <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(
@@ -292,25 +300,25 @@ species_role_server <- function(id, default_params, unharvestedprojection,
         ),
         context = "species_role_simulation"
       )
-      
+
       pb$inc(1/total_steps, "Done")
-      
+
       # Update the reactive value
       bioSimData(list(harvested = harvested,
                       unharvested = unharvestedprojection))
     })
-    
+
     # Store last successful plots for error recovery
     lastBioSpeciesPlot <- mizerShiny:::createLastPlotReactive()
     lastBioSizePlot    <- mizerShiny:::createLastPlotReactive()
     lastBioGuildPlot   <- mizerShiny:::createLastPlotReactive()
     lastDietPlot       <- mizerShiny:::createLastPlotReactive()
-    
+
     # Output plots
     output$speciesPlot <- renderPlotly({
       req(bioSimData())
       chosen_year <- input$year
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mode <- mizerShiny:::getModeFromToggle(input$triplotToggle)
@@ -328,12 +336,12 @@ species_role_server <- function(id, default_params, unharvestedprojection,
         context = "speciesPlot"
       )
     })
-    
+
     output$sizePlot <- renderPlotly({
       req(bioSimData())
       t1 <- max(input$year - 1, 1)
       t2 <- input$year + 1
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           g <- mizerShiny:::plotSpectraRelative(
@@ -350,12 +358,12 @@ species_role_server <- function(id, default_params, unharvestedprojection,
         context = "sizePlot"
       )
     })
-    
+
     output$guildPlot <- renderPlotly({
       req(bioSimData())
       validate(need(!is.null(guildparams), "Guild data not available"))
       chosen_year <- input$year
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           mode <- mizerShiny:::getModeFromToggle(input$triguildToggle)
@@ -372,12 +380,12 @@ species_role_server <- function(id, default_params, unharvestedprojection,
         context = "guildPlot"
       )
     })
-    
+
     output$dietplot <- renderPlotly({
       req(bioSimData())
       win <- list(start = max(input$year - 1, 1), end = input$year + 1)
       sims <- list(bioSimData()$harvested, bioSimData()$unharvested)
-      
+
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
           # Add bounds checking for time range
@@ -386,12 +394,12 @@ species_role_server <- function(id, default_params, unharvestedprojection,
                             ", max_time = ", dim(bioSimData()$harvested@n)[1])
             stop(paste("Time range out of bounds:", details))
           }
-          
+
           # Subset simulations by time range
           harvest_sub <- lapply(sims, function(sim) {
             mizerShiny:::subsetSimByTimeRange(sim, win)
           })
-          
+
           mizerShiny:::plotDietCompare(
             harvest_sub,
             species   = input$diet_species_select,
