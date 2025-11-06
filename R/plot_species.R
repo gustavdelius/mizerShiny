@@ -360,12 +360,15 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
 
   # Use geom_rect for manual stacking and dodging
   # Map Species to numeric positions but keep as factor for discrete scale
-  p <- ggplot(yield_data) +
-    geom_rect(aes(xmin = XPos - BarWidth/2,
-                  xmax = XPos + BarWidth/2,
-                  ymin = Ymin, ymax = Ymax,
-                  fill = Gear, alpha = TimeClass, text = tooltip_text),
-              show.legend = c(fill = TRUE, alpha = FALSE)) +
+  # Note: 'text' is a plotly aesthetic, not ggplot2, so we suppress the warning
+  p <- suppressWarnings(
+    ggplot(yield_data) +
+      geom_rect(aes(xmin = XPos - BarWidth/2,
+                    xmax = XPos + BarWidth/2,
+                    ymin = Ymin, ymax = Ymax,
+                    fill = Gear, alpha = TimeClass, text = tooltip_text),
+                show.legend = c(fill = TRUE, alpha = FALSE))
+  ) +
     scale_x_continuous(breaks = seq_along(levels(yield_data$Species)),
                        labels = levels(yield_data$Species)) +
     scale_fill_manual(values = gear_colors, name = "Gear") +

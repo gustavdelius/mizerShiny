@@ -284,12 +284,15 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
                                   "Yield: ", round(plot_df$yield, 2), " g/year")
 
   # Use geom_rect for manual stacking and dodging
-  p <- ggplot2::ggplot(plot_df) +
-    ggplot2::geom_rect(ggplot2::aes(xmin = XPos - BarWidth/2,
-                  xmax = XPos + BarWidth/2,
-                  ymin = Ymin, ymax = Ymax,
-                  fill = Gear, alpha = TimeClass, text = tooltip_text),
-              show.legend = c(fill = TRUE, alpha = FALSE)) +
+  # Note: 'text' is a plotly aesthetic, not ggplot2, so we suppress the warning
+  p <- suppressWarnings(
+    ggplot2::ggplot(plot_df) +
+      ggplot2::geom_rect(ggplot2::aes(xmin = XPos - BarWidth/2,
+                    xmax = XPos + BarWidth/2,
+                    ymin = Ymin, ymax = Ymax,
+                    fill = Gear, alpha = TimeClass, text = tooltip_text),
+                show.legend = c(fill = TRUE, alpha = FALSE))
+  ) +
     ggplot2::scale_x_continuous(breaks = seq_along(species_order),
                        labels = species_order) +
     ggplot2::scale_fill_manual(values = gear_colors, name = "Gear") +
