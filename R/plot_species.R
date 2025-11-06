@@ -353,13 +353,18 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
   # This allows the module to override with scale_x_discrete(limits = ...)
   yield_data$Species <- factor(yield_data$Species, levels = unique(yield_data$Species))
 
+  # Create text for tooltip
+  yield_data$tooltip_text <- paste0("Gear: ", yield_data$Gear, "<br>",
+                                     "TimeClass: ", yield_data$TimeClass, "<br>",
+                                     "Yield: ", round(yield_data$Yield, 2), " g/year")
+
   # Use geom_rect for manual stacking and dodging
   # Map Species to numeric positions but keep as factor for discrete scale
   p <- ggplot(yield_data) +
     geom_rect(aes(xmin = XPos - BarWidth/2,
                   xmax = XPos + BarWidth/2,
                   ymin = Ymin, ymax = Ymax,
-                  fill = Gear, alpha = TimeClass),
+                  fill = Gear, alpha = TimeClass, text = tooltip_text),
               show.legend = c(fill = TRUE, alpha = FALSE)) +
     scale_x_continuous(breaks = seq_along(levels(yield_data$Species)),
                        labels = levels(yield_data$Species)) +

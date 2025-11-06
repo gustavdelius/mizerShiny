@@ -663,7 +663,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
                   chosen_year,
                   mode = mode
                 ) + scale_x_discrete(limits = ordered_species_reactive())
-              )
+              ),
+              tooltip = "text"
             )
           } else if (vis$show_sim1) {
             ggplotly(
@@ -674,7 +675,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
                   mode = mode
                 ) +
                   scale_x_discrete(limits = ordered_species_reactive())
-              )
+              ),
+              tooltip = "text"
             )
           } else {
             ggplotly(
@@ -685,7 +687,8 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
                   mode = mode
                 ) +
                   scale_x_discrete(limits = ordered_species_reactive())
-              )
+              ),
+              tooltip = "text"
             )
           }
         },
