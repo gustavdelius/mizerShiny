@@ -656,30 +656,36 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
 
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
-              mizerShiny:::plotSpeciesActualYield2(
-                fishSimData()$sim1,
-                fishSimData()$sim2,
-                chosen_year,
-                mode = mode
-              ) + scale_x_discrete(limits = ordered_species_reactive())
+              suppressMessages(
+                mizerShiny:::plotSpeciesActualYield2(
+                  fishSimData()$sim1,
+                  fishSimData()$sim2,
+                  chosen_year,
+                  mode = mode
+                ) + scale_x_discrete(limits = ordered_species_reactive())
+              )
             )
           } else if (vis$show_sim1) {
             ggplotly(
-              mizerShiny:::plotSpeciesActualYield(
-                fishSimData()$sim1,
-                chosen_year,
-                mode = mode
-              ) +
-                scale_x_discrete(limits = ordered_species_reactive())
+                suppressMessages(
+                mizerShiny:::plotSpeciesActualYield(
+                  fishSimData()$sim1,
+                  chosen_year,
+                  mode = mode
+                ) +
+                  scale_x_discrete(limits = ordered_species_reactive())
+              )
             )
           } else {
             ggplotly(
-              mizerShiny:::plotSpeciesActualYield(
-                fishSimData()$sim2,
-                chosen_year,
-                mode = mode
-              ) +
-                scale_x_discrete(limits = ordered_species_reactive())
+                suppressMessages(
+                mizerShiny:::plotSpeciesActualYield(
+                  fishSimData()$sim2,
+                  chosen_year,
+                  mode = mode
+                ) +
+                  scale_x_discrete(limits = ordered_species_reactive())
+              )
             )
           }
         },
