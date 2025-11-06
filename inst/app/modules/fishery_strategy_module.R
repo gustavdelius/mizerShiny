@@ -10,6 +10,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
     col_sizes = c("0.3fr", "1.7fr"),
     gap_size  = "10px",
 
+    # Controls ----
     grid_card(
       area = "area1",
       card_body(
@@ -53,6 +54,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
       )
     ),
 
+    # Tabs ----
     grid_card(
       area = "area0",
       card_body(
@@ -83,6 +85,12 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
               title = "Yield change",
               div(style = "flex:1; display:flex;",
                   plotlyOutput(ns("fishspeciesYieldChangePlot"), height = "100%", width = "100%")
+              )
+            ),
+            tabPanel(
+              title = "Length",
+              div(style = "flex:1; display:flex;",
+                  plotlyOutput(ns("fishlengthPlot"), height = "100%", width = "100%")
               )
             ),
             # tabPanel(
@@ -129,6 +137,7 @@ fishery_strategy_ui <- function(id, fish_max_year, have_guild_file, have_nutriti
         )
       ),
 
+      # Conditional Panels ----
       card_body(
         style = "flex: auto",
         conditionalPanel(
@@ -458,8 +467,9 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
     lastSpectrumPlot             <- mizerShiny:::createLastPlotReactive()
     lastFishDietSinglePlot       <- mizerShiny:::createLastPlotReactive()
     lastNutritionPlot            <- mizerShiny:::createLastPlotReactive()
+    lastFishLengthPlot           <- mizerShiny:::createLastPlotReactive()
 
-    # Plots
+    # Yield dashboard ----
     output$yieldPlot <- renderPlotly({
       req(fishSimData())
 
@@ -479,6 +489,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
     })
 
+    # Biomass plot ----
     output$fishspeciesActualPlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
@@ -524,6 +535,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
     })
 
+    # Yield plot ----
     output$fishspeciesYieldPlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
@@ -569,6 +581,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
     })
 
+    # Yield change plot ----
     output$fishspeciesYieldChangePlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
@@ -617,6 +630,26 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
     })
 
+    # Length (Yield vs Size by Length) plot ----
+    output$fishlengthPlot <- renderPlotly({
+      req(fishSimData())
+
+      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
+
+      mizerShiny:::generatePlotWithErrorHandling(
+        plot_fun = function() {
+          sims <- list(Current = fishSimData()$unharv)
+          if (vis$show_sim1) sims <- c(sims, list(Sim_1 = fishSimData()$sim1))
+          if (vis$show_sim2) sims <- c(sims, list(Sim_2 = fishSimData()$sim2))
+          ggplotly(mizerShiny:::plotYieldVsSize(sims, x_var = "Length"))
+        },
+        last_plot_reactive = lastFishLengthPlot,
+        condition = TRUE,
+        context = "fishlengthPlot"
+      )
+    })
+
+    # Biomass change plot ----
     output$fishspeciesPlot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
@@ -665,6 +698,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
     })
 
+    # Size plot ----
     output$fishsizePlot <- renderPlotly({
       req(fishSimData())
 
@@ -709,6 +743,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
     })
 
+    # Guild plot ----
     output$fishguildPlot <- renderPlotly({
       req(fishSimData())
       validate(need(!is.null(guildparams), "Guild data not available"))
@@ -770,6 +805,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       built(FALSE)
     })
 
+    # Spectrum plot ----
     output$spectrumPlot <- renderPlotly({
       p <- tryCatch({
         sim <- fishSimData(); req(sim)
@@ -911,6 +947,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       ignoreInit = TRUE
     )
 
+    # Diet plot ----
     output$fishdietsingleplot <- renderPlotly({
       req(fishSimData())
 
@@ -955,6 +992,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
       )
     })
 
+    # Nutrition plot ----
     output$nutritionplot <- renderPlotly({
       req(fishSimData())
       chosen_year <- fish_win1()
