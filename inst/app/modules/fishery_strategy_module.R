@@ -440,7 +440,7 @@ fishery_strategy_server <- function(id, default_params, unfishedprojection,
     # Initialize fishSimData as a reactive value
     fishSimData <- reactiveVal(list(
       sim1 = unfishedprojection,
-      sim2 = NULL,
+      sim2 = unfishedprojection,
       unharv = unfishedprojection
     ))
 
