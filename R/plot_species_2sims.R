@@ -280,11 +280,13 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
     ggplot2::geom_rect(ggplot2::aes(xmin = XPos - BarWidth/2,
                   xmax = XPos + BarWidth/2,
                   ymin = Ymin, ymax = Ymax,
-                  fill = Gear, alpha = TimeClass)) +
+                  fill = Gear, alpha = TimeClass),
+              show.legend = c(fill = TRUE, alpha = FALSE)) +
     ggplot2::scale_x_continuous(breaks = seq_along(species_order),
                        labels = species_order) +
     ggplot2::scale_fill_manual(values = gear_colors, name = "Gear") +
-    ggplot2::scale_alpha_manual(values = opacity_values, name = "Time") +
+    ggplot2::scale_alpha_manual(values = opacity_values, guide = "none") +
+    ggplot2::guides(alpha = "none", fill = ggplot2::guide_legend(override.aes = list(alpha = 1))) +
     ggplot2::labs(x = "Species", y = "Yield [g/year]") +
     # ggplot2::scale_y_continuous(trans = "log10") +
     ggplot2::theme_minimal() +
