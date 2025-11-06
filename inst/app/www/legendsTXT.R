@@ -48,6 +48,33 @@ to select and remove species from the plot. Resource is an energy input into \
 the simulation that models plankton."
 )
 
+# --- Toggle help  ---
+legends$role_show_intermediate_years <-
+    "When on, bars also show earlier responses at ¼ and ½ of the selected period, alongside the value at its end."
+legends$role_log <-
+    "Switches the body-size axis to logarithmic. Useful when spectra span orders of magnitude."
+
+legends$fishery_show_intermediate_years <-
+    "When on, bars also show earlier responses at ¼ and ½ of the selected period, alongside the value at its end."
+legends$fishery_log <-
+    "Switches the body-size axis to logarithmic for spectra. Turn off for a linear size axis."
+
+legends$fishery_biomass <-
+    legends$fishery_biomass <-
+    "Absolute biomass by species for the baseline fishing strategy at selected time points. X: species; Y: biomass. Shading distinguishes strategies and earlier → later time points."
+
+legends$fishery_biomass_change <-
+    "Biomass % change by species relative to the baseline strategy at selected time points (¼, ½, end of period). X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points."
+
+legends$fishery_yield <-
+    "Absolute yield over the selected period, by species and gear. Baseline and current strategies are shown together. Shading distinguishes strategies and earlier → later time points."
+
+legends$fishery_yield_change <-
+    "Yield % change by species relative to the baseline strategy at selected time points (¼, ½, end of period), broken down by fishing gear. X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points."
+
+legends$fishery_length <-
+    "Length (size) composition of the catch. Select species/gear and compare current vs baseline where available. Compositions are not re-normalised; total area varies with yield."
+
 # Duplicate role legends for fishery plots
 legends$fishery_guild   <- legends$role_guild
 legends$fishery_size    <- legends$role_size
