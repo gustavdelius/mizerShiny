@@ -334,13 +334,16 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
 
   # Create position offsets for dodging bars by time
   time_levels <- c("initial", "quarter", "half", "full")
-  n_times <- length(unique(yield_data$class))
+  # Get actual time classes present in data, in order
+  actual_time_classes <- unique(yield_data$class)
+  actual_time_classes <- actual_time_classes[order(match(actual_time_classes, time_levels))]
+  n_times <- length(actual_time_classes)
   dodge_width <- 0.8
   dodge_offset <- (seq_len(n_times) - (n_times + 1) / 2) * dodge_width / n_times
 
   yield_data <- yield_data |>
     dplyr::mutate(
-      TimeNum = as.numeric(factor(class, levels = time_levels)),
+      TimeNum = as.numeric(factor(class, levels = actual_time_classes)),
       SpeciesNum = as.numeric(factor(Species)),
       XPos = SpeciesNum + dodge_offset[TimeNum],
       BarWidth = dodge_width / n_times
