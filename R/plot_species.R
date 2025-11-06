@@ -356,11 +356,13 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
     geom_rect(aes(xmin = XPos - BarWidth/2,
                   xmax = XPos + BarWidth/2,
                   ymin = Ymin, ymax = Ymax,
-                  fill = Gear, alpha = TimeClass)) +
+                  fill = Gear, alpha = TimeClass),
+              show.legend = c(fill = TRUE, alpha = FALSE)) +
     scale_x_continuous(breaks = seq_along(levels(yield_data$Species)),
                        labels = levels(yield_data$Species)) +
     scale_fill_manual(values = gear_colors, name = "Gear") +
-    scale_alpha_manual(values = opacity_values, name = "Time") +
+    scale_alpha_manual(values = opacity_values, guide = "none") +
+    guides(alpha = "none", fill = guide_legend(override.aes = list(alpha = 1))) +
     labs(x = "Species", y = "Yield [g/year]") +
     # scale_y_continuous(trans = "log10") +
     theme_minimal() +
