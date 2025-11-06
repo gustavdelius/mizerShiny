@@ -22,7 +22,7 @@ params <- getShinyOption("params")
 # If no params provided, use defaults
 if (is.null(params)) {
     params <- default_params
-    guildparams <- default_guilds
+    guildparams <- default_guildparams
     nutrition <- default_nutrition
 }
 
@@ -32,7 +32,16 @@ have_guild_file <- !is.null(guildparams)
 have_nutrition_file <- !is.null(nutrition)
 
 fishery_strategy_tabs <- getShinyOption("fishery_strategy_tabs")
+if (is.null(fishery_strategy_tabs)) {
+  fishery_strategy_tabs <- c("Biomass", "Biomass % Change",
+                             "Yield", "Yield % Change",
+                             "Nutrition change", "Length",
+                             "Guild")
+}
 species_role_tabs <- getShinyOption("species_role_tabs")
+if (is.null(species_role_tabs)) {
+  species_role_tabs <- c("Biomass", "Size", "Guilds", "Diet")
+}
 
 # Functions to help load in files
 app_path <- function(...) {
