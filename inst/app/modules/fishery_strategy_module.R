@@ -7,10 +7,10 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
   ns <- NS(id)
 
   grid_container(
-    layout    = c("area1 area0"),
-    row_sizes = c("1fr"),
-    col_sizes = c("0.3fr", "1.7fr"),
-    gap_size  = "10px",
+    layout    = config$layout,
+    row_sizes = config$row_sizes,
+    col_sizes = config$col_sizes,
+    gap_size  = config$gap_size,
     # Controls ----
     grid_card(
       area = "area1",
