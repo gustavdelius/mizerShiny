@@ -203,7 +203,7 @@ plotSpeciesActualBiomass <- function(harvestedprojection, chosenyear,
 
   ggplot(biomass_data, aes(x = Species, y = Biomass, fill = Class)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
-    labs(x = "Species", y = "Biomass [g]") +
+    labs(x = "Species", y = "Biomass [tonnes/km^2]") +
     scale_fill_manual(values = abs_colours()) +
     # scale_y_continuous(trans = "log10") +
     theme_minimal() +
@@ -374,7 +374,7 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
     scale_fill_manual(values = gear_colors, name = "Gear") +
     scale_alpha_manual(values = opacity_values, guide = "none") +
     guides(alpha = "none", fill = guide_legend(override.aes = list(alpha = 1))) +
-    labs(x = "Species", y = "Yield [g/year]") +
+    labs(x = "Species", y = "Yield [tonnes/km^2/year]") +
     # scale_y_continuous(trans = "log10") +
     theme_minimal() +
     theme(

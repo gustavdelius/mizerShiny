@@ -193,7 +193,7 @@ plotSpeciesActualBiomass2 <- function(harvestedprojection1, harvestedprojection2
 
   ggplot2::ggplot(plot_df, ggplot2::aes(x = Species, y = biomass, fill = fill_group)) +
     ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
-    ggplot2::labs(x = "Species", y = "Biomass [g]") +
+    ggplot2::labs(x = "Species", y = "Biomass [tonnes/km^2]") +
     ggplot2::scale_fill_manual(values = abs_colours()) +
     # ggplot2::scale_y_continuous(trans = "log10") +
     ggplot2::theme_minimal() +
@@ -298,7 +298,7 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
     ggplot2::scale_fill_manual(values = gear_colors, name = "Gear") +
     ggplot2::scale_alpha_manual(values = opacity_values, guide = "none") +
     ggplot2::guides(alpha = "none", fill = ggplot2::guide_legend(override.aes = list(alpha = 1))) +
-    ggplot2::labs(x = "Species", y = "Yield [g/year]") +
+    ggplot2::labs(x = "Species", y = "Yield [tonnes/km^2/year]") +
     # ggplot2::scale_y_continuous(trans = "log10") +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),

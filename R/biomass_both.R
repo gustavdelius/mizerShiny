@@ -15,8 +15,8 @@
 #' @param ... Passed to ggplot2 theme functions
 #' @return A ggplot object
 #' @keywords internal
-plotbothbiomass <- function(sim, sim2, specie = NULL, 
-                            start_time, end_time, 
+plotbothbiomass <- function(sim, sim2, specie = NULL,
+                            start_time, end_time,
                             start_time2, end_time2,
                             y_ticks = 6, ylim = c(NA, NA), highlight = NULL, ...) {
   if (is.null(specie)) {
@@ -39,7 +39,7 @@ plotbothbiomass <- function(sim, sim2, specie = NULL,
   plot_dat <- rbind(bm1, bm2)
   ggplot2::ggplot(plot_dat, ggplot2::aes(x = Year, y = Biomass, color = Species, linetype = Sim)) +
     ggplot2::geom_line() +
-    ggplot2::scale_y_continuous(trans = "log10", name = "Biomass [g]") +
+    ggplot2::scale_y_continuous(trans = "log10", name = "Biomass [tonnes/km^2]") +
     ggplot2::scale_x_continuous(name = "Year") +
     ggplot2::scale_linetype_manual(values = c("sim1" = "solid", "sim2" = "dashed")) +
     ggplot2::theme_minimal() +
