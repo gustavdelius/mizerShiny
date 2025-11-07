@@ -26,9 +26,9 @@ group fish by diet and life stage.",
   fishery_yield = "To be written.",
   fishery_yield_change = "To be written.",
   fishery_nutrition =
-      "Relative change in nutrition compared with the current fishing strategy. \
+      "Relative change in nutrition compared with the baseline fishing strategy. \
 X axis contains the nutrient, Y axis is the % change in comparison with the \
-  current fishing strategy. Colour indicates whether change is positive or \
+  baseline fishing strategy. Colour indicates whether change is positive or \
   negative. Nutrient amount is calculated from biomass of species caught.",
   fishery_length = "To be written.",
   fishery_yield_composition =
@@ -60,14 +60,13 @@ legends$fishery_log <-
     "Switches the body-size axis to logarithmic for spectra. Turn off for a linear size axis."
 
 legends$fishery_biomass <-
-    legends$fishery_biomass <-
-    "Absolute biomass by species for the baseline fishing strategy at selected time points. X: species; Y: biomass. Shading distinguishes strategies and earlier → later time points."
+    "Absolute biomass by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: biomass. Shading distinguishes earlier → later time points."
 
 legends$fishery_biomass_change <-
     "Biomass % change by species relative to the baseline strategy at selected time points (¼, ½, end of period). X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points."
 
 legends$fishery_yield <-
-    "Absolute yield over the selected period, by species and gear. Baseline and current strategies are shown together. Shading distinguishes strategies and earlier → later time points."
+    "Absolute yield by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: yield. Shading distinguishes earlier → later time points."
 
 legends$fishery_yield_change <-
     "Yield % change by species relative to the baseline strategy at selected time points (¼, ½, end of period), broken down by fishing gear. X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points."
