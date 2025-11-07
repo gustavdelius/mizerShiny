@@ -164,10 +164,17 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
             ggplot2::geom_line() +
             ggplot2::facet_wrap(~Species, scales = "free") +
             ggplot2::labs(x = "Size [cm]",
-                          y = "Normalised number density [1/cm]",
+                          y = "Number density",
                           colour = "Simulation")
 
     }
+
+    pl <- pl + ggplot2::theme_minimal(base_size = 16) +
+        ggplot2::theme(
+            axis.text.y = ggplot2::element_blank(),
+            panel.spacing.y = grid::unit(1.5, "lines")
+        )
+
     if (!is.null(gear)) {
         pl <- pl + ggtitle(paste("Gear:", gear))
     }
