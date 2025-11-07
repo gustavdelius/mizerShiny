@@ -26,9 +26,9 @@ group fish by diet and life stage.",
   fishery_yield = "To be written.",
   fishery_yield_change = "To be written.",
   fishery_nutrition =
-      "Relative change in nutrition compared with the current fishing strategy. \
+      "Relative change in nutrition compared with the baseline fishing strategy. \
 X axis contains the nutrient, Y axis is the % change in comparison with the \
-  current fishing strategy. Colour indicates whether change is positive or \
+  baseline fishing strategy. Colour indicates whether change is positive or \
   negative. Nutrient amount is calculated from biomass of species caught.",
   fishery_length = "To be written.",
   fishery_yield_composition =
