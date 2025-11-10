@@ -69,6 +69,13 @@ legends$fishery_slider_tabs <-
 legends$fishery_sim_choice <-
     "Choose which simulations to display in the plots: the first setup, second setup, or both side by side."
 
+legends$tab_fishery_strategy <-
+    "Configure fishing strategies, adjust species-specific controls, and compare outcomes between simulation setups."
+legends$tab_species_role <-
+    "Explore how species contribute to the ecosystem under different scenarios, including biomass, guild, diet, and size effects."
+legends$page_guide_button <-
+    "Launch an interactive walkthrough of the current page. Use it to learn what each control and plot shows."
+
 legends$fishery_biomass <-
     "Absolute biomass by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: biomass. Shading distinguishes earlier → later time points."
 
