@@ -306,13 +306,31 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                   `data-bs-placement` = "top",
                   `data-bs-html` = "true",
                   `data-bs-content` = as.character(legends$species_order_help),
-                  HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
+                  tags$span(
+                    style = "font-weight:500; color: var(--bs-heading-color); line-height:1.2; display:flex; align-items:center;",
+                    "Species Order:"
+                  ),
+                  tags$style(
+                    HTML(
+                      sprintf(
+                        "#%s { margin: 0; }
+#%s .shiny-options-group { margin: 0; }
+#%s .form-select { height: auto; padding-top: 4px; padding-bottom: 4px; }
+#%s .selectize-control.single .selectize-input { padding: 4px 28px 4px 8px; }",
+                        ns("species_order_fish"),
+                        ns("species_order_fish"),
+                        ns("species_order_fish"),
+                        ns("species_order_fish")
+                      )
+                    )
+                  ),
                   selectInput(
                     inputId = ns("species_order_fish"),
                     label   = NULL,
                     choices = c("Custom", "Size", "Guild"),
                     width = "120px"
-                  ),
+                  ) |>
+                    tagAppendAttributes(style = "margin: 0; align-self: center;"),
                   actionButton(
                     ns("customOrderInfo_fish"),
                     label = HTML("<strong>customise</strong>"),
