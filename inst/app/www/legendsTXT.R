@@ -53,6 +53,8 @@ legends$role_show_intermediate_years <-
     "When on, bars also show earlier responses at ¼ and ½ of the selected period, alongside the value at its end."
 legends$role_log <-
     "Switches the body-size axis to logarithmic. Useful when spectra span orders of magnitude."
+legends$role_species_select <-
+    "Choose which species to adjust. The selected species is used for the biomass and mortality sliders and plotted metrics."
 legends$role_time_range <-
     "Adjust the time range shown in the plots. Use the buttons to step by one year."
 
@@ -62,6 +64,8 @@ legends$fishery_log <-
     "Switches the body-size axis to logarithmic for spectra. Turn off for a linear size axis."
 legends$fishery_time_range <-
     "Adjust the time range shown in the plots. Use the buttons to step by one year."
+legends$fishery_sim_choice <-
+    "Choose which simulations to display in the plots: the first setup, second setup, or both side by side."
 
 legends$fishery_biomass <-
     "Absolute biomass by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: biomass. Shading distinguishes earlier → later time points."

@@ -14,39 +14,47 @@ species_role_ui <- function(id, config, legends, have_guild_file,
     grid_card(
       area = "area1",
       card_body(
-        selectInput(
-          inputId = ns("species_name_select"),
-          label   = "Select a Species:",
-          choices = NULL
-        ) |> tagAppendAttributes(id = "species_chose"),
-        sliderInput(
-          inputId = ns("species"),
-          label   = HTML(
-            "% Change in Biomass <button id='infoButtonSpecies' class='btn btn-info btn-xs' type='button' \
-            data-bs-toggle='popover' title='' \
-            data-bs-content='Slider value indicates the percentage change in starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 20. To decrease by 20%, set value to -20.'>\
-            <strong>?</strong></button>"
-          ),
-          min   = -100,
-          max   = 100,
-          value = 0,
-          step  = 1,
-          width = "100%"
-        ) |> tagAppendAttributes(id = "species_slider"),
-        sliderInput(
-          inputId = ns("mortspecies"),
-          label   = HTML(
-            "% Change in Mortality<button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
-            data-bs-toggle='popover' title='' \
-            data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 10%, set the value of the slider to 10. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -1'>\
-            <strong>?</strong></button>"
-          ),
-          min   = -25,
-          max   = 25,
-          value = 0,
-          step  = 1,
-          width = "100%"
-        ) |> tagAppendAttributes(id = "mort_slider"),
+        div(
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$role_species_select),
+          selectInput(
+            inputId = ns("species_name_select"),
+            label   = "Select a Species:",
+            choices = NULL
+          ) |> tagAppendAttributes(id = "species_chose")
+        ),
+        div(
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = "Slider value indicates the percentage change in starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 20. To decrease by 20%, set value to -20.",
+          sliderInput(
+            inputId = ns("species"),
+            label   = "% Change in Biomass",
+            min     = -100,
+            max     = 100,
+            value   = 0,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "species_slider")
+        ),
+        div(
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = "Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 10%, set the value of the slider to 10. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -1.",
+          sliderInput(
+            inputId = ns("mortspecies"),
+            label   = "% Change in Mortality",
+            min     = -25,
+            max     = 25,
+            value   = 0,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "mort_slider")
+        ),
         div(
           style = "display:flex; flex-direction:column; gap:10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
           `data-bs-toggle` = "popover",

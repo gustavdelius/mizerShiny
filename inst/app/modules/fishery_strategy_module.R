@@ -38,17 +38,22 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             actionButton(ns("incYear_fish"), "+1 year", class = "btn-small")
           )
         ),
-        div(style = "margin: 4px 0  0; padding: 6px 8px 0 8px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-            div(style = "display: flex; align-items: center; gap: 8px;",
-                HTML("<span style='font-weight:500; font-size: 0.9em; color: var(--bs-heading-color);'>Show:</span>"),
-                radioButtons(
-                  inputId = ns("sim_choice"),
-                  label   = NULL,
-                  choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                  selected = "sim1",
-                  inline = TRUE
-                )
-            )
+        div(
+          style = "margin: 4px 0  0; padding: 6px 8px 0 8px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$fishery_sim_choice),
+          div(style = "display: flex; align-items: center; gap: 8px;",
+              HTML("<span style='font-weight:500; font-size: 0.9em; color: var(--bs-heading-color);'>Show:</span>"),
+              radioButtons(
+                inputId = ns("sim_choice"),
+                label   = NULL,
+                choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+                selected = "sim1",
+                inline = TRUE
+              )
+          )
         ),
         tabsetPanel(
           tabPanel(
