@@ -308,7 +308,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
               conditionalPanel(
                 condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass % Change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield % Change'"),
                 div(
-                  style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                  style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb; margin-top: 8px;",
                   `data-bs-toggle` = "popover",
                   `data-bs-placement` = "top",
                   `data-bs-html` = "true",
