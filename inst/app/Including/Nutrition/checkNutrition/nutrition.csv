@@ -1,27 +1,27 @@
 common_name,scientific_name,worms_alpha_id,phylum,class,order,family,genus,species,,selenium (mcg),zinc (mg),omega_3 (mg),calcium (mg),iron (mg),vitamin_a (mcg),vitamin D (mcg),D2 ERGCAL(mcg),D3 CHOCAL(mcg),folate (mcg),vitamin_b12 (mg),iodine (mcg)
 Atlantic salmon,Salmo salar,127186,Chordata,Actinopteri,Salmoniformes,Salmonidae,Salmo,Salmo salar,,18.56684744,0.253615201,1199.061634,11.33047589,0.379451918,11.9074505,4.7,,5.69,5,4.4,12
-Atlantic mackerel,Scomber scombrus,127023,Chordata,Actinopteri,Scombriformes,Scombridae,Scomber,Scomber scombrus,,51.95536808,0.694573758,760.918991,20.10148527,0.704570517,16.81810264,8,,6.44,1,8.8,29
-Atlantic cod,Gadus morhua,126436,Chordata,Actinopteri,Gadiformes,Gadidae,Gadus,Gadus morhua,,15.44717801,0.422098776,533.315366,9.579675117,0.124969796,10.65936332,0,,0.88,7,1.5,196
+Mackerel,Scomber scombrus,127023,Chordata,Actinopteri,Scombriformes,Scombridae,Scomber,Scomber scombrus,,51.95536808,0.694573758,760.918991,20.10148527,0.704570517,16.81810264,8,,6.44,1,8.8,29
+Cod,Gadus morhua,126436,Chordata,Actinopteri,Gadiformes,Gadidae,Gadus,Gadus morhua,,15.44717801,0.422098776,533.315366,9.579675117,0.124969796,10.65936332,0,,0.88,7,1.5,196
 Skipjack tuna,Katsuwonus pelamis,127018,Chordata,Actinopteri,Scombriformes,Scombridae,Katuwonus,Katsuwonus pelamis,,87.39649576,1.540619588,449.731036,155.2889152,2.267505658,6.635559235,3.2,,,4,2.2,18
 Haddock,Melanogrammus aeglefinus,126437,Chordata,Actinopteri,Gadiformes,Gadidae,Melanogrammus,Melanogrammus aeglefinus,,32.88016692,0.308687628,616.929001,10.18140899,0.175196758,7.920938296,0,0,0.5,10,1.9,320
-Atlantic herring,Clupea harengus,126417,Chordata,Actinopteri,Clupeiformes,Clupeidae,Clupea,Clupea harengus,,16.47946925,1.028568358,914.504005,75.36142584,0.372178257,29.06716422,19,,9.59,9,13,29
+Herring,Clupea harengus,126417,Chordata,Actinopteri,Clupeiformes,Clupeidae,Clupea,Clupea harengus,,16.47946925,1.028568358,914.504005,75.36142584,0.372178257,29.06716422,19,,9.59,9,13,29
 Alaska pollock,Gadus chalcogrammus,300735,Chordata,Actinopteri,Gadiformes,Gadidae,Gadus,Gadus chalcogrammus,,14.47168841,0.445398332,336.97462,12.04720893,0.185400806,11.23677228,0,,,5,2.3,56
 Rainbow trout,Oncorhynchus mykiss,127185 ,Chordata,Actinopteri,Salmoniformes,Salmonidae,Oncorhynchus,Oncorhynchus mykiss,,264.571134,0.523086085,1042.40591,29.76506854,0.916872256,5.654445043,7.9,,6.9,9,2.8,5
 Sea trout,Salmo trutta,127187,Chordata,Actinopteri,Salmoniformes,Salmonidae,Salmo,Salmo trutta,,19.12131521,0.5438428,558.997062,32.98564055,1.397001564,6.335406459,7.9,,,9,2.8,5
 Ling,Molva molva,126461,Chordata,Actinopteri,Gadiformes,Lotidae,Molva,Molva molva,,32.48739074,0.280264175,368.429759,15.1905554,0.27794797,8.346642533,0,,,7,1, 
 Turbot,Scophthalmus maximus,127149,Chordata,Actinopteri,Pleuronectiformes,Scophthalmidae,Scophthalmus,Scophthalmus maximus,,14.14015984,0.156291298,274.512858,28.51438306,0.144259598,8.191237237,0,,3.63,8,2, 
-European hake,Merluccius merluccius,126484,Chordata,Actinopteri,Gadiformes,Merlucciidae,Merluccius,Merluccius merluccius,,34.6,0.3,248,14,0.5,11.8,0,,,,,
+Hake,Merluccius merluccius,126484,Chordata,Actinopteri,Gadiformes,Merlucciidae,Merluccius,Merluccius merluccius,,34.6,0.3,248,14,0.5,11.8,0,,,,,
 Blue whiting,Micromesistius poutassou,126439,Chordata,Actinopteri,Gadiformes,Gadidae,Micromesistius,Micromesistius poutassou,,8.99,0.712,249,59.8,0.423,33.2,,,,,,
 Common dab,Limanda limanda,127139,Chordata,Actinopteri,Pleuronectiformes,Pleuronectidae,Limanda,Limanda limanda,,70,0.5,319,24,0.3,0,1.5,,,5,2,30
 Sprat,Sprattus sprattus,126425,Chordata,Actinopteri,Clupeiformes,Clupeidae,Sprattus,Sprattus sprattus,,10,1.7,1300,97,1.1,60,13,,,,7,64
-whiting,Merlangius merlangus,126438,Chordata,Actinopteri,Gadiformes,Gadidae,Merlangius,Merlangius merlangus,,21,0.4,100,18,0.1,0,0,,4.11,13,2.3,67
+Whiting,Merlangius merlangus,126438,Chordata,Actinopteri,Gadiformes,Gadidae,Merlangius,Merlangius merlangus,,21,0.4,100,18,0.1,0,0,,4.11,13,2.3,67
 John dory,Zeus faber,127427,Chordata,Actinopteri,Zeiformes,Zeidae,Zeus,Zeus faber,,21,0.3,500,40,0.246,0,0,0,0.5,,,
 Horse mackerel,Trachurus trachurus,126822,Chordata,Actinopteri,Carangiformes,Carangidae,Trachurus,Trachurus trachurus,,53,0.41,1750,40,1.1,4,,,41.19,2,6.8,29
 Four-spotted megrim,Lepidorhombus boscii,127145,Chordata,Actinopteri,Pleuronectiformes,Scophthalmidae,Lepidorhombus,Lepidorhombus boscii,,15.2,0.417,676,39.8,0.311,14.5,,,,,,
 Monkfish,Lophius spp.,,Chordata,Actinopteri,Lophiiformes,Lophiidae,Lophius,Lophius spp.,,37,0.5,100,8,0.3,0,0,,,7,0.9,
 Lemon sole,Microstomus kitt,127140,Chordata,Actinopteri,Pleuronectiformes,Pleuronectidae,Microstomus,Microstomus kitt,,50,0.3,50,17,0.12,0,0,,,13,1,23
 Norway pout,Trisopterus esmarkii,126444,Chordata,Actinopteri,Gadiformes,Gadidae,Trisopterus,Trisopterus esmarkii,,17.5,1.25,627,73.1,0.802,25.5,,,,,,
-Dover sole,Solea solea,127160,Chordata,Actinopteri,Pleuronectiformes,Soleidae,Solea,Solea solea,,23,0.4,224,29,0.8,0,0,,0.75,,,
+Sole,Solea solea,127160,Chordata,Actinopteri,Pleuronectiformes,Soleidae,Solea,Solea solea,,23,0.4,224,29,0.8,0,0,,0.75,,,
 Plaice,Pleuronectes platessa,127143,Chordata,Actinopteri,Pleuronectiformes,Pleuronectidae,Pleuronectes,Pleuronectes platessa,,35,0.5,160,17,0.1,0,0,,1.11,12,1.3,31
 Poor cod,Trisopterus minutus,126446,Chordata,Actinopteri,Gadiformes,Gadidae,Trisopterus,Trisopterus minutus,,19.3,1.13,701,66.1,0.674,16.6,,,,,,
 Bib,Trisopterus luscus,126445,Chordata,Actinopteri,Gadiformes,Gadidae,Trisopterus,Trisopterus luscus,,14.4,1.29,649,69.1,0.679,13.5,,,0.32,,,
@@ -42,7 +42,7 @@ Anchovy,Engraulis encrasicolus,400098,Chordata,Actinopteri,Clupeiformes,Engrauli
 Blue ling,Molva dypterygia,154806,Chordata,Actinopteri,Gadiformes,Lotidae,Molva,Molva dypterygia,,29.8,0.305,381,16.4,0.278,10.9,,0,,,,
 Boarfish,Capros aper,127419,Chordata,Actinopteri,Acanthuriformes,Caproidae,Capros,Capros aper,,37,0.767,313,74.7,1.11,18.1,,,,,,
 Greater silver smelt,Argentina silus,126715,Chordata,Actinopteri,Argentiniformes,Argentinidae,Argentina,Argentina silus,,22.1,0.487,180,26.6,0.366,24.9,,,,,,
-Megrim,Lepidorhombus whiffiagonis,127146,Chordata,Actinopteri,Pleuronectiformes,Scophthalmidae,Lepidorhombus,Lepidorhombus whiffiagonis,,14.6,0.285,350,21.2,0.309,12.1,,,,,,
+Monkfish,Lepidorhombus whiffiagonis,127146,Chordata,Actinopteri,Pleuronectiformes,Scophthalmidae,Lepidorhombus,Lepidorhombus whiffiagonis,,14.6,0.285,350,21.2,0.309,12.1,,,,,,
 Common octopus ,Octopus vulgaris,140605,Mollusca,Cephalopoda,Octopoda,Octopodidae,Octopus,Octopus vulgaris,,44.8,1.68,239,53,5.3,45,,,0,16,20,41
 Red seabream,Pagellus bogaraveo,127059,Chordata,Actinopteri,Perciformes,Sparidae,Pagellus,Pagellus bogaraveo,,47.9,0.275,742,41.2,0.167,10.4,,,,,,
 Round nose grenadier,Coryphaenoides rupestris,158960,Chordata,Actinopteri,Gadiformes,Macrouridae,Coryphaenoides,Coryphaenoides rupestris,,26.9,0.429,104,17.4,0.296,21.2,,,0.52,,,

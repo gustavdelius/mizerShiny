@@ -10,7 +10,7 @@ The goal of mizerShiny is to provide a frontend for running [mizer](https://size
 
 ## Running mizerShiny
 
-You can install mizerShiny and then run the default North Sea mizer model like so
+You can install mizerShiny and then run the default Celtic Sea mizer model like so:
 
 ```{r example, eval=F}
 devtools::install_github("gustavdelius/mizerShiny")
