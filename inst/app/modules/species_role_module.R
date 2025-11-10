@@ -14,52 +14,68 @@ species_role_ui <- function(id, config, legends, have_guild_file,
     grid_card(
       area = "area1",
       card_body(
-        selectInput(
-          inputId = ns("species_name_select"),
-          label   = "Select a Species:",
-          choices = NULL
-        ) |> tagAppendAttributes(id = "species_chose"),
-        sliderInput(
-          inputId = ns("species"),
-          label   = HTML(
-            "% Change in Biomass <button id='infoButtonSpecies' class='btn btn-info btn-xs' type='button' \
-            data-bs-toggle='popover' title='' \
-            data-bs-content='Slider value indicates the percentage change in starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 20. To decrease by 20%, set value to -20.'>\
-            <strong>?</strong></button>"
-          ),
-          min   = -100,
-          max   = 100,
-          value = 0,
-          step  = 1,
-          width = "100%"
-        ) |> tagAppendAttributes(id = "species_slider"),
-        sliderInput(
-          inputId = ns("mortspecies"),
-          label   = HTML(
-            "% Change in Mortality<button id='infoButtonMort' class='btn btn-info btn-xs' type='button' \
-            data-bs-toggle='popover' title='' \
-            data-bs-content='Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 10%, set the value of the slider to 10. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -1'>\
-            <strong>?</strong></button>"
-          ),
-          min   = -25,
-          max   = 25,
-          value = 0,
-          step  = 1,
-          width = "100%"
-        ) |> tagAppendAttributes(id = "mort_slider"),
-        sliderInput(
-          inputId = ns("year"),
-          label   = "Time Range",
-          min     = 3,
-          max     = config$max_year,
-          value   = 5,
-          step    = 1,
-          width   = "100%"
-        ) |> tagAppendAttributes(id = "yearspecies_slider"),
-        div(id   = ns("yearAdjustButtons_bio"),
+        div(
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$role_species_select),
+          selectInput(
+            inputId = ns("species_name_select"),
+            label   = "Select a Species:",
+            choices = NULL
+          ) |> tagAppendAttributes(id = "species_chose")
+        ),
+        div(
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$role_biomass_slider),
+          sliderInput(
+            inputId = ns("species"),
+            label   = "% Change in Biomass",
+            min     = -100,
+            max     = 100,
+            value   = 0,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "species_slider")
+        ),
+        div(
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$role_mortality_slider),
+          sliderInput(
+            inputId = ns("mortspecies"),
+            label   = "% Change in Mortality",
+            min     = -25,
+            max     = 25,
+            value   = 0,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "mort_slider")
+        ),
+        div(
+          style = "display:flex; flex-direction:column; gap:10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$role_time_range),
+          sliderInput(
+            inputId = ns("year"),
+            label   = "Time Range",
+            min     = 3,
+            max     = config$max_year,
+            value   = 5,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "yearspecies_slider"),
+          div(
+            id    = ns("yearAdjustButtons_bio"),
             style = "display:flex; justify-content:center; gap:10px;",
             actionButton(ns("decYear_bio"), "-1 year", class = "btn-small"),
             actionButton(ns("incYear_bio"), "+1 year", class = "btn-small")
+          )
         )
       )
     ),
@@ -142,31 +158,38 @@ species_role_ui <- function(id, config, legends, have_guild_file,
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
               conditionalPanel(
                 condition = paste0("input['", ns("plotTabs"), "'] == 'Biomass'"),
-                div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                    HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
-                    selectInput(
-                      inputId = ns("species_order_bio"),
-                      label   = NULL,
-                      choices = c("Custom", "Size", "Guild"),
-                      width = "120px"
-                    ),
-                    HTML(
-                      "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
-                    ),
-                    actionButton(
-                      ns("customOrderInfo_bio"),
-                      label = HTML("<strong>customise</strong>"),
-                      class = "btn btn-info btn-xs no-focus-outline"
-                    )
+                div(
+                  style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                  `data-bs-toggle` = "popover",
+                  `data-bs-placement` = "top",
+                  `data-bs-html` = "true",
+                  `data-bs-content` = as.character(legends$species_order_help),
+                  HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
+                  selectInput(
+                    inputId = ns("species_order_bio"),
+                    label   = NULL,
+                    choices = c("Custom", "Size", "Guild"),
+                    width = "120px"
+                  ),
+                  actionButton(
+                    ns("customOrderInfo_bio"),
+                    label = HTML("<strong>customise</strong>"),
+                    class = "btn btn-info btn-xs no-focus-outline"
+                  )
                 )
               ),
-              div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
-                  materialSwitch(
-                    inputId = ns("triplotToggle"),
-                    label   = HTML(paste0("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;' data-bs-toggle='popover' data-bs-placement='left' title='' data-bs-content='", as.character(legends$role_show_intermediate_years), "'>Show intermediate years</span>")),
-                    value   = TRUE,
-                    status  = "info"
-                  )
+              div(
+                style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
+                `data-bs-toggle` = "popover",
+                `data-bs-placement` = "top",
+                `data-bs-html` = "true",
+                `data-bs-content` = as.character(legends$role_show_intermediate_years),
+                materialSwitch(
+                  inputId = ns("triplotToggle"),
+                  label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
+                  value   = TRUE,
+                  status  = "info"
+                )
               )
           )
         ),

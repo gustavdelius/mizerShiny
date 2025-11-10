@@ -188,13 +188,27 @@ ui <- fluidPage(
 
     # Fishery Strategy tab ----
     tabPanel(
-      title = "Fishery Strategy",
+      value = "Fishery Strategy",
+      title = span(
+        "Fishery Strategy",
+        `data-bs-toggle` = "popover",
+        `data-bs-placement` = "bottom",
+        `data-bs-html` = "true",
+        `data-bs-content` = as.character(legends$tab_fishery_strategy)
+      ),
       fishery_strategy_ui("fishery", config, legends, have_guild_file, have_nutrition_file, fishery_strategy_tabs)
     ),
 
     # Species Role tab ----
     tabPanel(
-      title = "Species Role",
+      value = "Species Role",
+      title = span(
+        "Species Role",
+        `data-bs-toggle` = "popover",
+        `data-bs-placement` = "bottom",
+        `data-bs-html` = "true",
+        `data-bs-content` = as.character(legends$tab_species_role)
+      ),
       species_role_ui("species", config, legends, have_guild_file, species_role_tabs)
     ),
 
@@ -202,7 +216,13 @@ ui <- fluidPage(
     bslib::nav_spacer(),
     bslib::nav_item(
       actionButton("start_tutorial", "Page Guide", class = "btn btn-primary",
-                   style = "margin-right: 20px; padding: 5px 5px;")
+                   style = "margin-right: 20px; padding: 5px 5px;") |>
+        tagAppendAttributes(
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "bottom",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$page_guide_button)
+        )
     )
   )
 )

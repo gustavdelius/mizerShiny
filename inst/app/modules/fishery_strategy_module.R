@@ -16,31 +16,61 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
       area = "area1",
       card_body(
         style = "margin-top: -0.5rem",
-        sliderInput(
-          inputId = ns("fishyear"),
-          label   = "Time Range",
-          min     = 3,
-          max     = config$max_year,
-          value   = 5,
-          step    = 1,
-          width   = "100%"
-        ) |> tagAppendAttributes(id = "fishyyear"),
-        div(id   = ns("yearAdjustButtons_fish"),
-            style = "display:flex; justify-content:center; gap:10px;",
+        div(
+          style = "display:flex; flex-direction:column; gap:0px; padding: 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$fishery_time_range),
+          sliderInput(
+            inputId = ns("fishyear"),
+            label   = "Time Range",
+            min     = 3,
+            max     = config$max_year,
+            value   = 5,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "fishyyear", style = "margin-bottom: 4px;"),
+          div(
+            id    = ns("yearAdjustButtons_fish"),
+            style = "display:flex; justify-content:center; gap:4px; margin-top: 2px;",
             actionButton(ns("decYear_fish"), "-1 year", class = "btn-small"),
             actionButton(ns("incYear_fish"), "+1 year", class = "btn-small")
+          )
         ),
-        div(style = "margin: 4px 0  0; padding: 6px 8px 0 8px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-            div(style = "display: flex; align-items: center; gap: 8px;",
-                HTML("<span style='font-weight:500; font-size: 0.9em; color: var(--bs-heading-color);'>Show:</span>"),
-                radioButtons(
-                  inputId = ns("sim_choice"),
-                  label   = NULL,
-                  choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
-                  selected = "sim1",
-                  inline = TRUE
+        div(
+          style = "margin: 2px 0 0; padding: 2px 6px 0 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$fishery_sim_choice),
+          div(
+            style = "display: flex; align-items: center; gap: 8px;",
+            tags$span(
+              style = "font-weight:500; font-size: 0.9em; color: var(--bs-heading-color); display:flex; align-items:center;",
+              "Show:"
+            ),
+            tags$style(
+              HTML(
+                sprintf(
+                  "#%s { margin: 0; }
+#%s .shiny-options-group { margin-top: 0; display: flex; align-items: center; gap: 12px; }
+#%s .form-check { margin-bottom: 0; }",
+                  ns("sim_choice"),
+                  ns("sim_choice"),
+                  ns("sim_choice")
                 )
-            )
+              )
+            ),
+            radioButtons(
+              inputId = ns("sim_choice"),
+              label   = NULL,
+              choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+              selected = "sim1",
+              inline = TRUE
+            ) |>
+              tagAppendAttributes(style = "margin: 0;")
+          )
         ),
         tabsetPanel(
           tabPanel(
@@ -51,7 +81,14 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             title = "Sim 2",
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui2")))
           )
-        )
+        ) |>
+          tagAppendAttributes(
+            style = "margin-top: 0px;",
+            `data-bs-toggle` = "popover",
+            `data-bs-placement` = "top",
+            `data-bs-html` = "true",
+            `data-bs-content` = as.character(legends$fishery_slider_tabs)
+          )
       )
     ),
 
@@ -270,31 +307,56 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
               conditionalPanel(
                 condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass % Change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield % Change'"),
-                div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                    HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
-                    selectInput(
-                      inputId = ns("species_order_fish"),
-                      label   = NULL,
-                      choices = c("Custom", "Size", "Guild"),
-                      width = "120px"
-                    ),
+                div(
+                  style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb; margin-top: 8px;",
+                  `data-bs-toggle` = "popover",
+                  `data-bs-placement` = "top",
+                  `data-bs-html` = "true",
+                  `data-bs-content` = as.character(legends$species_order_help),
+                  tags$span(
+                    style = "font-weight:500; color: var(--bs-heading-color); line-height:1.2; display:flex; align-items:center;",
+                    "Species Order:"
+                  ),
+                  tags$style(
                     HTML(
-                      "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
-                    ),
-                    actionButton(
-                      ns("customOrderInfo_fish"),
-                      label = HTML("<strong>customise</strong>"),
-                      class = "btn btn-info btn-xs no-focus-outline"
+                      sprintf(
+                        "#%s { margin: 0; }
+#%s .shiny-options-group { margin: 0; }
+#%s .form-select { height: auto; padding-top: 4px; padding-bottom: 4px; }
+#%s .selectize-control.single .selectize-input { padding: 4px 28px 4px 8px; }",
+                        ns("species_order_fish"),
+                        ns("species_order_fish"),
+                        ns("species_order_fish"),
+                        ns("species_order_fish")
+                      )
                     )
+                  ),
+                  selectInput(
+                    inputId = ns("species_order_fish"),
+                    label   = NULL,
+                    choices = c("Custom", "Size", "Guild"),
+                    width = "120px"
+                  ) |>
+                    tagAppendAttributes(style = "margin: 0; align-self: center;"),
+                  actionButton(
+                    ns("customOrderInfo_fish"),
+                    label = HTML("<strong>customise</strong>"),
+                    class = "btn btn-info btn-xs no-focus-outline"
+                  )
                 )
               ),
-              div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
-                  materialSwitch(
-                    inputId = ns("triplotToggleFish"),
-                    label   = HTML(paste0("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;' data-bs-toggle='popover' data-bs-placement='left' title='' data-bs-content='", as.character(legends$fishery_show_intermediate_years), "'>Show intermediate years</span>")),
-                    value   = TRUE,
-                    status  = "info"
-                  )
+              div(
+                style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
+                `data-bs-toggle` = "popover",
+                `data-bs-placement` = "top",
+                `data-bs-html` = "true",
+                `data-bs-content` = as.character(legends$fishery_show_intermediate_years),
+                materialSwitch(
+                  inputId = ns("triplotToggleFish"),
+                  label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
+                  value   = TRUE,
+                  status  = "info"
+                )
               )
           )
         ),
