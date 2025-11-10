@@ -270,31 +270,38 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
               conditionalPanel(
                 condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass % Change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield % Change'"),
-                div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
-                    HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
-                    selectInput(
-                      inputId = ns("species_order_fish"),
-                      label   = NULL,
-                      choices = c("Custom", "Size", "Guild"),
-                      width = "120px"
-                    ),
-                    HTML(
-                      "<button id='infoButtonOrder' class='btn btn-info btn-xs' type='button' data-bs-toggle='popover' title='' data-bs-content='Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.'><strong>?</strong></button>"
-                    ),
-                    actionButton(
-                      ns("customOrderInfo_fish"),
-                      label = HTML("<strong>customise</strong>"),
-                      class = "btn btn-info btn-xs no-focus-outline"
-                    )
+                div(
+                  style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+                  `data-bs-toggle` = "popover",
+                  `data-bs-placement` = "top",
+                  `data-bs-html` = "true",
+                  `data-bs-content` = "Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.",
+                  HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
+                  selectInput(
+                    inputId = ns("species_order_fish"),
+                    label   = NULL,
+                    choices = c("Custom", "Size", "Guild"),
+                    width = "120px"
+                  ),
+                  actionButton(
+                    ns("customOrderInfo_fish"),
+                    label = HTML("<strong>customise</strong>"),
+                    class = "btn btn-info btn-xs no-focus-outline"
+                  )
                 )
               ),
-              div(style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
-                  materialSwitch(
-                    inputId = ns("triplotToggleFish"),
-                    label   = HTML(paste0("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;' data-bs-toggle='popover' data-bs-placement='left' title='' data-bs-content='", as.character(legends$fishery_show_intermediate_years), "'>Show intermediate years</span>")),
-                    value   = TRUE,
-                    status  = "info"
-                  )
+              div(
+                style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f3e5f5; border-radius: 5px; border: 1px solid #e1bee7;",
+                `data-bs-toggle` = "popover",
+                `data-bs-placement` = "top",
+                `data-bs-html` = "true",
+                `data-bs-content` = as.character(legends$fishery_show_intermediate_years),
+                materialSwitch(
+                  inputId = ns("triplotToggleFish"),
+                  label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Show intermediate years</span>"),
+                  value   = TRUE,
+                  status  = "info"
+                )
               )
           )
         ),
