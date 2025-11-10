@@ -17,7 +17,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
       card_body(
         style = "margin-top: -0.5rem",
         div(
-          style = "display:flex; flex-direction:column; gap:10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          style = "display:flex; flex-direction:column; gap:0px; padding: 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
           `data-bs-toggle` = "popover",
           `data-bs-placement` = "right",
           `data-bs-html` = "true",
@@ -30,16 +30,16 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             value   = 5,
             step    = 1,
             width   = "100%"
-          ) |> tagAppendAttributes(id = "fishyyear"),
+          ) |> tagAppendAttributes(id = "fishyyear", style = "margin-bottom: 4px;"),
           div(
             id    = ns("yearAdjustButtons_fish"),
-            style = "display:flex; justify-content:center; gap:10px;",
+            style = "display:flex; justify-content:center; gap:4px; margin-top: 2px;",
             actionButton(ns("decYear_fish"), "-1 year", class = "btn-small"),
             actionButton(ns("incYear_fish"), "+1 year", class = "btn-small")
           )
         ),
         div(
-          style = "margin: 4px 0  0; padding: 6px 8px 0 8px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          style = "margin: 2px 0 0; padding: 2px 6px 0 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
           `data-bs-toggle` = "popover",
           `data-bs-placement` = "right",
           `data-bs-html` = "true",
@@ -64,7 +64,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             title = "Sim 2",
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui2")))
           )
-        )
+        ) |> tagAppendAttributes(style = "margin-top: 0px;")
       )
     ),
 
