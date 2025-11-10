@@ -64,6 +64,8 @@ legends$fishery_log <-
     "Switches the body-size axis to logarithmic for spectra. Turn off for a linear size axis."
 legends$fishery_time_range <-
     "Adjust the time range shown in the plots. Use the buttons to step by one year."
+legends$fishery_slider_tabs <-
+    "Switch between slider controls for Sim&nbsp;1 and Sim&nbsp;2. Changes apply only to the selected simulation, letting you compare strategies side by side."
 legends$fishery_sim_choice <-
     "Choose which simulations to display in the plots: the first setup, second setup, or both side by side."
 

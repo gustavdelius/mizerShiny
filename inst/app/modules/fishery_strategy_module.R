@@ -81,7 +81,14 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             title = "Sim 2",
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui2")))
           )
-        ) |> tagAppendAttributes(style = "margin-top: 0px;")
+        ) |>
+          tagAppendAttributes(
+            style = "margin-top: 0px;",
+            `data-bs-toggle` = "popover",
+            `data-bs-placement` = "top",
+            `data-bs-html` = "true",
+            `data-bs-content` = as.character(legends$fishery_slider_tabs)
+          )
       )
     ),
 
