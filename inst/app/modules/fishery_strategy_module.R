@@ -288,7 +288,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                   `data-bs-toggle` = "popover",
                   `data-bs-placement` = "top",
                   `data-bs-html` = "true",
-                  `data-bs-content` = "Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order.",
+                  `data-bs-content` = as.character(legends$species_order_help),
                   HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Species Order:</span>"),
                   selectInput(
                     inputId = ns("species_order_fish"),

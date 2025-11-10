@@ -86,3 +86,12 @@ legends$fishery_length <-
 legends$fishery_guild   <- legends$role_guild
 legends$fishery_size    <- legends$role_size
 legends$fishery_diet    <- legends$role_diet
+
+legends$species_order_help <-
+    "Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order."
+
+legends$role_biomass_slider <-
+    "Slider value indicates the percentage change in starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 20. To decrease by 20%, set value to -20."
+
+legends$role_mortality_slider <-
+    "Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 10%, set the value of the slider to 10. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -1."
