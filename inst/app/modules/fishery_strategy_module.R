@@ -78,16 +78,18 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui")))
           ),
           tabPanel(
-            title = "Sim 2",
+            title = span(
+              "Sim 2",
+              `data-bs-toggle` = "popover",
+              `data-bs-placement` = "top",
+              `data-bs-html` = "true",
+              `data-bs-content` = as.character(legends$fishery_slider_tabs)
+            ),
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui2")))
           )
         ) |>
           tagAppendAttributes(
-            style = "margin-top: 0px;",
-            `data-bs-toggle` = "popover",
-            `data-bs-placement` = "top",
-            `data-bs-html` = "true",
-            `data-bs-content` = as.character(legends$fishery_slider_tabs)
+            style = "margin-top: 0px;"
           )
       )
     ),
@@ -432,7 +434,18 @@ fishery_strategy_server <- function(id, sim_0,
           width = "100%"
         )
       })
-      div(id = "fishery_sliders", slider_list)
+      div(
+        id = "fishery_sliders",
+        tagList(slider_list),
+        div(
+          style = "display:flex; justify-content:flex-end; margin-top: 8px;",
+          actionButton(
+            session$ns("reset_effort_sim1"),
+            label = "Reset",
+            class = "btn btn-secondary btn-sm"
+          )
+        )
+      )
     })
 
     # Dynamic fishery effort sliders for Sim 2
@@ -452,7 +465,18 @@ fishery_strategy_server <- function(id, sim_0,
           width = "100%"
         )
       })
-      div(id = "fishery_sliders", slider_list)
+      div(
+        id = "fishery_sliders",
+        tagList(slider_list),
+        div(
+          style = "display:flex; justify-content:flex-end; margin-top: 8px;",
+          actionButton(
+            session$ns("reset_effort_sim2"),
+            label = "Reset",
+            class = "btn btn-secondary btn-sm"
+          )
+        )
+      )
     })
 
     # Changing the timerange to subset on the plot for yield
@@ -612,6 +636,32 @@ fishery_strategy_server <- function(id, sim_0,
       sims <- isolate(fishSimData())
       fishSimData(list(sim1 = sims$sim1, sim2 = sim2, unharv = sims$unharv))
     }, ignoreInit = TRUE)
+
+    # Reset Sim 1 effort sliders to base effort
+    observeEvent(input$reset_effort_sim1, {
+      base_effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
+      lapply(gears, function(gear) {
+        updateSliderInput(
+          session,
+          paste0("effort_", gear),
+          value = unname(base_effort[gear])
+        )
+      })
+    })
+
+    # Reset Sim 2 effort sliders to base effort
+    observeEvent(input$reset_effort_sim2, {
+      base_effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
+      lapply(gears, function(gear) {
+        updateSliderInput(
+          session,
+          paste0("effort2_", gear),
+          value = unname(base_effort[gear])
+        )
+      })
+    })
 
     # Setup year controls
     mizerShiny:::setupYearControls(
