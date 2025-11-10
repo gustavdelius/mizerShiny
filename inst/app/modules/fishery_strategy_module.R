@@ -434,7 +434,18 @@ fishery_strategy_server <- function(id, sim_0,
           width = "100%"
         )
       })
-      div(id = "fishery_sliders", slider_list)
+      div(
+        id = "fishery_sliders",
+        tagList(slider_list),
+        div(
+          style = "display:flex; justify-content:flex-end; margin-top: 8px;",
+          actionButton(
+            session$ns("reset_effort_sim1"),
+            label = "Reset",
+            class = "btn btn-secondary btn-sm"
+          )
+        )
+      )
     })
 
     # Dynamic fishery effort sliders for Sim 2
@@ -454,7 +465,18 @@ fishery_strategy_server <- function(id, sim_0,
           width = "100%"
         )
       })
-      div(id = "fishery_sliders", slider_list)
+      div(
+        id = "fishery_sliders",
+        tagList(slider_list),
+        div(
+          style = "display:flex; justify-content:flex-end; margin-top: 8px;",
+          actionButton(
+            session$ns("reset_effort_sim2"),
+            label = "Reset",
+            class = "btn btn-secondary btn-sm"
+          )
+        )
+      )
     })
 
     # Changing the timerange to subset on the plot for yield
@@ -614,6 +636,32 @@ fishery_strategy_server <- function(id, sim_0,
       sims <- isolate(fishSimData())
       fishSimData(list(sim1 = sims$sim1, sim2 = sim2, unharv = sims$unharv))
     }, ignoreInit = TRUE)
+
+    # Reset Sim 1 effort sliders to base effort
+    observeEvent(input$reset_effort_sim1, {
+      base_effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
+      lapply(gears, function(gear) {
+        updateSliderInput(
+          session,
+          paste0("effort_", gear),
+          value = unname(base_effort[gear])
+        )
+      })
+    })
+
+    # Reset Sim 2 effort sliders to base effort
+    observeEvent(input$reset_effort_sim2, {
+      base_effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
+      lapply(gears, function(gear) {
+        updateSliderInput(
+          session,
+          paste0("effort2_", gear),
+          value = unname(base_effort[gear])
+        )
+      })
+    })
 
     # Setup year controls
     mizerShiny:::setupYearControls(
