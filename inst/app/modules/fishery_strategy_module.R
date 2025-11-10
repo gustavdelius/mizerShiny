@@ -16,19 +16,27 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
       area = "area1",
       card_body(
         style = "margin-top: -0.5rem",
-        sliderInput(
-          inputId = ns("fishyear"),
-          label   = "Time Range",
-          min     = 3,
-          max     = config$max_year,
-          value   = 5,
-          step    = 1,
-          width   = "100%"
-        ) |> tagAppendAttributes(id = "fishyyear"),
-        div(id   = ns("yearAdjustButtons_fish"),
+        div(
+          style = "display:flex; flex-direction:column; gap:10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$fishery_time_range),
+          sliderInput(
+            inputId = ns("fishyear"),
+            label   = "Time Range",
+            min     = 3,
+            max     = config$max_year,
+            value   = 5,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "fishyyear"),
+          div(
+            id    = ns("yearAdjustButtons_fish"),
             style = "display:flex; justify-content:center; gap:10px;",
             actionButton(ns("decYear_fish"), "-1 year", class = "btn-small"),
             actionButton(ns("incYear_fish"), "+1 year", class = "btn-small")
+          )
         ),
         div(style = "margin: 4px 0  0; padding: 6px 8px 0 8px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
             div(style = "display: flex; align-items: center; gap: 8px;",

@@ -47,19 +47,27 @@ species_role_ui <- function(id, config, legends, have_guild_file,
           step  = 1,
           width = "100%"
         ) |> tagAppendAttributes(id = "mort_slider"),
-        sliderInput(
-          inputId = ns("year"),
-          label   = "Time Range",
-          min     = 3,
-          max     = config$max_year,
-          value   = 5,
-          step    = 1,
-          width   = "100%"
-        ) |> tagAppendAttributes(id = "yearspecies_slider"),
-        div(id   = ns("yearAdjustButtons_bio"),
+        div(
+          style = "display:flex; flex-direction:column; gap:10px; padding: 10px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$role_time_range),
+          sliderInput(
+            inputId = ns("year"),
+            label   = "Time Range",
+            min     = 3,
+            max     = config$max_year,
+            value   = 5,
+            step    = 1,
+            width   = "100%"
+          ) |> tagAppendAttributes(id = "yearspecies_slider"),
+          div(
+            id    = ns("yearAdjustButtons_bio"),
             style = "display:flex; justify-content:center; gap:10px;",
             actionButton(ns("decYear_bio"), "-1 year", class = "btn-small"),
             actionButton(ns("incYear_bio"), "+1 year", class = "btn-small")
+          )
         )
       )
     ),
