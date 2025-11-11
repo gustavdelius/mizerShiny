@@ -6,6 +6,7 @@
 \usage{
 plotNutritionChange(
   harvestedprojection,
+  nutrition,
   sim_0,
   chosenyear,
   mode = c("triple", "chosen")
@@ -13,6 +14,8 @@ plotNutritionChange(
 }
 \arguments{
 \item{harvestedprojection}{Harvested mizer projection}
+
+\item{nutrition}{Data frame of per-species nutrient contents}
 
 \item{sim_0}{Unharvested mizer projection}
 

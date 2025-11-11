@@ -5,6 +5,7 @@
 \title{Plot nutrition change for two simulations}
 \usage{
 plotNutritionChange2(
+  nutrition,
   harvestedprojection1,
   harvestedprojection2,
   sim_0,
@@ -13,6 +14,8 @@ plotNutritionChange2(
 )
 }
 \arguments{
+\item{nutrition}{Data frame of per-species nutrient contents}
+
 \item{harvestedprojection1}{First harvested mizer projection}
 
 \item{harvestedprojection2}{Second harvested mizer projection}

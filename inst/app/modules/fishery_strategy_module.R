@@ -176,7 +176,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                     },
                     ## Nutrition Plot ----
                     if (have_nutrition_file &&
-                        ("Nutrition change" %in% fishery_strategy_tabs)) {
+                        ("Nutrition" %in% fishery_strategy_tabs)) {
                         tabPanel(
                             value = "Nutrition",
                             title = span(
@@ -1306,6 +1306,7 @@ fishery_strategy_server <- function(id, sim_0,
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
               mizerShiny:::plotNutritionChange2(
+                nutrition,
                 fishSimData()$sim1,
                 fishSimData()$sim2,
                 fishSimData()$unharv,
@@ -1316,6 +1317,7 @@ fishery_strategy_server <- function(id, sim_0,
           } else if (vis$show_sim1) {
             ggplotly(
               mizerShiny:::plotNutritionChange(
+                nutrition,
                 fishSimData()$sim1,
                 fishSimData()$unharv,
                 chosen_year,
@@ -1325,6 +1327,7 @@ fishery_strategy_server <- function(id, sim_0,
           } else {
             ggplotly(
               mizerShiny:::plotNutritionChange(
+                nutrition,
                 fishSimData()$sim2,
                 fishSimData()$unharv,
                 chosen_year,

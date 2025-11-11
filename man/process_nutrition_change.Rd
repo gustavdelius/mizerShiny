@@ -5,6 +5,7 @@
 \title{Shared processing for nutrition change plots}
 \usage{
 process_nutrition_change(
+  nutrition,
   harvestedprojection,
   sim_0,
   chosenyear,
@@ -12,6 +13,8 @@ process_nutrition_change(
 )
 }
 \arguments{
+\item{nutrition}{Data frame of per-species nutrient contents}
+
 \item{harvestedprojection}{Harvested mizer projection}
 
 \item{sim_0}{Unharvested mizer projection}

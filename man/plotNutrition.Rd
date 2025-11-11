@@ -4,9 +4,11 @@
 \alias{plotNutrition}
 \title{Plot relative nutritional output compared to a reference simulation}
 \usage{
-plotNutrition(sims, ref, step)
+plotNutrition(nutrition, sims, ref, step)
 }
 \arguments{
+\item{nutrition}{Data frame of per-species nutrient contents}
+
 \item{sims}{List of mizer projection objects to compare}
 
 \item{ref}{Reference mizer projection}
