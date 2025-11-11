@@ -434,6 +434,105 @@ fishery_strategy_server <- function(id, sim_0,
   params_noninteracting <- mizerShiny:::make_noninteracting(params)
 
   moduleServer(id, function(input, output, session) {
+    
+    # Update species select input
+    observe({
+        updateSelectInput(session, "fish_name_select", choices = species_list)
+    })
+
+    get_gears <- function() {
+      unique(params@gear_params$gear)
+    }
+
+    makeEffort <- function(prefix, base_effort, gears = get_gears()) {
+      ef <- base_effort
+      for (g in gears) {
+        id <- paste0(prefix, g)
+        if (!is.null(input[[id]]))
+          ef[g] <- input[[id]]
+      }
+      ef
+    }
+
+    createSliderUI <- function(effort_prefix, l50_prefix, reset_button_id) {
+      renderUI({
+        gears <- get_gears()
+        slider_list <- lapply(gears, function(gear) {
+          list(
+            sliderInput(
+              inputId = session$ns(paste0(effort_prefix, gear)),
+              label = paste("Effort for", gear),
+              min = 0,
+              max = if (params@initial_effort[gear] == 0) {
+                2
+              } else (params@initial_effort[gear] * 2),
+              value = params@initial_effort[gear],
+              step = 0.05,
+              width = "100%"
+            ),
+            sliderInput(
+              inputId = session$ns(paste0(l50_prefix, gear)),
+              label = paste("% change in L50 for", gear),
+              min = -20,
+              max = 40,
+              value = 0,
+              step = 1,
+              width = "100%"
+            )
+          )
+        })
+        div(
+          id = "fishery_sliders",
+          tagList(slider_list),
+          div(
+            style = "display:flex; justify-content:flex-end; margin-top: 8px;",
+            actionButton(
+              session$ns(reset_button_id),
+              label = "Reset",
+              class = "btn btn-secondary btn-sm"
+            )
+          )
+        )
+      })
+    }
+
+    observeStrategyEffort <- function(effort_prefix, context, sim_key, label) {
+      observeEvent({
+        gears <- get_gears()
+        lapply(gears, function(gear) input[[paste0(effort_prefix, gear)]])
+      }, {
+        gears <- get_gears()
+        effort <- makeEffort(effort_prefix, params@initial_effort, gears)
+        max_year <- isolate(input$fishyear)
+
+        pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
+        pb$set(message = "Running fishery simulation …", value = 0)
+
+        pb$inc(1, paste("Projecting", label, "…"))
+        sim <- mizerShiny:::runSimulationWithErrorHandling(
+          function() project(params, effort = effort, t_max = max_year + 5),
+          context = context
+        )
+
+        sims <- isolate(fishSimData())
+        sims[[sim_key]] <- sim
+        fishSimData(sims)
+      }, ignoreInit = TRUE)
+    }
+
+    observeResetButton <- function(reset_button_id, effort_prefix) {
+      observeEvent(input[[reset_button_id]], {
+        base_effort <- params@initial_effort
+        gears <- get_gears()
+        lapply(gears, function(gear) {
+          updateSliderInput(
+            session,
+            paste0(effort_prefix, gear),
+            value = unname(base_effort[gear])
+          )
+        })
+      })
+    }
 
     # Update species select input
     observe({
@@ -442,85 +541,9 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Fishery sliders ----
     # Dynamic fishery effort sliders for Strategy 1
-    output$fishery_sliders_ui <- renderUI({
-      effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
-      slider_list <- lapply(gears, function(gear) {
-        list(
-          sliderInput(
-          inputId = session$ns(paste0("effort_", gear)),
-          label = paste("Effort for", gear),
-          min = 0,
-          max = if (params@initial_effort[gear] == 0) {
-            2
-          } else (params@initial_effort[gear] * 2),
-          value = params@initial_effort[gear],
-          step = 0.05,
-          width = "100%"
-        ),
-        sliderInput(
-          inputId = session$ns(paste0("l50_", gear)),
-          label = paste("% change in L50 for", gear),
-          min = -20,
-          max = 40,
-          value = 0,
-          step = 1,
-          width = "100%"
-        ))
-      })
-      div(
-        id = "fishery_sliders",
-        tagList(slider_list),
-        div(
-          style = "display:flex; justify-content:flex-end; margin-top: 8px;",
-          actionButton(
-            session$ns("reset_effort_sim1"),
-            label = "Reset",
-            class = "btn btn-secondary btn-sm"
-          )
-        )
-      )
-    })
-
-    # Dynamic fishery effort sliders for Strategy 2
-    output$fishery_sliders_ui2 <- renderUI({
-      effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
-      slider_list <- lapply(gears, function(gear) {
-        list(sliderInput(
-          inputId = session$ns(paste0("effort2_", gear)),
-          label = paste("Effort for", gear),
-          min = 0,
-          max = if(params@initial_effort[gear]==0){
-            2
-          }else(params@initial_effort[gear]*2),
-          value = params@initial_effort[gear],
-          step = 0.05,
-          width = "100%"
-        ),
-        sliderInput(
-          inputId = session$ns(paste0("l50_2_", gear)),
-          label = paste("% change in L50 for", gear),
-          min = -20,
-          max = 40,
-          value = 0,
-          step = 1,
-          width = "100%"
-        ))
-      })
-      div(
-        id = "fishery_sliders",
-        tagList(slider_list),
-        div(
-          style = "display:flex; justify-content:flex-end; margin-top: 8px;",
-          actionButton(
-            session$ns("reset_effort_sim2"),
-            label = "Reset",
-            class = "btn btn-secondary btn-sm"
-          )
-        )
-      )
-    })
+    # Dynamic fishery effort sliders
+    output$fishery_sliders_ui  <- createSliderUI("effort_",  "l50_",   "reset_effort_sim1")
+    output$fishery_sliders_ui2 <- createSliderUI("effort2_", "l50_2_", "reset_effort_sim2")
 
     # Observers ----
 
@@ -547,9 +570,9 @@ fishery_strategy_server <- function(id, sim_0,
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       pb$set(message = "Running simulation …", value = 0)
 
-      gears <- unique(params@gear_params$gear)
-      effort_sim1 <- makeEffort("effort_",  gears, params@initial_effort)
-      effort_sim2 <- makeEffort("effort2_", gears, params@initial_effort)
+      gears <- get_gears()
+      effort_sim1 <- makeEffort("effort_",  params@initial_effort, gears)
+      effort_sim2 <- makeEffort("effort2_", params@initial_effort, gears)
 
       pb$inc(1 / total_steps, "Projecting Strategy 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
@@ -585,20 +608,9 @@ fishery_strategy_server <- function(id, sim_0,
       )
     })
 
-    makeEffort <- function(prefix, gears, base_effort) {
-      ef <- base_effort
-      for (g in gears) {
-        id <- paste0(prefix, g)
-        # Inside moduleServer, input is already namespaced
-        if (!is.null(input[[id]]))
-          ef[g] <- input[[id]]
-      }
-      ef
-    }
-
     ## Switch to "Both" when Strategy 2 sliders are changed ----
     observeEvent({
-      gears <- unique(params@gear_params$gear)
+      gears <- get_gears()
       lapply(gears, function(gear) {
         input[[paste0("effort2_", gear)]]
       })
@@ -679,75 +691,23 @@ fishery_strategy_server <- function(id, sim_0,
       fishSimData(list(sim1 = sim1, sim2 = sim2, unharv = unharv))
     })
 
-    ## Strategy 1 sliders observer ----
-    observeEvent({
-      gears <- unique(params@gear_params$gear)
-      lapply(gears, function(gear) input[[paste0("effort_", gear)]])
-    }, {
-      gears <- unique(params@gear_params$gear)
-      effort1 <- makeEffort("effort_" , gears, params@initial_effort)
-      max_year <- isolate(input$fishyear)
+    ## Strategy sliders observers ----
+    observeStrategyEffort(
+      effort_prefix = "effort_",
+      context = "fishery_sim1",
+      sim_key = "sim1",
+      label = "Strategy 1"
+    )
 
-      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
-      pb$set(message = "Running fishery simulation …", value = 0)
+    observeStrategyEffort(
+      effort_prefix = "effort2_",
+      context = "fishery_sim2",
+      sim_key = "sim2",
+      label = "Strategy 2"
+    )
 
-      pb$inc(1, "Projecting Strategy 1 …")
-      sim1 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(params, effort = effort1, t_max = max_year + 5),
-        context = "fishery_sim1"
-      )
-
-      sims <- isolate(fishSimData())
-      fishSimData(list(sim1 = sim1, sim2 = sims$sim2, unharv = sims$unharv))
-    }, ignoreInit = TRUE)
-
-    ## Strategy 2 sliders observer ----
-    observeEvent({
-      gears <- unique(params@gear_params$gear)
-      lapply(gears, function(gear) input[[paste0("effort2_", gear)]])
-    }, {
-      gears <- unique(params@gear_params$gear)
-      effort2 <- makeEffort("effort2_", gears, params@initial_effort)
-      max_year <- isolate(input$fishyear)
-
-      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
-      pb$set(message = "Running fishery simulation …", value = 0)
-
-      pb$inc(1, "Projecting Strategy 2 …")
-      sim2 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(params, effort = effort2, t_max = max_year + 5),
-        context = "fishery_sim2"
-      )
-
-      sims <- isolate(fishSimData())
-      fishSimData(list(sim1 = sims$sim1, sim2 = sim2, unharv = sims$unharv))
-    }, ignoreInit = TRUE)
-
-    ## Reset Strategy 1 button observer ----
-    observeEvent(input$reset_effort_sim1, {
-      base_effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
-      lapply(gears, function(gear) {
-        updateSliderInput(
-          session,
-          paste0("effort_", gear),
-          value = unname(base_effort[gear])
-        )
-      })
-    })
-
-    ## Reset Strategy 2 button observer ----
-    observeEvent(input$reset_effort_sim2, {
-      base_effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
-      lapply(gears, function(gear) {
-        updateSliderInput(
-          session,
-          paste0("effort2_", gear),
-          value = unname(base_effort[gear])
-        )
-      })
-    })
+    observeResetButton("reset_effort_sim1", "effort_")
+    observeResetButton("reset_effort_sim2", "effort2_")
 
     # Year controls ----
     mizerShiny:::setupYearControls(
