@@ -4,14 +4,14 @@ Sprat	Sprattus sprattus
 Cod	Gadus morhua
 Haddock	Melanogrammus aeglefinus
 Whiting	Merlangius merlangus
-Blue Whiting	Micromesistius poutassou
+Blue whiting	Micromesistius poutassou
 Norway Pout	Trisopterus esmarkii
 Poor Cod	Trisopterus minutus
-European Hake	Merluccius merluccius
+Hake	Merluccius merluccius
 Monkfish	Lophius piscatorius
-Horse Mackerel	Trachurus trachurus
+Horse mackerel	Trachurus trachurus
 Mackerel	Scomber scombrus
 Common Dab	Limanda limanda
 Plaice	Pleuronectes platessa
-Megrim	Lepidorhombus boscii
+Megrim	Lepidorhombus whiffiagonis
 Sole	Solea solea

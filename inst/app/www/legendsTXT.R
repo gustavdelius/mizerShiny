@@ -12,10 +12,8 @@ ecosystem at a given size. The blue line is the changed simulation; the dashed \
 line is the base simulation. Use the <em>Log</em> switch to change the \
 X&nbsp;axis from log-scale to linear.",
   role_guild = # Will also be used for fishery_guild
-    "Change in feeding guilds across the entire community compared with the \
-base model. X axis is the guild, Y is the % change. Each group of three\
-bars represents biomass at quarter, half and full of the selected year \
-(bright &rarr; dark). Feeding guilds \
+    "Percentage change in biomass by feeding guild relative to the baseline strategy. \
+Each guild shows three bars for the ¼, ½ and end‑year points (bright→dark) when Intermediate years is on. X axis is the guild, Y is the % change. Feeding guilds \
 group fish by diet and life stage.",
   role_diet = # Will also be used for fishery_diet
       "Diet composition of a selected fish across its size range. X axis is the \
@@ -50,37 +48,53 @@ the simulation that models plankton."
 
 # --- Toggle help  ---
 legends$role_show_intermediate_years <-
-    "When on, bars also show earlier responses at ¼ and ½ of the selected period, alongside the value at its end."
+    "When on, each chart shows three time points for every species/guild: \
+¼ and ½ of the span from the model start to the selected end year, plus the end-year value. \
+Turn off to show only the end-year value."
+
 legends$role_log <-
-    "Switches the body-size axis to logarithmic. Useful when spectra span orders of magnitude."
+    "Switch the body-size axis between logarithmic and linear scaling."
 legends$role_species_select <-
-    "Choose which species to adjust. The selected species is used for the biomass and mortality sliders and plotted metrics."
+    "Choose the species whose biomass and mortality sliders act on, and is plotted."
 legends$role_time_range <-
-    "Adjust the time range shown in the plots. Use the buttons to step by one year."
+    "Set the end of the simulation period used in plots. Drag the slider to choose the end year; use “–1 year” / “+1 year” to step by one year."
 
 legends$fishery_show_intermediate_years <-
-    "When on, bars also show earlier responses at ¼ and ½ of the selected period, alongside the value at its end."
+    "When on, each bar chart shows three time points for every species/guild: \
+¼ and ½ of the span from the model start to the selected end year, plus the end-year value. \
+Turn off to show only the end-year value."
+
 legends$fishery_log <-
-    "Switches the body-size axis to logarithmic for spectra. Turn off for a linear size axis."
+    "Switch the body-size axis between logarithmic and linear scaling."
 legends$fishery_time_range <-
-    "Adjust the time range shown in the plots. Use the buttons to step by one year."
+    "Set the simulation period. Drag the slider to choose the end year; use “–1 year” / “+1 year” to step by one year."
 legends$fishery_slider_tabs <-
-    "Switch between slider controls for Sim&nbsp;1 and Sim&nbsp;2. Changes apply only to the selected simulation, letting you compare strategies side by side."
+    "Choose which strategy’s sliders you are editing (Strategy 1 or Strategy 2). \
+Changes only affect the selected strategy."
 legends$fishery_sim_choice <-
-    "Choose which simulations to display in the plots: the first setup, second setup, or both side by side."
+    "Choose which strategies to display: Strategy 1, Strategy 2, or both. \
+When both are shown, plots are split by strategy."
+
+legends$fishery_multispecies <-
+    "Toggle multispecies interactions (predation). \
+On = interacting community (species affect one another). \
+Off = non‑interacting (each species projects independently). \
+Toggling re‑runs the baseline and both strategies for the selected time range."
 
 legends$tab_fishery_strategy <-
     "Configure fishing strategies, adjust species-specific controls, and compare outcomes between simulation setups."
 legends$tab_species_role <-
     "Explore how species contribute to the ecosystem under different scenarios, including biomass, guild, diet, and size effects."
 legends$page_guide_button <-
-    "Launch an interactive walkthrough of the current page. Use it to learn what each control and plot shows."
+    "Launch a short, page-specific walkthrough explaining the main controls and plots."
 
 legends$fishery_biomass <-
     "Absolute biomass by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: biomass. Shading distinguishes earlier → later time points."
 
 legends$fishery_biomass_change <-
-    "Biomass % change by species relative to the baseline strategy at selected time points (¼, ½, end of period). X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points."
+    "Percentage change in species biomass under the chosen strategy \
+relative to the baseline strategy. \
+Shading indicates earlier→later time points when “Intermediate years” is on."
 
 legends$fishery_yield <-
     "Absolute yield by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: yield. Shading distinguishes earlier → later time points."
@@ -89,7 +103,7 @@ legends$fishery_yield_change <-
     "Yield % change by species relative to the baseline strategy at selected time points (¼, ½, end of period), broken down by fishing gear. X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points."
 
 legends$fishery_length <-
-    "Length (size) composition of the catch. Select species/gear and compare current vs baseline where available. Compositions are not re-normalised; total area varies with yield."
+    "Size (length) composition of the catch. Select species to see how catch size distribution shifts, broken down by gear. Areas are not re-normalised; total area varies with overall yield."
 
 # Duplicate role legends for fishery plots
 legends$fishery_guild   <- legends$role_guild
@@ -100,7 +114,9 @@ legends$species_order_help <-
     "Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order."
 
 legends$role_biomass_slider <-
-    "Slider value indicates the percentage change in starting biomass of the species. Example: to increase the starting population of a given species by 20%, set value on the slider to 20. To decrease by 20%, set value to -20."
+    "Sets the % change to the starting biomass of the selected species. \
+For example, +20 increases the starting biomass by 20%."
 
 legends$role_mortality_slider <-
-    "Slider value indicates the change in mortality of a species. Example: to increase the mortality of a species by 10%, set the value of the slider to 10. This will change the mortality throughout the simulation to be 1% higher. If you want it to be a 1% decrease, set value to -1."
+    "Sets the % change to natural mortality for the selected species across all sizes. \
+For example, +1 makes mortality 1% higher; −1 makes it 1% lower."
