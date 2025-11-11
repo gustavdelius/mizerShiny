@@ -6,11 +6,12 @@
       var old = bootstrap.Popover.getInstance(el);
       if(old) old.dispose();
       // Create new
+      var trigger = el.getAttribute('data-bs-trigger') || 'hover focus';
       new bootstrap.Popover(el, {
         container: 'body',
         html: true,
         sanitize: false,
-        trigger: 'hover focus'
+        trigger: trigger
       });
     });
   }
