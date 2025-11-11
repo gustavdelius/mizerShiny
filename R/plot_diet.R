@@ -23,8 +23,8 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
     df <- reshape2::melt(d, value.name = "Proportion")
     df <- subset(df, Proportion > 0.001)
     df$w   <- as.numeric(as.character(df$w))
-    df$Sim <- if (!is.null(sim_names) && length(sim_names) >= idx)
-      sim_names[idx] else paste0("Sim ", idx)
+    df$Strategy <- if (!is.null(sim_names) && length(sim_names) >= idx)
+      sim_names[idx] else paste0("Strategy ", idx)
     df
   }
 
@@ -45,9 +45,9 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
   }
   col_vec <- col_vec[prey_levels]
 
-  sims   <- unique(plot_dat$Sim)
+  sims   <- unique(plot_dat$Strategy)
   full_panels <- lapply(sims, function(sim_lab) {
-    sub <- plot_dat[plot_dat$Sim == sim_lab, ]
+    sub <- plot_dat[plot_dat$Strategy == sim_lab, ]
     miss <- setdiff(prey_levels, sub$Prey)
     if (length(miss)) {
       dummy <- data.frame(
@@ -55,7 +55,7 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
         w          = min(sub$w),
         Prey       = factor(miss, levels = prey_levels),
         Proportion = 0,
-        Sim        = sim_lab
+        Strategy        = sim_lab
       )
       sub <- rbind(sub, dummy)
     }

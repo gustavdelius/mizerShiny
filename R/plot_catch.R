@@ -33,7 +33,7 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
     } else if (is.list(sim)) {
         sim_list <- sim
         if (is.null(names(sim_list))) {
-            names(sim_list) <- paste0("Sim ", seq_along(sim_list))
+            names(sim_list) <- paste0("Strategy ", seq_along(sim_list))
         }
         # Ensure the first entry is labelled "Current" for consistency in plotting
         names(sim_list)[1] <- ifelse(is.na(names(sim_list)[1]) || names(sim_list)[1] == "", "Current", names(sim_list)[1])
@@ -129,7 +129,7 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
                              l = l,
                              catch_w = catch_w,
                              catch_l = catch_l,
-                             Sim = names(sim_list)[iSim],
+                             Strategy = names(sim_list)[iSim],
                              Species = SpIdx[which(s_name == SpIdx)])
             plot_dat <- rbind(plot_dat, df)
         }
@@ -144,7 +144,7 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
         if (return_data) return(plot_dat)
 
         pl <- ggplot2::ggplot(plot_dat, ggplot2::aes(x = w, y = `Catch density`,
-                                                     colour = Sim)) +
+                                                     colour = Strategy)) +
             ggplot2::geom_line() +
             ggplot2::facet_wrap(~Species, scales = "free") +
             ggplot2::labs(x = "Size [g]",
@@ -160,7 +160,7 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
         if (return_data) return(plot_dat)
 
         pl <- ggplot2::ggplot(plot_dat, ggplot2::aes(x = l, y = `Catch density`,
-                                                     colour = Sim)) +
+                                                     colour = Strategy)) +
             ggplot2::geom_line() +
             ggplot2::facet_wrap(~Species, scales = "free") +
             ggplot2::labs(x = "Size [cm]",
@@ -190,5 +190,5 @@ plotlyYieldVsSize <- function(object,
                               ...) {
   argg <- c(as.list(environment()), list(...))
   ggplotly(do.call("plotYieldVsSize", argg),
-           tooltip = c("Catch density", "Sim", "w", "l"))
+           tooltip = c("Catch density", "Strategy", "w", "l"))
 }

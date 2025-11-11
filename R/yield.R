@@ -30,7 +30,7 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
     reshape2::melt(yieldGearList[[i]]) |>
       dplyr::group_by(sp, time) |>
       dplyr::summarise(value = sum(value, na.rm=TRUE), .groups="drop") |>
-      dplyr::mutate(sim = paste0("Sim ", i))
+      dplyr::mutate(sim = paste0("Strategy ", i))
   }))
 
   species_colors <- NULL
@@ -60,7 +60,7 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
     reshape2::melt(yieldGearList[[i]]) |>
       dplyr::group_by(gear, time) |>
       dplyr::summarise(value = sum(value, na.rm=TRUE), .groups="drop") |>
-      dplyr::mutate(sim = paste0("Sim ", i))
+      dplyr::mutate(sim = paste0("Strategy ", i))
   }))
   gearline_plotly <- (
     ggplot2::ggplot(gear_all, ggplot2::aes(time, value, color = gear, linetype = sim)) +
@@ -80,7 +80,7 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
   compo_all <- dplyr::bind_rows(lapply(seq_along(yieldGearList), function(i) {
     mat <- apply(yieldGearList[[i]], c(2,3), sum)
     reshape2::melt(mat, varnames = c("Gear","Species"), value.name = "Yield") |>
-      dplyr::mutate(sim = paste0("Sim ", i))
+      dplyr::mutate(sim = paste0("Strategy ", i))
   }))
   compo_summ <- compo_all |>
     dplyr::group_by(Species, sim) |>
@@ -90,8 +90,8 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
     ggplot2::ggplot(compo_summ, ggplot2::aes(x = Species, y = total, fill = Species, alpha = sim)) +
       ggplot2::geom_bar(stat = "identity", width = 0.5,
                          position = ggplot2::position_dodge2(width = 1.0, preserve = "single", padding = 0)) +
-      ggplot2::scale_alpha_manual(values = c("Sim 1" = 1, "Sim 2" = 0.4)) +
-      ggplot2::labs(x = "Species", y = "Yield", fill = "Species", alpha = "Simulation") +
+      ggplot2::scale_alpha_manual(values = c("Strategy 1" = 1, "Strategy 2" = 0.4)) +
+      ggplot2::labs(x = "Species", y = "Yield", fill = "Species", alpha = "Strategy") +
       ggplot2::theme_minimal() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
       (if (!is.null(species_colors)) ggplot2::scale_fill_manual(values = species_colors) else NULL)
@@ -101,12 +101,12 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
 
   singular_all <- dplyr::bind_rows(lapply(seq_along(yieldList), function(i) {
     tot <- apply(yieldGearList[[i]], 2, sum)
-    data.frame(sim = paste0("Sim ", i), Species = dimnames(yieldList[[i]])[[2]], Yield = tot)
+    data.frame(sim = paste0("Strategy ", i), Species = dimnames(yieldList[[i]])[[2]], Yield = tot)
   }))
   singular_plotly <- (
     ggplot2::ggplot(singular_all, ggplot2::aes(x = sim, y = Yield, fill = Species)) +
       ggplot2::geom_col() +
-      ggplot2::labs(x = "Simulation", y = "Total Yield", fill = "Species") +
+      ggplot2::labs(x = "Strategy", y = "Total Yield", fill = "Species") +
       ggplot2::theme_minimal() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1)) +
       (if (!is.null(species_colors)) ggplot2::scale_fill_manual(values = species_colors) else NULL)
@@ -147,7 +147,7 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
     list(text = "Species Change",      x = 0.085,  y = 1.06, xref = "paper", yref = "paper", showarrow = FALSE),
     list(text = "Gear Change",         x = 0.512, y = 1.06, xref = "paper", yref = "paper", showarrow = FALSE),
     list(text = "Yield Composition",   x = 0.075,  y = 0.48, xref = "paper", yref = "paper", showarrow = FALSE),
-    list(text = "Total Yield per Sim", x = 0.512, y = 0.48, xref = "paper", yref = "paper", showarrow = FALSE)
+    list(text = "Total Yield", x = 0.512, y = 0.48, xref = "paper", yref = "paper", showarrow = FALSE)
   )
   fig <- plotly::subplot(left_col, right_col, nrows = 1, widths = c(0.7, 0.3), margin = 0.05) |>
     plotly::layout(annotations = annotations)
@@ -156,7 +156,7 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
   labs <- purrr::imap(domains, function(dom, idx) {
     if (nSim == 1) { x_off <- 0.05; y_off <- 0.06 }
     else if (idx == 1) { x_off <- 0.05; y_off <- 0.08 } else { x_off <- 0.05; y_off <- 0.04 }
-    list(text = paste0("Sim ", idx, " composition"), x = mean(dom$x) + x_off, y = dom$y[2] + y_off,
+    list(text = paste0("Strategy ", idx, " composition"), x = mean(dom$x) + x_off, y = dom$y[2] + y_off,
          xref = "paper", yref = "paper", showarrow = FALSE, font = list(size = 14))
   })
   fig |> plotly::layout(annotations = labs)

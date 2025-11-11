@@ -18,8 +18,8 @@ plotSpeciesWithTimeRange2 <- function(harvestedprojection1, harvestedprojection2
   df1 <- process_sim_shared(harvestedprojection1, sim_0, chosenyear, mode)
   df2 <- process_sim_shared(harvestedprojection2, sim_0, chosenyear, mode)
 
-  df1$sim <- "Sim 1"
-  df2$sim <- "Sim 2"
+  df1$sim <- "Strategy 1"
+  df2$sim <- "Strategy 2"
   plot_df <- dplyr::bind_rows(df1, df2)
 
   ggplot2::ggplot(plot_df, ggplot2::aes(x = Species, y = percentage_diff, fill = fill_group)) +
@@ -94,13 +94,13 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
       dplyr::full_join(process_guilds(unharvested_full) |> dplyr::mutate(time = "full"), by = c("Guild", "time")) |>
       dplyr::mutate(percentage_diff = (value.x - value.y) / value.y * 100) |>
       dplyr::select(Guild, time, percentage_diff) |>
-      dplyr::mutate(sim = "Sim 1")
+      dplyr::mutate(sim = "Strategy 1")
 
     sim2_final <- process_guilds(harvested_full2)  |> dplyr::mutate(time = "full") |>
       dplyr::full_join(process_guilds(unharvested_full) |> dplyr::mutate(time = "full"), by = c("Guild", "time")) |>
       dplyr::mutate(percentage_diff = (value.x - value.y) / value.y * 100) |>
       dplyr::select(Guild, time, percentage_diff) |>
-      dplyr::mutate(sim = "Sim 2")
+      dplyr::mutate(sim = "Strategy 2")
 
     joinedguilds <- dplyr::bind_rows(sim1_final, sim2_final)
   } else {
@@ -137,7 +137,7 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
       dplyr::full_join(unharv, by = c("Guild","time")) |>
       dplyr::mutate(percentage_diff = (value.x - value.y) / value.y * 100) |>
       dplyr::select(Guild, time, percentage_diff) |>
-      dplyr::mutate(sim = "Sim 1")
+      dplyr::mutate(sim = "Strategy 1")
 
     sim2_final <- guilds2 |>
       dplyr::group_by(Guild, time) |>
@@ -145,7 +145,7 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
       dplyr::full_join(unharv, by = c("Guild","time")) |>
       dplyr::mutate(percentage_diff = (value.x - value.y) / value.y * 100) |>
       dplyr::select(Guild, time, percentage_diff) |>
-      dplyr::mutate(sim = "Sim 2")
+      dplyr::mutate(sim = "Strategy 2")
 
     joinedguilds <- dplyr::bind_rows(sim1_final, sim2_final)
   }
@@ -187,8 +187,8 @@ plotSpeciesActualBiomass2 <- function(harvestedprojection1, harvestedprojection2
   df1 <- process_sim_shared_actual(harvestedprojection1, chosenyear, mode)
   df2 <- process_sim_shared_actual(harvestedprojection2, chosenyear, mode)
 
-  df1$sim <- "Sim 1"
-  df2$sim <- "Sim 2"
+  df1$sim <- "Strategy 1"
+  df2$sim <- "Strategy 2"
   plot_df <- dplyr::bind_rows(df1, df2)
 
   ggplot2::ggplot(plot_df, ggplot2::aes(x = Species, y = biomass, fill = fill_group)) +
@@ -223,8 +223,8 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
   df1 <- process_sim_shared_actual_yield(harvestedprojection1, chosenyear, mode)
   df2 <- process_sim_shared_actual_yield(harvestedprojection2, chosenyear, mode)
 
-  df1$sim <- "Sim 1"
-  df2$sim <- "Sim 2"
+  df1$sim <- "Strategy 1"
+  df2$sim <- "Strategy 2"
   plot_df <- dplyr::bind_rows(df1, df2)
 
   # Get unique gears and assign colors
@@ -330,8 +330,8 @@ plotSpeciesYieldChange2 <- function(harvestedprojection1, harvestedprojection2,
   df1 <- process_sim_shared_yield(harvestedprojection1, sim_0, chosenyear, mode)
   df2 <- process_sim_shared_yield(harvestedprojection2, sim_0, chosenyear, mode)
 
-  df1$sim <- "Sim 1"
-  df2$sim <- "Sim 2"
+  df1$sim <- "Strategy 1"
+  df2$sim <- "Strategy 2"
   plot_df <- dplyr::bind_rows(df1, df2)
 
   ggplot2::ggplot(plot_df, ggplot2::aes(x = Species, y = percentage_diff, fill = fill_group)) +

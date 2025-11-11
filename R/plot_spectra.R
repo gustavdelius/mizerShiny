@@ -70,11 +70,11 @@ plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
     dplyr::mutate(Percentage_Change = 2 * (y3 - x) / (x + y3) * 100)
 
   ggplot2::ggplot() +
-    ggplot2::geom_line(data = df1, ggplot2::aes(x = w, y = Percentage_Change, color = "Sim 1"), linetype = "solid") +
-    ggplot2::geom_line(data = df3, ggplot2::aes(x = w, y = Percentage_Change, color = "Sim 2"), linetype = "dashed") +
+    ggplot2::geom_line(data = df1, ggplot2::aes(x = w, y = Percentage_Change, color = "Strategy 1"), linetype = "solid") +
+    ggplot2::geom_line(data = df3, ggplot2::aes(x = w, y = Percentage_Change, color = "Strategy 2"), linetype = "dashed") +
     ggplot2::geom_hline(yintercept = 0, linetype = "dashed", color = "dark grey", linewidth = 0.75) +
     ggplot2::labs(x = "Size (g)", y = "Biomass % Change", color = "Comparison") +
-    ggplot2::scale_color_manual(values = c("Sim 1" = "#2FA4E7", "Sim 2" = "#E76F51")) +
+    ggplot2::scale_color_manual(values = c("Strategy 1" = "#2FA4E7", "Strategy 2" = "#E76F51")) +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(size = 14, hjust = 1, vjust = 0.5),
                    axis.text.y = ggplot2::element_text(size = 14),
