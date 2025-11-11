@@ -673,7 +673,7 @@ fishery_strategy_server <- function(id, sim_0,
         t_max1 <- target_year - max_sim1 + 5
         pb$inc(1/steps, "Projecting Strategy 1 …")
         sim1 <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims$sim1@params, t_max = t_max1),
+          function() project(sims$sim1, t_max = t_max1),
           context = "fishery_time_range_sim1"
         )
       }
@@ -682,7 +682,7 @@ fishery_strategy_server <- function(id, sim_0,
         t_max2 <- target_year - max_sim2 + 5
         pb$inc(1/steps, "Projecting Strategy 2 …")
         sim2 <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims$sim2@params, t_max = t_max2),
+          function() project(sims$sim2, t_max = t_max2),
           context = "fishery_time_range_sim2"
         )
       }
@@ -691,7 +691,7 @@ fishery_strategy_server <- function(id, sim_0,
         t_maxu <- target_year - max_unharv + 5
         pb$inc(1/steps, "Projecting base …")
         unharv <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims$unharv@params, t_max = t_maxu),
+          function() project(sims$unharv, t_max = t_maxu),
           context = "fishery_time_range_unharv"
         )
       }
