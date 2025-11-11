@@ -503,13 +503,23 @@ fishery_strategy_server <- function(id, sim_0,
         effort <- makeEffort(prefix, params@initial_effort, gears)
         max_year <- isolate(input$fishyear)
         sims <- isolate(fishSimData())
+        params <- sims[[sim_key]]@params
+        gp <- params@gear_params
+        for (g in gears) {
+          l50_change <- input[[paste0("l50", prefix, g)]]
+          gp[gp$gear == g, "l50"] <- gp[gp$gear == g, "l50"] *
+            (1 + l50_change / 100)
+          gp[gp$gear == g, "l25"] <- gp[gp$gear == g, "l25"] *
+              (1 + l50_change / 100)
+        }
+        gear_params(params) <- gp
 
         pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
         pb$set(message = "Running fishery simulation …", value = 0)
 
         pb$inc(1, paste("Projecting", label, "…"))
         sim <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims[[sim_key]]@params, effort = effort, t_max = max_year + 5),
+          function() project(params, effort = effort, t_max = max_year + 5),
           context = context
         )
 
