@@ -163,7 +163,7 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
     ggplot2::scale_fill_manual(values = change_colours(), drop = FALSE) +
     ggplot2::labs(x = "Guild", y = "Biomass % Change") +
     ggplot2::theme_minimal() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 14, angle = 90, vjust = 0.5),
+    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 14, angle = 20, vjust = 0.5),
                    axis.text.y = ggplot2::element_text(size = 14),
                    legend.position = "none",
                    axis.title = ggplot2::element_text(size = 16)) +
