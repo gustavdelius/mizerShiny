@@ -81,6 +81,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
           ),
           tabPanel(
             title = span(
+              id = "fishery_strategy_tab_2",
               "Strategy 2",
               `data-bs-toggle` = "popover",
               `data-bs-placement` = "top",
