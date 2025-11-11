@@ -75,6 +75,9 @@ process_sim_shared <- function(harvestedprojection, sim_0, chosenyear, mode = c(
     plot_data <- percentage_diff_full
   }
 
+  negligible <- abs(plot_data$percentage_diff) < 0.01
+  plot_data$percentage_diff[negligible] <- 0
+
   plot_data$class <- factor(plot_data$class, levels = c("quarter", "half", "full"))
   plot_data$fill_group <- interaction(plot_data$percentage_diff >= 0, plot_data$class)
   plot_data$fill_group <- factor(
