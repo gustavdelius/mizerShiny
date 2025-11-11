@@ -15,9 +15,9 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
     grid_card(
       area = "area1",
       card_body(
-        ## Multispeces toggle ----
+        ## Multispecies toggle ----
         div(
-          style = "display:flex; flex-direction:column; gap:0px; padding: 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
+          style = "display:flex; flex-direction:row; align-items:center; gap:8px; padding: 2px 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb; min-height:32px;",
           `data-bs-toggle` = "popover",
           `data-bs-placement` = "right",
           `data-bs-html` = "true",
@@ -442,7 +442,11 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
 
 fishery_strategy_server <- function(id, sim_0,
                                    guildparams, ordered_species_reactive, species_list) {
-    params <- sim_0@params
+  params <- sim_0@params
+  # keep copies for switching between interacting and non-interacting
+  params_interacting <- params
+  params_noninteracting <- mizerEcopath::makeNoninteracting(params)
+
   moduleServer(id, function(input, output, session) {
 
     # Update species select input
@@ -514,6 +518,53 @@ fishery_strategy_server <- function(id, sim_0,
     })
 
     # Observers ----
+    observeEvent(input$multispeciesToggle, {
+      updated_params <- if (isTRUE(input$multispeciesToggle)) {
+        params_interacting
+      } else {
+        params_noninteracting
+      }
+
+      params <<- updated_params
+
+      max_year <- isolate(input$fishyear)
+      notif_id <- shiny::showNotification(
+        "Updating simulations …",
+        type = "message",
+        duration = NULL,
+        closeButton = TRUE
+      )
+      on.exit(shiny::removeNotification(id = notif_id, session = session), add = TRUE)
+
+      total_steps <- 3
+      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
+      pb$set(message = "Running simulation …", value = 0)
+
+      gears <- unique(params@gear_params$gear)
+      effort_sim1 <- makeEffort("effort_",  gears, params@initial_effort)
+      effort_sim2 <- makeEffort("effort2_", gears, params@initial_effort)
+
+      pb$inc(1 / total_steps, "Projecting Sim 1 …")
+      sim1 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(params, effort = effort_sim1, t_max = max_year),
+        context = "fishery_multispecies_sim1"
+      )
+
+      pb$inc(1 / total_steps, "Projecting Sim 2 …")
+      sim2 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(params, effort = effort_sim2, t_max = max_year),
+        context = "fishery_multispecies_sim2"
+      )
+
+      pb$inc(1 / total_steps, "Projecting base …")
+      sim0 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(params, t_max = max_year),
+        context = "fishery_multispecies_unharv"
+      )
+
+      fishSimData(list(sim1 = sim1, sim2 = sim2, unharv = sim0))
+    }, ignoreInit = TRUE)
+
     # Changing the timerange to subset on the plot for yield
     observe({
       time1  <- input$fishyear  + 1
