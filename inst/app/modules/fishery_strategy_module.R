@@ -15,7 +15,22 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
     grid_card(
       area = "area1",
       card_body(
-        style = "margin-top: -0.5rem",
+        ## Multispecies toggle ----
+        div(
+          style = "display:flex; flex-direction:row; align-items:center; gap:8px; padding: 2px 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb; min-height:32px;",
+          `data-bs-toggle` = "popover",
+          `data-bs-placement` = "right",
+          `data-bs-html` = "true",
+          `data-bs-content` = as.character(legends$fishery_multispecies),
+          materialSwitch(
+            inputId = ns("multispeciesToggle"),
+            label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Multispecies effects</span>"),
+            value   = TRUE,
+            status  = "info"
+          )
+        ),
+
+        ## Time Range ----
         div(
           style = "display:flex; flex-direction:column; gap:0px; padding: 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
           `data-bs-toggle` = "popover",
@@ -38,6 +53,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             actionButton(ns("incYear_fish"), "+1 year", class = "btn-small")
           )
         ),
+        ## Simulation Choice ----
         div(
           style = "margin: 2px 0 0; padding: 2px 6px 0 6px; background-color: #e3f2fd; border-radius: 5px; border: 1px solid #bbdefb;",
           `data-bs-toggle` = "popover",
@@ -72,6 +88,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
               tagAppendAttributes(style = "margin: 0;")
           )
         ),
+        ## Simulation Tabs ----
         tabsetPanel(
           tabPanel(
             title = "Sim 1",
@@ -101,6 +118,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             div(
                 class = "plot-card",
                 style = "flex: 4.5; height:50vh; display:flex; flex-direction:column; overflow: hidden; margin-top: -0.5rem",
+                ## Biomass Plot ----
                 tabsetPanel(
                     id = ns("fishy_plots"),
                     if ("Biomass" %in% fishery_strategy_tabs) {
@@ -120,6 +138,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Biomass % Change Plot ----
                     if ("Biomass % Change" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Biomass % Change",
@@ -136,6 +155,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Yield Plot ----
                     if ("Yield" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Yield",
@@ -152,6 +172,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Yield % Change Plot ----
                     if ("Yield % Change" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Yield % Change",
@@ -168,6 +189,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Nutrition Plot ----
                     if (have_nutrition_file &&
                         ("Nutrition change" %in% fishery_strategy_tabs)) {
                         tabPanel(
@@ -185,6 +207,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Length Plot ----
                     if ("Length" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Length",
@@ -201,6 +224,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Guild Plot ----
                     if (have_guild_file &&
                         ("Guild" %in% fishery_strategy_tabs)) {
                         tabPanel(
@@ -218,6 +242,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Yield Composition Plot ----
                     if ("Yield Composition" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Yield Composition",
@@ -234,6 +259,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Size Plot ----
                     if ("Size" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Size",
@@ -250,6 +276,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Spectra Plot ----
                     if ("Spectra" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Spectra",
@@ -266,6 +293,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                             )
                         )
                     },
+                    ## Diet Plot ----
                     if ("Diet" %in% fishery_strategy_tabs) {
                         tabPanel(
                             value = "Diet",
@@ -289,6 +317,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
       # Conditional Panels ----
       card_body(
         style = "flex: auto",
+        ## Yield Composition Time Range Slider ----
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Yield Composition'"),
           div(style = "display: flex; align-items: center; gap: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;",
@@ -304,6 +333,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
               ) |> tagAppendAttributes(id = "fishyyear_yield")
           )
         ),
+        ## Species Order and Show Intermediate Years Toggle ----
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Biomass' || input['", ns("fishy_plots"), "'] == 'Biomass % Change' || input['", ns("fishy_plots"), "'] == 'Yield' || input['", ns("fishy_plots"), "'] == 'Yield % Change' || input['", ns("fishy_plots"), "'] == 'Guild' || input['", ns("fishy_plots"), "'] == 'Nutrition'"),
           div(style = "display: flex; align-items: center; gap: 15px; flex-wrap: wrap;",
@@ -362,6 +392,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
               )
           )
         ),
+        ## Log Toggle for Size Plot ----
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Size'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
@@ -375,6 +406,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
               )
           )
         ),
+        ## Log Toggle for Spectra Plot ----
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Spectra'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
@@ -388,6 +420,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
               )
           )
         ),
+        ## Diet Plot Species Selector ----
         conditionalPanel(
           condition = paste0("input['", ns("fishy_plots"), "'] == 'Diet'"),
           div(style = "display: flex; align-items: center; gap: 15px;",
@@ -409,7 +442,11 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
 
 fishery_strategy_server <- function(id, sim_0,
                                    guildparams, ordered_species_reactive, species_list) {
-    params <- sim_0@params
+  params <- sim_0@params
+  # keep copies for switching between interacting and non-interacting
+  params_interacting <- params
+  params_noninteracting <- mizerEcopath::makeNoninteracting(params)
+
   moduleServer(id, function(input, output, session) {
 
     # Update species select input
@@ -417,6 +454,7 @@ fishery_strategy_server <- function(id, sim_0,
       updateSelectInput(session, "fish_name_select", choices = species_list)
     })
 
+      # Effort sliders ----
     # Dynamic fishery effort sliders for Sim 1
     output$fishery_sliders_ui <- renderUI({
       effort <- params@initial_effort
@@ -426,9 +464,9 @@ fishery_strategy_server <- function(id, sim_0,
           inputId = session$ns(paste0("effort_", gear)),
           label = paste("Effort for", gear),
           min = 0,
-          max = if(params@initial_effort[gear]==0){
+          max = if (params@initial_effort[gear] == 0) {
             2
-          }else(params@initial_effort[gear]*2),
+          } else (params@initial_effort[gear] * 2),
           value = params@initial_effort[gear],
           step = 0.05,
           width = "100%"
@@ -478,6 +516,54 @@ fishery_strategy_server <- function(id, sim_0,
         )
       )
     })
+
+    # Observers ----
+    observeEvent(input$multispeciesToggle, {
+      updated_params <- if (isTRUE(input$multispeciesToggle)) {
+        params_interacting
+      } else {
+        params_noninteracting
+      }
+
+      params <<- updated_params
+
+      max_year <- isolate(input$fishyear)
+      notif_id <- shiny::showNotification(
+        "Updating simulations …",
+        type = "message",
+        duration = NULL,
+        closeButton = TRUE
+      )
+      on.exit(shiny::removeNotification(id = notif_id, session = session), add = TRUE)
+
+      total_steps <- 3
+      pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
+      pb$set(message = "Running simulation …", value = 0)
+
+      gears <- unique(params@gear_params$gear)
+      effort_sim1 <- makeEffort("effort_",  gears, params@initial_effort)
+      effort_sim2 <- makeEffort("effort2_", gears, params@initial_effort)
+
+      pb$inc(1 / total_steps, "Projecting Sim 1 …")
+      sim1 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(params, effort = effort_sim1, t_max = max_year),
+        context = "fishery_multispecies_sim1"
+      )
+
+      pb$inc(1 / total_steps, "Projecting Sim 2 …")
+      sim2 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(params, effort = effort_sim2, t_max = max_year),
+        context = "fishery_multispecies_sim2"
+      )
+
+      pb$inc(1 / total_steps, "Projecting base …")
+      sim0 <- mizerShiny:::runSimulationWithErrorHandling(
+        function() project(params, t_max = max_year),
+        context = "fishery_multispecies_unharv"
+      )
+
+      fishSimData(list(sim1 = sim1, sim2 = sim2, unharv = sim0))
+    }, ignoreInit = TRUE)
 
     # Changing the timerange to subset on the plot for yield
     observe({
