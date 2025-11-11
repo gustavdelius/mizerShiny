@@ -5,17 +5,17 @@
 \title{Plot nutrition change at selected times}
 \usage{
 plotNutritionChange(
-  harvestedprojection,
   nutrition,
+  harvestedprojection,
   sim_0,
   chosenyear,
   mode = c("triple", "chosen")
 )
 }
 \arguments{
-\item{harvestedprojection}{Harvested mizer projection}
-
 \item{nutrition}{Data frame of per-species nutrient contents}
+
+\item{harvestedprojection}{Harvested mizer projection}
 
 \item{sim_0}{Unharvested mizer projection}
 
