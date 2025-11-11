@@ -60,30 +60,14 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
           `data-bs-placement` = "right",
           `data-bs-html` = "true",
           `data-bs-content` = as.character(legends$fishery_sim_choice),
-          div(
-            style = "display: flex; align-items: center; gap: 8px;",
-            tags$span(
-              style = "font-weight:500; font-size: 0.9em; color: var(--bs-heading-color); display:flex; align-items:center;",
-              "Show:"
-            ),
-            tags$style(
-              HTML(
-                sprintf(
-                  "#%s { margin: 0; }
-#%s .shiny-options-group { margin-top: 0; display: flex; align-items: center; gap: 12px; }
-#%s .form-check { margin-bottom: 0; }",
-                  ns("sim_choice"),
-                  ns("sim_choice"),
-                  ns("sim_choice")
-                )
-              )
-            ),
-            radioButtons(
-              inputId = ns("sim_choice"),
-              label   = NULL,
-              choices = c("Strategy 1" = "sim1", "Strategy 2" = "sim2", "Both" = "both"),
-              selected = "sim1",
-              inline = TRUE
+          div(style = "display: flex; align-items: center; gap: 8px;",
+              HTML("<span style='font-weight:500; font-size: 0.9em; color: var(--bs-heading-color);'>Show:</span>"),
+              radioButtons(
+                inputId = ns("sim_choice"),
+                label   = NULL,
+                choices = c("Strategy 1" = "sim1", "Strategy 2" = "sim2", "Both" = "both"),
+                selected = "sim1",
+                inline = TRUE
             ) |>
               tagAppendAttributes(style = "margin: 0;")
           )
