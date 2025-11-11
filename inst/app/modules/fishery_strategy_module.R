@@ -59,31 +59,16 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
           `data-bs-toggle` = "popover",
           `data-bs-placement` = "right",
           `data-bs-html` = "true",
+          `data-bs-trigger` = "hover",
           `data-bs-content` = as.character(legends$fishery_sim_choice),
-          div(
-            style = "display: flex; align-items: center; gap: 8px;",
-            tags$span(
-              style = "font-weight:500; font-size: 0.9em; color: var(--bs-heading-color); display:flex; align-items:center;",
-              "Show:"
-            ),
-            tags$style(
-              HTML(
-                sprintf(
-                  "#%s { margin: 0; }
-#%s .shiny-options-group { margin-top: 0; display: flex; align-items: center; gap: 12px; }
-#%s .form-check { margin-bottom: 0; }",
-                  ns("sim_choice"),
-                  ns("sim_choice"),
-                  ns("sim_choice")
-                )
-              )
-            ),
-            radioButtons(
-              inputId = ns("sim_choice"),
-              label   = NULL,
-              choices = c("Strategy 1" = "sim1", "Strategy 2" = "sim2", "Both" = "both"),
-              selected = "sim1",
-              inline = TRUE
+          div(style = "display: flex; align-items: center; gap: 8px;",
+              HTML("<span style='font-weight:500; font-size: 0.9em; color: var(--bs-heading-color);'>Show:</span>"),
+              radioButtons(
+                inputId = ns("sim_choice"),
+                label   = NULL,
+                choices = c("Strategy 1" = "sim1", "Strategy 2" = "sim2", "Both" = "both"),
+                selected = "sim1",
+                inline = TRUE
             ) |>
               tagAppendAttributes(style = "margin: 0;")
           )
@@ -191,7 +176,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                     },
                     ## Nutrition Plot ----
                     if (have_nutrition_file &&
-                        ("Nutrition change" %in% fishery_strategy_tabs)) {
+                        ("Nutrition" %in% fishery_strategy_tabs)) {
                         tabPanel(
                             value = "Nutrition",
                             title = span(
@@ -445,7 +430,7 @@ fishery_strategy_server <- function(id, sim_0,
   params <- sim_0@params
   # keep copies for switching between interacting and non-interacting
   params_interacting <- params
-  params_noninteracting <- mizerEcopath::makeNoninteracting(params)
+  params_noninteracting <- mizerShiny:::make_noninteracting(params)
 
   moduleServer(id, function(input, output, session) {
 
@@ -1321,6 +1306,7 @@ fishery_strategy_server <- function(id, sim_0,
           if (vis$show_sim1 && vis$show_sim2) {
             ggplotly(
               mizerShiny:::plotNutritionChange2(
+                nutrition,
                 fishSimData()$sim1,
                 fishSimData()$sim2,
                 fishSimData()$unharv,
@@ -1331,6 +1317,7 @@ fishery_strategy_server <- function(id, sim_0,
           } else if (vis$show_sim1) {
             ggplotly(
               mizerShiny:::plotNutritionChange(
+                nutrition,
                 fishSimData()$sim1,
                 fishSimData()$unharv,
                 chosen_year,
@@ -1340,6 +1327,7 @@ fishery_strategy_server <- function(id, sim_0,
           } else {
             ggplotly(
               mizerShiny:::plotNutritionChange(
+                nutrition,
                 fishSimData()$sim2,
                 fishSimData()$unharv,
                 chosen_year,

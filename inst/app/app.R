@@ -35,7 +35,7 @@ fishery_strategy_tabs <- getShinyOption("fishery_strategy_tabs")
 if (is.null(fishery_strategy_tabs)) {
   fishery_strategy_tabs <- c("Biomass", "Biomass % Change",
                              "Yield", "Yield % Change",
-                             "Nutrition change", "Length",
+                             "Nutrition", "Length",
                              "Guild")
 }
 species_role_tabs <- getShinyOption("species_role_tabs")

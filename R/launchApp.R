@@ -32,7 +32,7 @@ mizerShiny <-
              guildparams = default_guildparams, nutrition = default_nutrition,
              fishery_strategy_tabs = c("Biomass", "Biomass % Change",
                                        "Yield", "Yield % Change",
-                                       "Nutrition change", "Length",
+                                       "Nutrition", "Length",
                                        "Guild"),
              species_role_tabs = c("Biomass", "Size", "Guilds", "Diet"), ...) {
 

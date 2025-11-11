@@ -4,9 +4,11 @@
 \alias{calc_nutrition_totals}
 \title{Calculate total nutrients from a simulation at given time steps}
 \usage{
-calc_nutrition_totals(sim, steps)
+calc_nutrition_totals(nutrition, sim, steps)
 }
 \arguments{
+\item{nutrition}{Data frame of per-species nutrient contents}
+
 \item{sim}{Mizer projection object}
 
 \item{steps}{Integer time indices to evaluate (can be a range)}

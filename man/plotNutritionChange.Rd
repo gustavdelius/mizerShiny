@@ -5,6 +5,7 @@
 \title{Plot nutrition change at selected times}
 \usage{
 plotNutritionChange(
+  nutrition,
   harvestedprojection,
   sim_0,
   chosenyear,
@@ -12,6 +13,8 @@ plotNutritionChange(
 )
 }
 \arguments{
+\item{nutrition}{Data frame of per-species nutrient contents}
+
 \item{harvestedprojection}{Harvested mizer projection}
 
 \item{sim_0}{Unharvested mizer projection}
