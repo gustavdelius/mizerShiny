@@ -81,7 +81,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
             radioButtons(
               inputId = ns("sim_choice"),
               label   = NULL,
-              choices = c("Sim 1" = "sim1", "Sim 2" = "sim2", "Both" = "both"),
+              choices = c("Strategy 1" = "sim1", "Strategy 2" = "sim2", "Both" = "both"),
               selected = "sim1",
               inline = TRUE
             ) |>
@@ -91,12 +91,12 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
         ## Simulation Tabs ----
         tabsetPanel(
           tabPanel(
-            title = "Sim 1",
+            title = "Strategy 1",
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui")))
           ),
           tabPanel(
             title = span(
-              "Sim 2",
+              "Strategy 2",
               `data-bs-toggle` = "popover",
               `data-bs-placement` = "top",
               `data-bs-html` = "true",
@@ -455,7 +455,7 @@ fishery_strategy_server <- function(id, sim_0,
     })
 
       # Effort sliders ----
-    # Dynamic fishery effort sliders for Sim 1
+    # Dynamic fishery effort sliders for Strategy 1
     output$fishery_sliders_ui <- renderUI({
       effort <- params@initial_effort
       gears <- unique(params@gear_params$gear)
@@ -486,7 +486,7 @@ fishery_strategy_server <- function(id, sim_0,
       )
     })
 
-    # Dynamic fishery effort sliders for Sim 2
+    # Dynamic fishery effort sliders for Strategy 2
     output$fishery_sliders_ui2 <- renderUI({
       effort <- params@initial_effort
       gears <- unique(params@gear_params$gear)
@@ -544,13 +544,13 @@ fishery_strategy_server <- function(id, sim_0,
       effort_sim1 <- makeEffort("effort_",  gears, params@initial_effort)
       effort_sim2 <- makeEffort("effort2_", gears, params@initial_effort)
 
-      pb$inc(1 / total_steps, "Projecting Sim 1 …")
+      pb$inc(1 / total_steps, "Projecting Strategy 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(params, effort = effort_sim1, t_max = max_year),
         context = "fishery_multispecies_sim1"
       )
 
-      pb$inc(1 / total_steps, "Projecting Sim 2 …")
+      pb$inc(1 / total_steps, "Projecting Strategy 2 …")
       sim2 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(params, effort = effort_sim2, t_max = max_year),
         context = "fishery_multispecies_sim2"
@@ -596,7 +596,7 @@ fishery_strategy_server <- function(id, sim_0,
       ef
     }
 
-    # Observer to automatically switch to "Both" when Sim 2 sliders are changed
+    # Observer to automatically switch to "Both" when Strategy 2 sliders are changed
     observeEvent({
       gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) {
@@ -651,7 +651,7 @@ fishery_strategy_server <- function(id, sim_0,
 
       if (need_sim1) {
         t_max1 <- target_year - max_sim1 + 5
-        pb$inc(1/steps, "Projecting Sim 1 …")
+        pb$inc(1/steps, "Projecting Strategy 1 …")
         sim1 <- mizerShiny:::runSimulationWithErrorHandling(
           function() project(sims$sim1, t_max = t_max1),
           context = "fishery_time_range_sim1"
@@ -660,7 +660,7 @@ fishery_strategy_server <- function(id, sim_0,
 
       if (need_sim2) {
         t_max2 <- target_year - max_sim2 + 5
-        pb$inc(1/steps, "Projecting Sim 2 …")
+        pb$inc(1/steps, "Projecting Strategy 2 …")
         sim2 <- mizerShiny:::runSimulationWithErrorHandling(
           function() project(sims$sim2, t_max = t_max2),
           context = "fishery_time_range_sim2"
@@ -679,7 +679,7 @@ fishery_strategy_server <- function(id, sim_0,
       fishSimData(list(sim1 = sim1, sim2 = sim2, unharv = unharv))
     })
 
-    # Re-run only Sim 1 when Sim 1 effort sliders change
+    # Re-run only Strategy 1 when Strategy 1 effort sliders change
     observeEvent({
       gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) input[[paste0("effort_", gear)]])
@@ -691,7 +691,7 @@ fishery_strategy_server <- function(id, sim_0,
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       pb$set(message = "Running fishery simulation …", value = 0)
 
-      pb$inc(1, "Projecting Sim 1 …")
+      pb$inc(1, "Projecting Strategy 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(params, effort = effort1, t_max = max_year + 5),
         context = "fishery_sim1"
@@ -701,7 +701,7 @@ fishery_strategy_server <- function(id, sim_0,
       fishSimData(list(sim1 = sim1, sim2 = sims$sim2, unharv = sims$unharv))
     }, ignoreInit = TRUE)
 
-    # Re-run only Sim 2 when Sim 2 effort sliders change
+    # Re-run only Strategy 2 when Strategy 2 effort sliders change
     observeEvent({
       gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) input[[paste0("effort2_", gear)]])
@@ -713,7 +713,7 @@ fishery_strategy_server <- function(id, sim_0,
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       pb$set(message = "Running fishery simulation …", value = 0)
 
-      pb$inc(1, "Projecting Sim 2 …")
+      pb$inc(1, "Projecting Strategy 2 …")
       sim2 <- mizerShiny:::runSimulationWithErrorHandling(
         function() project(params, effort = effort2, t_max = max_year + 5),
         context = "fishery_sim2"
@@ -723,7 +723,7 @@ fishery_strategy_server <- function(id, sim_0,
       fishSimData(list(sim1 = sims$sim1, sim2 = sim2, unharv = sims$unharv))
     }, ignoreInit = TRUE)
 
-    # Reset Sim 1 effort sliders to base effort
+    # Reset Strategy 1 effort sliders to base effort
     observeEvent(input$reset_effort_sim1, {
       base_effort <- params@initial_effort
       gears <- unique(params@gear_params$gear)
@@ -736,7 +736,7 @@ fishery_strategy_server <- function(id, sim_0,
       })
     })
 
-    # Reset Sim 2 effort sliders to base effort
+    # Reset Strategy 2 effort sliders to base effort
     observeEvent(input$reset_effort_sim2, {
       base_effort <- params@initial_effort
       gears <- unique(params@gear_params$gear)
@@ -953,9 +953,9 @@ fishery_strategy_server <- function(id, sim_0,
 
       mizerShiny:::generatePlotWithErrorHandling(
         plot_fun = function() {
-          sims <- list(Current = fishSimData()$unharv)
-          if (vis$show_sim1) sims <- c(sims, list(Sim_1 = fishSimData()$sim1))
-          if (vis$show_sim2) sims <- c(sims, list(Sim_2 = fishSimData()$sim2))
+          sims <- list(Baseline = fishSimData()$unharv)
+          if (vis$show_sim1) sims <- c(sims, list(`Strategy 1` = fishSimData()$sim1))
+          if (vis$show_sim2) sims <- c(sims, list(`Strategy 2` = fishSimData()$sim2))
           ggplotly(mizerShiny:::plotYieldVsSize(sims, x_var = "Length"))
         },
         last_plot_reactive = lastFishLengthPlot,
@@ -1130,12 +1130,12 @@ fishery_strategy_server <- function(id, sim_0,
         df1 <- mizer::plotSpectra(sim$sim1,
                            time_range  = selected_year,
                            return_data = TRUE) |>
-          mutate(sim = "Sim 1")
+          mutate(sim = "Strategy 1")
 
         df2 <- mizer::plotSpectra(sim$sim2,
                            time_range  = selected_year,
                            return_data = TRUE) |>
-          mutate(sim = "Sim 2")
+          mutate(sim = "Strategy 2")
 
         all_species <- c()
         if (!is.null(df1)) all_species <- c(all_species, unique(df1$Species))
@@ -1283,11 +1283,11 @@ fishery_strategy_server <- function(id, sim_0,
 
           if (vis$show_sim1) {
             sims <- c(sims, list(fishSimData()$sim1))
-            names <- c(names, "Sim 1")
+            names <- c(names, "Strategy 1")
           }
           if (vis$show_sim2) {
             sims <- c(sims, list(fishSimData()$sim2))
-            names <- c(names, "Sim 2")
+            names <- c(names, "Strategy 2")
           }
 
           # Subset simulations by time range
