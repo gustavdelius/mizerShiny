@@ -434,11 +434,6 @@ fishery_strategy_server <- function(id, sim_0,
   params_noninteracting <- mizerShiny:::make_noninteracting(params)
 
   moduleServer(id, function(input, output, session) {
-    
-    # Update species select input
-    observe({
-        updateSelectInput(session, "fish_name_select", choices = species_list)
-    })
 
     get_gears <- function() {
       unique(params@gear_params$gear)
@@ -447,20 +442,20 @@ fishery_strategy_server <- function(id, sim_0,
     makeEffort <- function(prefix, base_effort, gears = get_gears()) {
       ef <- base_effort
       for (g in gears) {
-        id <- paste0(prefix, g)
+        id <- paste0("effort", prefix, g)
         if (!is.null(input[[id]]))
           ef[g] <- input[[id]]
       }
       ef
     }
 
-    createSliderUI <- function(effort_prefix, l50_prefix, reset_button_id) {
+    createSliderUI <- function(prefix, reset_button_id) {
       renderUI({
         gears <- get_gears()
         slider_list <- lapply(gears, function(gear) {
           list(
             sliderInput(
-              inputId = session$ns(paste0(effort_prefix, gear)),
+              inputId = session$ns(paste0("effort", prefix, gear)),
               label = paste("Effort for", gear),
               min = 0,
               max = if (params@initial_effort[gear] == 0) {
@@ -471,7 +466,7 @@ fishery_strategy_server <- function(id, sim_0,
               width = "100%"
             ),
             sliderInput(
-              inputId = session$ns(paste0(l50_prefix, gear)),
+              inputId = session$ns(paste0("l50", prefix, gear)),
               label = paste("% change in L50 for", gear),
               min = -20,
               max = 40,
@@ -496,38 +491,41 @@ fishery_strategy_server <- function(id, sim_0,
       })
     }
 
-    observeStrategyEffort <- function(effort_prefix, context, sim_key, label) {
+    observeStrategy <- function(prefix, context, sim_key, label) {
       observeEvent({
         gears <- get_gears()
-        lapply(gears, function(gear) input[[paste0(effort_prefix, gear)]])
+        lapply(gears, function(gear) {
+            input[[paste0("effort", prefix, gear)]]
+            input[[paste0("l50", prefix, gear)]]
+        })
       }, {
         gears <- get_gears()
-        effort <- makeEffort(effort_prefix, params@initial_effort, gears)
+        effort <- makeEffort(prefix, params@initial_effort, gears)
         max_year <- isolate(input$fishyear)
+        sims <- isolate(fishSimData())
 
         pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
         pb$set(message = "Running fishery simulation …", value = 0)
 
         pb$inc(1, paste("Projecting", label, "…"))
         sim <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(params, effort = effort, t_max = max_year + 5),
+          function() project(sims[[sim_key]]@params, effort = effort, t_max = max_year + 5),
           context = context
         )
 
-        sims <- isolate(fishSimData())
         sims[[sim_key]] <- sim
         fishSimData(sims)
       }, ignoreInit = TRUE)
     }
 
-    observeResetButton <- function(reset_button_id, effort_prefix) {
+    observeResetButton <- function(reset_button_id, prefix) {
       observeEvent(input[[reset_button_id]], {
         base_effort <- params@initial_effort
         gears <- get_gears()
         lapply(gears, function(gear) {
           updateSliderInput(
             session,
-            paste0(effort_prefix, gear),
+            paste0("effort", prefix, gear),
             value = unname(base_effort[gear])
           )
         })
@@ -542,8 +540,8 @@ fishery_strategy_server <- function(id, sim_0,
     # Fishery sliders ----
     # Dynamic fishery effort sliders for Strategy 1
     # Dynamic fishery effort sliders
-    output$fishery_sliders_ui  <- createSliderUI("effort_",  "l50_",   "reset_effort_sim1")
-    output$fishery_sliders_ui2 <- createSliderUI("effort2_", "l50_2_", "reset_effort_sim2")
+    output$fishery_sliders_ui  <- createSliderUI("_",  "reset_effort_sim1")
+    output$fishery_sliders_ui2 <- createSliderUI("2_", "reset_effort_sim2")
 
     # Observers ----
 
@@ -571,18 +569,18 @@ fishery_strategy_server <- function(id, sim_0,
       pb$set(message = "Running simulation …", value = 0)
 
       gears <- get_gears()
-      effort_sim1 <- makeEffort("effort_",  params@initial_effort, gears)
-      effort_sim2 <- makeEffort("effort2_", params@initial_effort, gears)
+      effort_sim1 <- makeEffort("_",  params@initial_effort, gears)
+      effort_sim2 <- makeEffort("2_", params@initial_effort, gears)
 
       pb$inc(1 / total_steps, "Projecting Strategy 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(params, effort = effort_sim1, t_max = max_year),
+        function() project(sim1@params, effort = effort_sim1, t_max = max_year),
         context = "fishery_multispecies_sim1"
       )
 
       pb$inc(1 / total_steps, "Projecting Strategy 2 …")
       sim2 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(params, effort = effort_sim2, t_max = max_year),
+        function() project(sim2@params, effort = effort_sim2, t_max = max_year),
         context = "fishery_multispecies_sim2"
       )
 
@@ -665,7 +663,7 @@ fishery_strategy_server <- function(id, sim_0,
         t_max1 <- target_year - max_sim1 + 5
         pb$inc(1/steps, "Projecting Strategy 1 …")
         sim1 <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims$sim1, t_max = t_max1),
+          function() project(sims$sim1@params, t_max = t_max1),
           context = "fishery_time_range_sim1"
         )
       }
@@ -674,7 +672,7 @@ fishery_strategy_server <- function(id, sim_0,
         t_max2 <- target_year - max_sim2 + 5
         pb$inc(1/steps, "Projecting Strategy 2 …")
         sim2 <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims$sim2, t_max = t_max2),
+          function() project(sims$sim2@params, t_max = t_max2),
           context = "fishery_time_range_sim2"
         )
       }
@@ -683,7 +681,7 @@ fishery_strategy_server <- function(id, sim_0,
         t_maxu <- target_year - max_unharv + 5
         pb$inc(1/steps, "Projecting base …")
         unharv <- mizerShiny:::runSimulationWithErrorHandling(
-          function() project(sims$unharv, t_max = t_maxu),
+          function() project(sims$unharv@params, t_max = t_maxu),
           context = "fishery_time_range_unharv"
         )
       }
@@ -692,22 +690,22 @@ fishery_strategy_server <- function(id, sim_0,
     })
 
     ## Strategy sliders observers ----
-    observeStrategyEffort(
-      effort_prefix = "effort_",
+    observeStrategy(
+      prefix = "_",
       context = "fishery_sim1",
       sim_key = "sim1",
       label = "Strategy 1"
     )
 
-    observeStrategyEffort(
-      effort_prefix = "effort2_",
+    observeStrategy(
+      prefix = "2_",
       context = "fishery_sim2",
       sim_key = "sim2",
       label = "Strategy 2"
     )
 
-    observeResetButton("reset_effort_sim1", "effort_")
-    observeResetButton("reset_effort_sim2", "effort2_")
+    observeResetButton("reset_effort_sim1", "_")
+    observeResetButton("reset_effort_sim2", "2_")
 
     # Year controls ----
     mizerShiny:::setupYearControls(
