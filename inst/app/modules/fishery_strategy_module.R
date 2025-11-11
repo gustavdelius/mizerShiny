@@ -430,7 +430,7 @@ fishery_strategy_server <- function(id, sim_0,
   params <- sim_0@params
   # keep copies for switching between interacting and non-interacting
   params_interacting <- params
-  params_noninteracting <- make_noninteracting(params)
+  params_noninteracting <- mizerShiny:::make_noninteracting(params)
 
   moduleServer(id, function(input, output, session) {
 
