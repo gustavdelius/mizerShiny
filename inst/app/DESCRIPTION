@@ -1,0 +1,8 @@
+Package: mizerShinyApp
+Type: Shiny
+Title: mizerShiny app
+Version: 0.0.1
+Imports:
+    mizerShiny
+Remotes:
+    gustavdelius/mizerShiny

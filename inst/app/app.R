@@ -14,6 +14,7 @@ library(plotly)
 
 # Mizer ecosystem package
 library(mizer)
+library(mizerShiny)
 
 guildparams <- getShinyOption("guildparams")
 nutrition <- getShinyOption("nutrition")
