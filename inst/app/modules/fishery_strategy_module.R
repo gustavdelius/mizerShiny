@@ -352,7 +352,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                   selectInput(
                     inputId = ns("species_order_fish"),
                     label   = NULL,
-                    choices = c("Custom", "Size", "Guild"),
+                    choices = c("Custom", "Size"),
                     width = "120px"
                   ) |>
                     tagAppendAttributes(style = "margin: 0; align-self: center;"),
