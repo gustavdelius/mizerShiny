@@ -1,13 +1,31 @@
 intro_steps <- list(
 
     # ============================
+    # Guide overview
+    # ============================
+    list(
+        element = ".baseline-definition, [id$='baselineDefinition'], [id$='whatIsBaseline']",
+        title   = "What is this app for?",
+        intro   = "Explore how different fishing strategies change the modelled community over time.
+Investigate one strategy or compare two side-by-side, and see the effects of changing fishing effort on biomass, yield, size composition of landings, nutrition of landings, and feeding guild structures."
+    ),
+
+    # (optional next click if you want the baseline explained separately)
+    list(
+        element = ".baseline-definition, [id$='baselineDefinition'], [id$='whatIsBaseline']",
+        title   = "The baseline strategy",
+        intro   = "The baseline against which relative changes are compared to is the uploaded mizer model called with mizerShiny(), or the default Celtic Sea model if no model is provided.
+This baseline strategy can be returned to by setting all effort sliders to a value of 1, or pressing the reset button."
+    ),
+
+    # ============================
     # STRATEGY SELECTION / EDITING
     # ============================
     list(
         # Tab pill for Strategy 1 (link element created by tabPanel(title = "Strategy 1", ...))
         element = "a.nav-link[data-value='Strategy 1'], a[data-value='Strategy 1']",
         title   = "Strategy 1",
-        intro   = "Use this tab to configure and view Strategy 1 (effort sliders below)."
+        intro   = "Use this tab to configure the effort of each gear in Strategy 1, using the sliders below."
     ),
     list(
         # Tab pill for Strategy 2
@@ -29,7 +47,8 @@ intro_steps <- list(
         # materialSwitch – label is a visible, stable anchor
         element = "[for$='multispeciesToggle'], [id$='multispeciesToggle']",
         title   = "Multispecies effects",
-        intro   = "On = interacting community (predation & competition feedbacks). Off = non‑interacting species. Toggling re‑runs the baseline and both strategies for the selected time range."
+        intro   = "Use to enable or disable predation between (and within) each species.
+        Effectively, this allows you to examine the differences between a series of calibrated single-species models and a fully interacting multispecies community. "
     ),
     list(
         element = "[id$='fishyyear']",
@@ -90,14 +109,6 @@ intro_steps <- list(
         element = "input[type='checkbox'][id$='fishy_intermediate_toggle'], [for$='fishy_intermediate_toggle']",
         title   = "Show intermediate years",
         intro   = "Add ¼ and ½ time points (between model start and the selected end year) to show the trajectory, not just the end result. Under the baseline strategy, Biomass and Yield will be the same height at each time point"
-    ),
-
-    # ============================
-    # BASELINE
-    # ============================
-    list(
-        element = ".baseline-definition, [id$='baselineDefinition'], [id$='whatIsBaseline']",
-        title   = "What is the baseline?",
-        intro   = "Baseline = the default parameter with all gears at initial effort (i.e. effort = 1). All % changes are calculated relative to this baseline."
     )
+
 )
