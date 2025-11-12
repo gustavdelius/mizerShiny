@@ -524,7 +524,7 @@ fishery_strategy_server <- function(id, sim_0,
       )
       on.exit(shiny::removeNotification(id = notif_id, session = session), add = TRUE)
 
-      total_steps <- 3
+      total_steps <- 2
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       pb$set(message = "Running simulation …", value = 0)
 
@@ -544,11 +544,7 @@ fishery_strategy_server <- function(id, sim_0,
         context = "fishery_multispecies_sim2"
       )
 
-      pb$inc(1 / total_steps, "Projecting base …")
-      sim0 <- mizerShiny:::runSimulationWithErrorHandling(
-        function() project(params, t_max = max_year),
-        context = "fishery_multispecies_unharv"
-      )
+      sim0 <- fishSimData()$unharv
 
       fishSimData(list(sim1 = sim1, sim2 = sim2, unharv = sim0))
     }, ignoreInit = TRUE)
