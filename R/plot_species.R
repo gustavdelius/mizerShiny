@@ -192,6 +192,7 @@ process_sim_shared_actual <- function(harvestedprojection, chosenyear, mode = c(
 #' @param harvestedprojection Harvested mizer projection
 #' @param chosenyear Integer defining the full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
+#' @param species_order Optional character vector defining the display order of species
 #' @return A ggplot object
 #' @keywords internal
 plotSpeciesActualBiomass <- function(harvestedprojection, chosenyear,
@@ -295,7 +296,8 @@ process_sim_shared_actual_yield <- function(harvestedprojection, chosenyear, mod
 #' @return A ggplot object
 #' @keywords internal
 plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
-                                     mode = c("triple", "chosen")) {
+                                   mode = c("triple", "chosen"),
+                                   species_order = NULL) {
   mode <- match.arg(mode)
   yield_data <- process_sim_shared_actual_yield(harvestedprojection, chosenyear, mode)
   yield_data$Yield <- yield_data$yield
@@ -349,9 +351,14 @@ plotSpeciesActualYield <- function(harvestedprojection, chosenyear,
       BarWidth = dodge_width / n_times
     )
 
-  # Convert Species to factor to use discrete scale
-  # This allows the module to override with scale_x_discrete(limits = ...)
-  yield_data$Species <- factor(yield_data$Species, levels = unique(yield_data$Species))
+  # Convert Species to factor with supplied ordering so modules can align axes
+  species_levels <- unique(yield_data$Species)
+  if (!is.null(species_order)) {
+    species_levels <- c(species_order, setdiff(species_levels, species_order))
+  }
+  yield_data$Species <- factor(yield_data$Species, levels = species_levels)
+  yield_data$SpeciesNum <- as.numeric(yield_data$Species)
+  yield_data$XPos <- yield_data$SpeciesNum + dodge_offset[yield_data$TimeNum]
 
   # Create text for tooltip
   yield_data$tooltip_text <- paste0("Gear: ", yield_data$Gear, "<br>",

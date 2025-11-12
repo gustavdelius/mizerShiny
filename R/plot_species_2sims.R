@@ -215,10 +215,12 @@ plotSpeciesActualBiomass2 <- function(harvestedprojection1, harvestedprojection2
 #' @param harvestedprojection2 Second harvested mizer projection
 #' @param chosenyear Integer defining full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
+#' @param species_order Optional character vector defining the display order of species
 #' @return A ggplot object
 #' @keywords internal
 plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
-                                      chosenyear, mode = c("triple", "chosen")) {
+                                    chosenyear, mode = c("triple", "chosen"),
+                                    species_order = NULL) {
   mode <- match.arg(mode)
   df1 <- process_sim_shared_actual_yield(harvestedprojection1, chosenyear, mode)
   df2 <- process_sim_shared_actual_yield(harvestedprojection2, chosenyear, mode)
@@ -275,8 +277,17 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
       TimeClass = fill_group
     )
 
-  # Get unique species in order for labeling
-  species_order <- unique(plot_df$Species)
+  # Get unique species in order for labeling, respecting supplied order
+  species_levels <- unique(plot_df$Species)
+  if (!is.null(species_order)) {
+    species_levels <- c(species_order, setdiff(species_levels, species_order))
+  }
+  plot_df$Species <- factor(plot_df$Species, levels = species_levels)
+  plot_df$SpeciesNum <- as.numeric(plot_df$Species)
+  plot_df$XPos <- plot_df$SpeciesNum + dodge_offset[plot_df$TimeNum]
+
+  # Updated ordered species for axis labels
+  species_axis_levels <- levels(plot_df$Species)
 
   # Create text for tooltip
   plot_df$tooltip_text <- paste0("Gear: ", plot_df$Gear, "<br>",
@@ -293,8 +304,8 @@ plotSpeciesActualYield2 <- function(harvestedprojection1, harvestedprojection2,
                     fill = Gear, alpha = TimeClass, text = tooltip_text),
                 show.legend = c(fill = TRUE, alpha = FALSE))
   ) +
-    ggplot2::scale_x_continuous(breaks = seq_along(species_order),
-                       labels = species_order) +
+    ggplot2::scale_x_continuous(breaks = seq_along(species_axis_levels),
+                       labels = species_axis_levels) +
     ggplot2::scale_fill_manual(values = gear_colors, name = "Gear") +
     ggplot2::scale_alpha_manual(values = opacity_values, guide = "none") +
     ggplot2::guides(alpha = "none", fill = ggplot2::guide_legend(override.aes = list(alpha = 1))) +

@@ -7,7 +7,8 @@
 plotSpeciesActualYield(
   harvestedprojection,
   chosenyear,
-  mode = c("triple", "chosen")
+  mode = c("triple", "chosen"),
+  species_order = NULL
 )
 }
 \arguments{

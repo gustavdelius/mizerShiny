@@ -16,6 +16,8 @@ plotSpeciesActualBiomass(
 \item{chosenyear}{Integer defining the full period; quarter/half derived}
 
 \item{mode}{Either "triple" or "chosen"}
+
+\item{species_order}{Optional character vector defining the display order of species}
 }
 \value{
 A ggplot object

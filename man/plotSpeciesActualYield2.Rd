@@ -8,7 +8,8 @@ plotSpeciesActualYield2(
   harvestedprojection1,
   harvestedprojection2,
   chosenyear,
-  mode = c("triple", "chosen")
+  mode = c("triple", "chosen"),
+  species_order = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ plotSpeciesActualYield2(
 \item{chosenyear}{Integer defining full period; quarter/half derived}
 
 \item{mode}{Either "triple" or "chosen"}
+
+\item{species_order}{Optional character vector defining the display order of species}
 }
 \value{
 A ggplot object

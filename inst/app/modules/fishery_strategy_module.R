@@ -845,7 +845,8 @@ fishery_strategy_server <- function(id, sim_0,
                   fishSimData()$sim1,
                   fishSimData()$sim2,
                   chosen_year,
-                  mode = mode
+                  mode = mode,
+                  species_order = ordered_species_reactive()
                 ) + scale_x_discrete(limits = ordered_species_reactive())
               ),
               tooltip = "text"
@@ -856,7 +857,8 @@ fishery_strategy_server <- function(id, sim_0,
                 mizerShiny:::plotSpeciesActualYield(
                   fishSimData()$sim1,
                   chosen_year,
-                  mode = mode
+                  mode = mode,
+                  species_order = ordered_species_reactive()
                 ) +
                   scale_x_discrete(limits = ordered_species_reactive())
               ),
@@ -868,7 +870,8 @@ fishery_strategy_server <- function(id, sim_0,
                 mizerShiny:::plotSpeciesActualYield(
                   fishSimData()$sim2,
                   chosen_year,
-                  mode = mode
+                  mode = mode,
+                  species_order = ordered_species_reactive()
                 ) +
                   scale_x_discrete(limits = ordered_species_reactive())
               ),
