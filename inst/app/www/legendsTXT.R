@@ -12,23 +12,18 @@ ecosystem at a given size. The blue line is the changed simulation; the dashed \
 line is the base simulation. Use the <em>Log</em> switch to change the \
 X&nbsp;axis from log-scale to linear.",
   role_guild = # Will also be used for fishery_guild
-    "Percentage change in biomass by feeding guild relative to the baseline strategy. \
-Each guild shows three bars for the ¼, ½ and end‑year points (bright→dark) when Intermediate years is on. X axis is the guild, Y is the % change. Feeding guilds \
-group fish by diet and life stage.",
+    "Percentage change in biomass by feeding guild relative to the baseline strategy. Feeding guilds
+group fish by diet and life stage.\
+ X axis is the guild, Y is the % change. Shading distinguishes earlier → later time points when “Intermediate years” is on. ",
   role_diet = # Will also be used for fishery_diet
       "Diet composition of a selected fish across its size range. X axis is the \
     size of fish, Y axis is the proportion of diet of a prey species. Colour \
     indicates prey species.",
-  fishery_biomass = "To be written.",
-  fishery_biomass_change = "To be written.",
-  fishery_yield = "To be written.",
-  fishery_yield_change = "To be written.",
   fishery_nutrition =
       "Relative change in nutrition compared with the baseline fishing strategy. \
 X axis contains the nutrient, Y axis is the % change in comparison with the \
   baseline fishing strategy. Colour indicates whether change is positive or \
   negative. Nutrient amount is calculated from biomass of species caught.",
-  fishery_length = "To be written.",
   fishery_yield_composition =
     "Dashboard of yield for the chosen fishery strategy within the \
 selected time range. <strong>Species Change</strong> – yield of individual \
@@ -78,8 +73,7 @@ When both are shown, plots are split by strategy."
 legends$fishery_multispecies <-
     "Toggle multispecies interactions (predation). \
 On = interacting community (species affect one another). \
-Off = non‑interacting (each species projects independently). \
-Toggling re‑runs the baseline and both strategies for the selected time range."
+Off = non‑interacting (each species projects independently)."
 
 legends$tab_fishery_strategy <-
     "Configure fishing strategies, adjust species-specific controls, and compare outcomes between simulation setups."
@@ -89,21 +83,22 @@ legends$page_guide_button <-
     "Launch a short, page-specific walkthrough explaining the main controls and plots."
 
 legends$fishery_biomass <-
-    "Absolute biomass by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: biomass. Shading distinguishes earlier → later time points."
+    "Absolute biomass by species for the selected fishing strategy (default is baseline). X: species; Y: biomass. Shading distinguishes earlier → later time points."
 
 legends$fishery_biomass_change <-
-    "Percentage change in species biomass under the chosen strategy \
-relative to the baseline strategy. \
+    "Percentage change in species biomass under the selected fishing strategy \
+relative to the baseline strategy at selected time points (¼, ½, end of period). \
+ X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points.
 Shading indicates earlier→later time points when “Intermediate years” is on."
 
 legends$fishery_yield <-
-    "Absolute yield by species for the selected fishing strategy (default is baseline) at selected time points. X: species; Y: yield. Shading distinguishes earlier → later time points."
+    "Absolute yield by species for the selected fishing strategy (default is baseline), broken down by fishing gear. X: species; Y: yield. Shading distinguishes earlier → later time points when “Intermediate years” is on."
 
 legends$fishery_yield_change <-
-    "Yield % change by species relative to the baseline strategy at selected time points (¼, ½, end of period), broken down by fishing gear. X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points."
+    "Yield % change by species relative to the baseline strategy at selected time points (¼, ½, end of period). X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points when “Intermediate years” is on."
 
 legends$fishery_length <-
-    "Size (length) composition of the catch. Select species to see how catch size distribution shifts, broken down by gear. Areas are not re-normalised; total area varies with overall yield."
+    "Size (length) composition of the catch. Area under the curve reflects the total yield."
 
 # Duplicate role legends for fishery plots
 legends$fishery_guild   <- legends$role_guild

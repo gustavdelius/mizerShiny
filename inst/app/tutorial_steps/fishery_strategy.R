@@ -1,74 +1,103 @@
 intro_steps <- list(
-  list(
-    element = ".nav-tabs li a[data-value='Sim 1']",
-    title   = "Single Simulation",
-    intro   = "Using this tab plots one fishing strategy"
-  ),
-  list(
-    element = ".nav-tabs li a[data-value='Sim 2']",
-    title   = "Compare Simulations",
-    intro   = "Using this tab will plot the fishing strateges on Sim1 and Sim2 tab in comparison with eachother."
-  ),
-  list(element = "#fishyyear", title = "Year Range to Plot",
-       intro = "Changing the value of this slider will change the
-                 year that is plotted. It is useful to look at different time scales,
-                 as the impact of the imposed change may differ and it will show the
-                 oscillatory change in fish populations."
-  ),
-  list(element = "#fishery_sliders", title = "Fishery Sliders",
-       intro = "The sliders here change the fishing effort of each fleet. Effort values loaded on start-up of the app are the preset values and are what
-       your simulation will be compared to. Fishing effort can be though of as the intensity of fishing and each fleet can be thought of as fishing vessels which
-       fish similar species and with similar size selectivity."
-  ),
-  list(element = "#fishy_plots .nav-link[data-value='Biomass']", title = "Biomass Plot",
-       intro = "The plot presents the percentage change in each of the species. This percentage change is relative to the current fishing strategy. Each species has 3 bars, which indicate the species percentage change at
-specific time points: quarter of the selected year, half of the selected year, and the full selected year...
-      "
-  ),
-  list(element = "#fishy_plots .nav-link[data-value='Biomass']", title = "Biomass continued",
-       intro = "Plotting all 3 time points
-aids in understanding how the ecosystem changes evolve over time, showing the progression from early to late stages of the simulation.
-"
-  ),
-  list(element = "#triMode_fish", title = "Change Time Plotted",
-       intro = "When changing the time with the +1/-1 buttons, it is difficult to observe changes when 3 time points are plotted. Use this toggle to change
-from 3 time points plotted to only the selected year plotted."
-       # Added step
-  ),
-  list(element = "#species_order_fish_box", title = "Order of Species",
-       intro = "As some of the graphs show changes in each of the species within the model,
-            the order that these species are presented may allow for easier observation of
-            any general patterns. You can change and customise the order using the options here."
-  ),
-  list(element = "#fishy_plots", title="Plots", intro = "Here is where you can navigate between different aspects of the ecosystem.
-       Remember that each plot uses plotly, so you can look at specific areas of the plot by selecting with your mouse (then double click to reset),
-       remove plot items by clicking them on the legend (double click to remove everything but that one), hover over plot information to get
-       more specific values and save the plot by using the picture icon in the top right of the plot."),
-  list(element = "#fishy_plots .nav-link[data-value='Yield Composition']", title = "Yield Composition Plot",
-       intro = "Dashboard of yield harvested from the simulation. Use the legend to understand what each of the plots mean"
-  ),
-  list(element = "#fishy_plots .nav-link[data-value='Size']", title = "Relative Size Spectrum Plot",
-       intro = "This plot shows the relative change in the size spectrum on a community level. Plotting the size spectrum informs
-      the viewer of the change in community composition, more specifically, how the distribution of fish size has changed. If comparing simulations, sim 2 will be a dashed line"
-  ),
-  list(element = "#fishy_plots .nav-link[data-value='Guild']", title = "Guild Plot",
-       intro = "The plot here showcases the change in the guilds within the species, which are fish in the ecosystem that share a distinct
-       feeding pattern in relation to other fish. Observing this plot helps to understand how the trophic dynamics of the ecosystem are changing.
-      Additionally, the guilds are plotted as 3 bars representing biomass at quarter, half and full of the selected year."
-  ),
-  list(element = "#fishy_plots .nav-link[data-value='Spectra']", title = "Size Spectrum Plot",
-       intro = "This plot is the size spectrum (the biomass distribution across sizes of fish) of each
-             species of fish in the model. If comparing simulations, sim 2 will be a dashed line. Select species using the legend to remove them, then use the
-       Time Range slider to see how they change over time. "
-  ),
-  list(element = "#fishy_plots .nav-link[data-value='Diet']", title = "Diet Plot",
-       intro = "This plot shows what a species of fish is eating across its size range. The majority of
-a species diet will be the 'Resource' - the 'Resource' is meant to simulate the plankton in a marine ecosystem and acts as the bottom
-trophic level, providing energy for the modelled species. The point of this tab is so that you can find the reasons behind the ecosystem
-changes that you have observed, it makes the trophic links between species clear, more specifically, what eats what."
-  ),
-    list(element = "#fishy_plots .nav-link[data-value='Nutrition']", title = "Nutrition",
-          intro = "The nutritional quality across the species caught is plotted here. It works by taking the relative biomass changes to the
-         current fishing strategy and calculating the difference in available nutrition in the catch. Keep in mind that this works by biomass values, so a higher yield will result in greater nutritional availability."
-  )
+
+    # ============================
+    # STRATEGY SELECTION / EDITING
+    # ============================
+    list(
+        # Tab pill for Strategy 1 (link element created by tabPanel(title = "Strategy 1", ...))
+        element = "a.nav-link[data-value='Strategy 1'], a[data-value='Strategy 1']",
+        title   = "Strategy 1",
+        intro   = "Use this tab to configure and view Strategy 1 (effort sliders below)."
+    ),
+    list(
+        # Tab pill for Strategy 2
+        element = "a.nav-link[data-value='Strategy 2'], a[data-value='Strategy 2']",
+        title   = "Strategy 2",
+        intro   = "Configure a second strategy so you can compare Strategy 1 and Strategy 2, or examine a second strategy in isolation without altering the first."
+    ),
+    list(
+        # Radio group: Show Strategy 1 / Strategy 2 / Both
+        element = "[id$='sim_choice']",
+        title   = "Show which strategies?",
+        intro   = "Choose to display Strategy 1, Strategy 2, or Both together."
+    ),
+
+    # ============================
+    # MULTISPECIES & TIME CONTROLS
+    # ============================
+    list(
+        # materialSwitch – label is a visible, stable anchor
+        element = "[for$='multispeciesToggle'], [id$='multispeciesToggle']",
+        title   = "Multispecies effects",
+        intro   = "On = interacting community (predation & competition feedbacks). Off = non‑interacting species. Toggling re‑runs the baseline and both strategies for the selected time range."
+    ),
+    list(
+        element = "[id$='fishyyear']",
+        title   = "Time range",
+        intro   = "Sets the end year used in plots. If “Show intermediate years” is on, charts also include the ¼ and ½ points from model start to this year."
+    ),
+    list(
+        element = "[id$='incYear_fish']",
+        title   = "+1 year",
+        intro   = "Step the selected end year forward by one."
+    ),
+
+    # ============================
+    # PLOT TABS (as visible in your UI)
+    # ============================
+    list(
+        element = "a.nav-link[data-value='Biomass'], a[data-value='Biomass']",
+        title   = "Biomass",
+        intro   = "Species biomass under the selected fishing strategy. Use the legend to focus on species; adjust the time range to see how outcomes evolve."
+    ),
+    list(
+        element = "a.nav-link[data-value='Biomass % Change'], a[data-value='Biomass % Change']",
+        title   = "Biomass % change",
+        intro   = "Change relative to the baseline (uploaded model). When “Show intermediate years” is on, shading shows earlier→later time points."
+    ),
+    list(
+        element = "a.nav-link[data-value='Yield'], a[data-value='Yield']",
+        title   = "Yield",
+        intro   = "Catch by species and gear under the selected strategy. Use Gear and Species filters to drill down."
+    ),
+    list(
+        element = "a.nav-link[data-value='Yield % Change'], a[data-value='Yield % Change']",
+        title   = "Yield % change",
+        intro   = "Change in catch relative to the baseline (uploaded model). Positive = more catch; negative = less."
+    ),
+    list(
+        element = "a.nav-link[data-value='Nutrition'], a.nav-link[data-value='Nutrition change'], a[data-value='Nutrition'], a[data-value='Nutrition change']",
+        title   = "Nutrition",
+        intro   = "Change in nutrient availability from the catch (e.g., protein, omega‑3) relative to the baseline."
+    ),
+    list(
+        element = "a.nav-link[data-value='Length'], a[data-value='Length']",
+        title   = "Catch size composition",
+        intro   = "How the size distribution of the catch shifts under the strategy. Total area reflects total yield."
+    ),
+    list(
+        element = "a.nav-link[data-value='Guild'], a[data-value='Guild']",
+        title   = "Feeding guilds",
+        intro   = "Aggregate responses by feeding guild to see community‑level trade‑offs."
+    ),
+
+    # ============================
+    # PAGE FOOTER CONTROL
+    # ============================
+    list(
+        # For materialSwitch, the input (checkbox) is visible and reliable in your build.
+        # Using the input id itself gives the guide a solid anchor next to the toggle.
+        element = "input[type='checkbox'][id$='fishy_intermediate_toggle'], [for$='fishy_intermediate_toggle']",
+        title   = "Show intermediate years",
+        intro   = "Add ¼ and ½ time points (between model start and the selected end year) to show the trajectory, not just the end result. Under the baseline strategy, Biomass and Yield will be the same height at each time point"
+    ),
+
+    # ============================
+    # BASELINE
+    # ============================
+    list(
+        element = ".baseline-definition, [id$='baselineDefinition'], [id$='whatIsBaseline']",
+        title   = "What is the baseline?",
+        intro   = "Baseline = the default parameter with all gears at initial effort (i.e. effort = 1). All % changes are calculated relative to this baseline."
+    )
 )

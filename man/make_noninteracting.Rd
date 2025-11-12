@@ -18,3 +18,4 @@ encounter to the external encounter and then sets the interaction matrix to
 zero and switches off the interaction with the resource, so that the model
 becomes non-interacting.
 }
+\keyword{internal}
