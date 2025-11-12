@@ -76,9 +76,9 @@ On = interacting community (species affect one another). \
 Off = non‑interacting (each species projects independently)."
 
 legends$tab_fishery_strategy <-
-    "Configure fishing strategies, adjust species-specific controls, and compare outcomes between simulation setups."
+    "Explore how different fishing strategies change the modelled community over time. ."
 legends$tab_species_role <-
-    "Explore how species contribute to the ecosystem under different scenarios, including biomass, guild, diet, and size effects."
+    "Explore how species contribute to the ecosystem by studying the effect of changing their initial abundance or their mortality rate."
 legends$page_guide_button <-
     "Launch a short, page-specific walkthrough explaining the main controls and plots."
 
