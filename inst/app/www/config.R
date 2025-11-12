@@ -8,6 +8,6 @@ config <- list(
     layout    = c("area1 area0"),
     row_sizes = c("1fr"),
     # The following minimum widths are chose so that all tabs fit.
-    col_sizes = c("minmax(220px, 0.2fr)", "minmax(780px, 0.8fr)"),
+    col_sizes = c("minmax(272px, 0.2fr)", "minmax(785px, 0.8fr)"),
     gap_size  = "10px"
 )
