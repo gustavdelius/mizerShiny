@@ -31,13 +31,13 @@ This baseline strategy can be returned to by setting all effort sliders to a val
         # Tab pill for Strategy 2
         element = "a.nav-link[data-value='Strategy 2'], a[data-value='Strategy 2']",
         title   = "Strategy 2",
-        intro   = "Configure a second strategy so you can compare Strategy 1 and Strategy 2, or examine a second strategy in isolation without altering the first."
+        intro   = "Configure a second strategy so you can compare Strategy 1 and Strategy 2."
     ),
     list(
         # Radio group: Show Strategy 1 / Strategy 2 / Both
         element = "[id$='sim_choice']",
         title   = "Show which strategies?",
-        intro   = "Choose to display Strategy 1, Strategy 2, or Both together."
+        intro   = "Choose to display Strategy 1, Strategy 2, or both together."
     ),
 
     # ============================
@@ -48,18 +48,24 @@ This baseline strategy can be returned to by setting all effort sliders to a val
         element = "[for$='multispeciesToggle'], [id$='multispeciesToggle']",
         title   = "Multispecies effects",
         intro   = "Use to enable or disable predation between (and within) each species.
-        Effectively, this allows you to examine the differences between a series of calibrated single-species models and a fully interacting multispecies community. "
+        This allows you to examine the differences between a set of single-species models, and a fully interacting multispecies model."
     ),
     list(
         element = "[id$='fishyyear']",
         title   = "Time range",
-        intro   = "Sets the end year used in plots. If “Show intermediate years” is on, charts also include the ¼ and ½ points from model start to this year."
+        intro   = "Sets the number of years to project the chosen strategy/stragies forward. Under the baseline scenario biomasses and yields will not change as the system is an unchanging (steady) state. If “Show intermediate years” is on, plots also include the ¼ and ½ intervals from model start to the projected year."
     ),
-    list(
-        element = "[id$='incYear_fish']",
-        title   = "+1 year",
-        intro   = "Step the selected end year forward by one."
-    ),
+
+#    list(
+#        element = "[id$='decYear_fish']",
+#        title   = "-1 year",
+#        intro   = "Step the selected end year backward by one for finer control."
+#    ),
+#    list(
+#        element = "[id$='incYear_fish']",
+#        title   = "+1 year",
+#        intro   = "Step the selected end year forward by one for finer control."
+#    ),
 
     # ============================
     # PLOT TABS (as visible in your UI)
@@ -67,37 +73,37 @@ This baseline strategy can be returned to by setting all effort sliders to a val
     list(
         element = "a.nav-link[data-value='Biomass'], a[data-value='Biomass']",
         title   = "Biomass",
-        intro   = "Species biomass under the selected fishing strategy. Use the legend to focus on species; adjust the time range to see how outcomes evolve."
+        intro   = "This tab plots the total biomass of each species under the selected fishing strategy/strategies. Baseline and final year biomasses are plotted, with the option to display intermediate years."
     ),
     list(
         element = "a.nav-link[data-value='Biomass % Change'], a[data-value='Biomass % Change']",
         title   = "Biomass % change",
-        intro   = "Change relative to the baseline (uploaded model). When “Show intermediate years” is on, shading shows earlier→later time points."
+        intro   = "Change in biomass relative to the baseline. Useful when changes in biomass are difficult to observe due to axis scaling."
     ),
     list(
         element = "a.nav-link[data-value='Yield'], a[data-value='Yield']",
         title   = "Yield",
-        intro   = "Catch by species and gear under the selected strategy. Use Gear and Species filters to drill down."
+        intro   = "This tab plots the total yield of each species under the selected fishing strategy/strategies. Colour denotes gear category. Baseline and final year biomasses are plotted, with the option to display intermediate years."
     ),
     list(
         element = "a.nav-link[data-value='Yield % Change'], a[data-value='Yield % Change']",
         title   = "Yield % change",
-        intro   = "Change in catch relative to the baseline (uploaded model). Positive = more catch; negative = less."
+        intro   = "Change in yield relative to the baseline. Useful when changes in yield are difficult to observe due to axis scaling."
     ),
     list(
         element = "a.nav-link[data-value='Nutrition'], a.nav-link[data-value='Nutrition change'], a[data-value='Nutrition'], a[data-value='Nutrition change']",
         title   = "Nutrition",
-        intro   = "Change in nutrient availability from the catch (e.g., protein, omega‑3) relative to the baseline."
+        intro   = "This tab plots the % change in the nutrient content of the yield compared to the baseline."
     ),
     list(
         element = "a.nav-link[data-value='Length'], a[data-value='Length']",
         title   = "Catch size composition",
-        intro   = "How the size distribution of the catch shifts under the strategy. Total area reflects total yield."
+        intro   = "This tab plots the size distribution of each landed species . If Stategy 1 and/or 2 are defined, their distributions are also plotted and scale with the total yield."
     ),
     list(
         element = "a.nav-link[data-value='Guild'], a[data-value='Guild']",
         title   = "Feeding guilds",
-        intro   = "Aggregate responses by feeding guild to see community‑level trade‑offs."
+        intro   = "This tab visualises the relative biomass change in each of four feeding guilds, defined by both species and size. For example, small hake tend to be planktivores, large hake tend to be piscivores"
     ),
 
     # ============================
@@ -108,7 +114,7 @@ This baseline strategy can be returned to by setting all effort sliders to a val
         # Using the input id itself gives the guide a solid anchor next to the toggle.
         element = "input[type='checkbox'][id$='fishy_intermediate_toggle'], [for$='fishy_intermediate_toggle']",
         title   = "Show intermediate years",
-        intro   = "Add ¼ and ½ time points (between model start and the selected end year) to show the trajectory, not just the end result. Under the baseline strategy, Biomass and Yield will be the same height at each time point"
+        intro   = "Add ¼ and ½ time intervals (between the baseline and the final year) to show the trajectory of the community, not just the final year result. Under the baseline strategy, Biomass and Yield will be the same height at each time point, "
     )
 
 )

@@ -1,10 +1,10 @@
 legends <- list(
   role_biomass =
-    "Change in biomass of each species at specific time points. The X axis shows \
+    "Change in biomass of each species at specific time intervals. The X axis shows \
 the species and the Y axis is the percentage change in its biomass compared \
 with the base simulation. Each species has three bars representing biomass at \
 quarter, half and full of the selected year. Red/blue indicate direction; bright &rarr; dark shows \
-quarter/half/full time points.",
+quarter/half/full time intervals.",
   role_size = # Will also be used for fishery_size
     "Change in the community size spectrum in comparison to the base \
 simulation. The community size spectrum is the biomass of all species in the \
@@ -14,7 +14,7 @@ X&nbsp;axis from log-scale to linear.",
   role_guild = # Will also be used for fishery_guild
     "Percentage change in biomass by feeding guild relative to the baseline strategy. Feeding guilds
 group fish by diet and life stage.\
- X axis is the guild, Y is the % change. Shading distinguishes earlier → later time points when “Intermediate years” is on. ",
+ X axis is the guild, Y is the % change. Shading distinguishes earlier → later time intervals when “Intermediate years” is on. ",
   role_diet = # Will also be used for fishery_diet
       "Diet composition of a selected fish across its size range. X axis is the \
     size of fish, Y axis is the proportion of diet of a prey species. Colour \
@@ -43,9 +43,9 @@ the simulation that models plankton."
 
 # --- Toggle help  ---
 legends$role_show_intermediate_years <-
-    "When on, each chart shows three time points for every species/guild: \
-¼ and ½ of the span from the model start to the selected end year, plus the end-year value. \
-Turn off to show only the end-year value."
+    "When on, each chart shows three time intervals for every species/guild: \
+¼ and ½ of the span from the model start to the selected end year, plus the final year. \
+Turn off to show only the final year."
 
 legends$role_log <-
     "Switch the body-size axis between logarithmic and linear scaling."
@@ -55,7 +55,7 @@ legends$role_time_range <-
     "Set the end of the simulation period used in plots. Drag the slider to choose the end year; use “–1 year” / “+1 year” to step by one year."
 
 legends$fishery_show_intermediate_years <-
-    "When on, each bar chart shows three time points for every species/guild: \
+    "When on, each bar chart shows three time intervals for every species/guild: \
 ¼ and ½ of the span from the model start to the selected end year, plus the end-year value. \
 Turn off to show only the end-year value."
 
@@ -83,19 +83,19 @@ legends$page_guide_button <-
     "Launch a short, page-specific walkthrough explaining the main controls and plots."
 
 legends$fishery_biomass <-
-    "Absolute biomass by species for the selected fishing strategy (default is baseline). X: species; Y: biomass. Shading distinguishes earlier → later time points."
+    "Total biomass by species for the selected fishing strategy (default is baseline). X: species; Y: biomass. Shading distinguishes earlier → later time intervals."
 
 legends$fishery_biomass_change <-
     "Percentage change in species biomass under the selected fishing strategy \
-relative to the baseline strategy at selected time points (¼, ½, end of period). \
- X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points.
-Shading indicates earlier→later time points when “Intermediate years” is on."
+relative to the baseline strategy at selected time intervals (¼, ½, end of period). \
+ X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time intervals.
+Shading indicates earlier→later time intervals when “Intermediate years” is on."
 
 legends$fishery_yield <-
-    "Absolute yield by species for the selected fishing strategy (default is baseline), broken down by fishing gear. X: species; Y: yield. Shading distinguishes earlier → later time points when “Intermediate years” is on."
+    "Total yield by species for the selected fishing strategy (default is baseline), broken down by fishing gear. X: species; Y: yield. Shading distinguishes earlier → later time intervals when “Intermediate years” is on."
 
 legends$fishery_yield_change <-
-    "Yield % change by species relative to the baseline strategy at selected time points (¼, ½, end of period). X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time points when “Intermediate years” is on."
+    "Yield % change by species relative to the baseline strategy at selected time intervals (¼, ½, final year). X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time intervals when “Intermediate years” is on."
 
 legends$fishery_length <-
     "Size (length) composition of the catch. Area under the curve reflects the total yield."
@@ -106,7 +106,7 @@ legends$fishery_size    <- legends$role_size
 legends$fishery_diet    <- legends$role_diet
 
 legends$species_order_help <-
-    "Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot;, &quot;Size&quot; and &quot;Guild&quot;. Click the &quot;customise&quot; button to change the custom order."
+    "Select how you want the species to be ordered on the axis. Options include &quot;Custom&quot; and &quot;Size&quot;. Click the &quot;customise&quot; button to change the custom order."
 
 legends$role_biomass_slider <-
     "Sets the % change to the starting biomass of the selected species. \
