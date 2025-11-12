@@ -112,7 +112,7 @@ This baseline strategy can be returned to by setting all effort sliders to a val
     list(
         # For materialSwitch, the input (checkbox) is visible and reliable in your build.
         # Using the input id itself gives the guide a solid anchor next to the toggle.
-        element = "input[type='checkbox'][id$='fishy_intermediate_toggle'], [for$='fishy_intermediate_toggle']",
+        element = "input[type='checkbox'][id$='triplotToggleFish'], [for$='triplotToggleFish']",
         title   = "Show intermediate years",
         intro   = "Add ¼ and ½ time intervals (between the baseline and the final year) to show the trajectory of the community, not just the final year result. Under the baseline strategy, Biomass and Yield will be the same height at each time point, "
     )

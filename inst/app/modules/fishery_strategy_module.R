@@ -77,6 +77,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
         tabsetPanel(
           tabPanel(
             title = "Strategy 1",
+            value = "Strategy 1",
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui")))
           ),
           tabPanel(
@@ -88,6 +89,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
               `data-bs-html` = "true",
               `data-bs-content` = as.character(legends$fishery_slider_tabs)
             ),
+            value = "Strategy 2",
             div(id = "fishery_sliders", uiOutput(ns("fishery_sliders_ui2")))
           )
         ) |>
