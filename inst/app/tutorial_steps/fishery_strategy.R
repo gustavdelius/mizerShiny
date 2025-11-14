@@ -15,7 +15,7 @@ Investigate one strategy or compare two side-by-side, and see the effects of cha
         element = ".baseline-definition, [id$='baselineDefinition'], [id$='whatIsBaseline']",
         title   = "The baseline strategy",
         intro   = "The baseline against which relative changes are compared to is the uploaded mizer model called with mizerShiny(), or the default Celtic Sea model if no model is provided.
-This baseline strategy can be returned to by setting all effort sliders to a value of 1, or pressing the reset button."
+All percentage changes in the app are calculated relative to this baseline, not to the initial yield after you move the effort sliders. You can return to the baseline strategy by setting all effort sliders to 1 or pressing Reset."
     ),
 
     # ============================
@@ -53,7 +53,7 @@ This baseline strategy can be returned to by setting all effort sliders to a val
     list(
         element = "[id$='fishyyear']",
         title   = "Time range",
-        intro   = "Sets the number of years to project the chosen strategy/stragies forward. Under the baseline scenario biomasses and yields will not change as the system is an unchanging (steady) state. If “Show intermediate years” is on, plots also include the ¼ and ½ intervals from model start to the projected year."
+        intro   = "Sets the number of years to project the chosen strategy/strategies forward. Under the baseline scenario biomasses and yields will not change as the system is an unchanging (steady) state. If “Show intermediate years” is on, plots also include the ¼ and ½ intervals from model start to the projected year."
     ),
 
 #    list(
@@ -73,7 +73,7 @@ This baseline strategy can be returned to by setting all effort sliders to a val
     list(
         element = "a.nav-link[data-value='Biomass'], a[data-value='Biomass']",
         title   = "Biomass",
-        intro   = "This tab plots the total biomass of each species under the selected fishing strategy/strategies. Baseline and final year biomasses are plotted, with the option to display intermediate years."
+        intro   = "This tab plots the total biomass of each species at the initial, intermediate (if shown), and final years for the selected fishing strategy/strategies. Baseline and final year biomasses are plotted."
     ),
     list(
         element = "a.nav-link[data-value='Biomass % Change'], a[data-value='Biomass % Change']",
@@ -83,12 +83,12 @@ This baseline strategy can be returned to by setting all effort sliders to a val
     list(
         element = "a.nav-link[data-value='Yield'], a[data-value='Yield']",
         title   = "Yield",
-        intro   = "This tab plots the total yield of each species under the selected fishing strategy/strategies. Colour denotes gear category. Baseline and final year biomasses are plotted, with the option to display intermediate years."
+        intro   = "This tab plots the total yield of each species at the initial, intermediate (if shown), and final years for the selected fishing strategy/strategies. The first bar is the yield at the start of the scenario after changing effort, not the baseline yield. Colour denotes gear category."
     ),
     list(
         element = "a.nav-link[data-value='Yield % Change'], a[data-value='Yield % Change']",
         title   = "Yield % change",
-        intro   = "Change in yield relative to the baseline. Useful when changes in yield are difficult to observe due to axis scaling."
+        intro   = "Change in yield relative to the baseline. Bars show how much higher or lower simulated yield is at the plotted time intervals compared with the baseline. Useful when changes in yield are difficult to observe due to axis scaling."
     ),
     list(
         element = "a.nav-link[data-value='Nutrition'], a.nav-link[data-value='Nutrition change'], a[data-value='Nutrition'], a[data-value='Nutrition change']",

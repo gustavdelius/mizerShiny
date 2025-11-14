@@ -92,7 +92,7 @@ relative to the baseline strategy at selected time intervals (¼, ½, end of per
 Shading indicates earlier→later time intervals when “Intermediate years” is on."
 
 legends$fishery_yield <-
-    "Total yield by species for the selected fishing strategy (default is baseline), broken down by fishing gear. X: species; Y: yield. Shading distinguishes earlier → later time intervals when “Intermediate years” is on."
+    "Total yield by species for the selected fishing strategy (default is baseline), broken down by fishing gear. The bars show yields under the selected strategy; the baseline yield is not shown here. X: species; Y: yield. Shading distinguishes earlier → later time intervals when “Intermediate years” is on."
 
 legends$fishery_yield_change <-
     "Yield % change by species relative to the baseline strategy at selected time intervals (¼, ½, final year). X: species; Y: % change. Red = decrease; blue = increase; shading indicates earlier → later time intervals when “Intermediate years” is on."
