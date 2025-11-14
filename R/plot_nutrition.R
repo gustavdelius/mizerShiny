@@ -9,6 +9,49 @@
 #' @param steps Integer time indices to evaluate (can be a range)
 #' @return Named vector of nutrient totals
 #' @keywords internal
+#'
+# Alter nutrient column names to be more readable and drop unwanted nutrients in csv (e.g., due to 0 content in assemblage - change if required)
+normalise_nutrition_cols <- function(nutrition) {
+    upper_names <- toupper(names(nutrition))
+
+    # Columns we want to drop entirely (e.g. all-zero Vitamin D2)
+    drop_targets <- c("D2_ERGCAL", "D2 ERGCAL", "D2 ERGCAL(MCG)")
+    keep_idx <- !upper_names %in% toupper(drop_targets)
+    nutrition <- nutrition[, keep_idx, drop = FALSE]
+    upper_names <- toupper(names(nutrition))  # refresh after dropping
+
+    # Map from UPPERCASE column names to nice labels
+    name_map <- c(
+        "SELENIUM"    = "Selenium",
+        "ZINC"        = "Zinc",
+        "OMEGA_3"     = "Omega-3",
+        "CALCIUM"     = "Calcium",
+        "IRON"        = "Iron",
+        "VITAMIN_A"   = "Vitamin A",
+        "VITAMIN A"   = "Vitamin A",
+        "VITAMIN_D"   = "Vitamin D",
+        "VITAMIN D"   = "Vitamin D",
+        "D3_CHOCAL"   = "Vitamin D3",
+        "D3 CHOCAL"   = "Vitamin D3",
+        "FOLATE"      = "Folate",
+        "VITAMIN_B12" = "Vitamin B12",
+        "VITAMIN B12" = "Vitamin B12",
+        "IODINE"      = "Iodine"
+    )
+
+    # Rename any columns that appear in the map (leave "species" alone)
+    for (i in seq_along(upper_names)) {
+        u <- upper_names[i]
+        if (!identical(names(nutrition)[i], "species") && u %in% names(name_map)) {
+            names(nutrition)[i] <- name_map[[u]]
+        }
+    }
+
+    nutrition
+}
+
+
+
 calc_nutrition_totals <- function(nutrition, sim, steps) {
   nut_cols <- setdiff(names(nutrition), "species")
   y <- getYield(sim)
@@ -39,7 +82,8 @@ process_nutrition_change <- function(nutrition,
                                      harvestedprojection, sim_0,
                                      chosenyear, mode = c("triple", "chosen")) {
   mode <- match.arg(mode)
-  nut_cols <- setdiff(names(nutrition), "species")
+  nutrition <- normalise_nutrition_cols(nutrition)
+    nut_cols <- setdiff(names(nutrition), "species")
 
   quarter_year <- max(1, ceiling(chosenyear * 0.25))
   half_year    <- max(1, ceiling(chosenyear * 0.5))
@@ -208,11 +252,13 @@ plotNutritionChange2 <- function(nutrition,
 #' @return A ggplot object
 #' @keywords internal
 plotNutrition <- function(nutrition, sims, ref, step) {
-  nut_cols <- setdiff(names(nutrition), "species")
+    # Normalise labels and drop unused nutrients (e.g. Vitamin D2)
+    nutrition <- normalise_nutrition_cols(nutrition)
+    nut_cols  <- setdiff(names(nutrition), "species")
 
-  tot_nuts <- function(sim) {
-    calc_nutrition_totals(nutrition, sim, step)
-  }
+    tot_nuts <- function(sim) {
+        calc_nutrition_totals(nutrition, sim, step)
+    }
 
   ref_tot  <- tot_nuts(ref)[nut_cols]
   sim_tots  <- lapply(sims, tot_nuts)
