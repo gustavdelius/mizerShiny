@@ -52,18 +52,29 @@ normalise_nutrition_cols <- function(nutrition) {
 
 
 
-calc_nutrition_totals <- function(nutrition, sim, steps) {
-  nut_cols <- setdiff(names(nutrition), "species")
-  y <- getYield(sim)
-  yield_df <- tibble(
-    species   = colnames(y),
-    Yield = colMeans(y[steps, , drop = FALSE])
-  )
-  yield_df |>
-    dplyr::left_join(nutrition,  by = "species") |>
-    dplyr::mutate(dplyr::across(dplyr::all_of(nut_cols), ~ .x * Yield)) |>
-    dplyr::summarise(dplyr::across(dplyr::all_of(nut_cols), ~ sum(.x, na.rm = TRUE))) |>
-    unlist(use.names = TRUE)
+calc_nutrition_totals <- function(nutrition, sim, steps, return_yield = FALSE) {
+    nut_cols <- setdiff(names(nutrition), "species")
+    y <- getYield(sim)
+
+    yield_df <- tibble(
+        species = colnames(y),
+        Yield   = colMeans(y[steps, , drop = FALSE])
+    )
+
+    joined <- yield_df |>
+        dplyr::left_join(nutrition, by = "species")
+
+    nut_vec <- joined |>
+        dplyr::mutate(dplyr::across(dplyr::all_of(nut_cols), ~ .x * Yield)) |>
+        dplyr::summarise(dplyr::across(dplyr::all_of(nut_cols), ~ sum(.x, na.rm = TRUE))) |>
+        unlist(use.names = TRUE)
+
+    if (isTRUE(return_yield)) {
+        total_yield <- sum(joined$Yield, na.rm = TRUE)
+        return(list(nutrients = nut_vec, total_yield = total_yield))
+    } else {
+        return(nut_vec)
+    }
 }
 
 #' Shared processing for nutrition change plots
@@ -80,88 +91,132 @@ calc_nutrition_totals <- function(nutrition, sim, steps) {
 #' @keywords internal
 process_nutrition_change <- function(nutrition,
                                      harvestedprojection, sim_0,
-                                     chosenyear, mode = c("triple", "chosen")) {
-  mode <- match.arg(mode)
-  nutrition <- normalise_nutrition_cols(nutrition)
-    nut_cols <- setdiff(names(nutrition), "species")
+                                     chosenyear,
+                                     mode      = c("triple", "chosen"),
+                                     normalise = c("total", "per_yield")) {
+    mode      <- match.arg(mode)
+    normalise <- match.arg(normalise)
 
-  quarter_year <- max(1, ceiling(chosenyear * 0.25))
-  half_year    <- max(1, ceiling(chosenyear * 0.5))
-  full_year    <- chosenyear
+    nutrition <- normalise_nutrition_cols(nutrition)
+    nut_cols  <- setdiff(names(nutrition), "species")
 
-  # Calculate nutrition totals for full year
-  unharvested_nut_full <- calc_nutrition_totals(nutrition, sim_0, full_year)
-  harvested_nut_full <- calc_nutrition_totals(nutrition,
-                                              harvestedprojection, full_year)
+    quarter_year <- max(1, ceiling(chosenyear * 0.25))
+    half_year    <- max(1, ceiling(chosenyear * 0.5))
+    full_year    <- chosenyear
 
-  percentage_diff_full <- tibble(
-    Nutrient = nut_cols,
-    unharvested_value = unharvested_nut_full[nut_cols],
-    harvested_value = harvested_nut_full[nut_cols]
-  ) |>
-    dplyr::mutate(
-      percentage_diff = ifelse(unharvested_value == 0,
-                               ifelse(harvested_value == 0, 0, Inf),
-                               ((harvested_value - unharvested_value) / unharvested_value) * 100),
-      class = "full"
+    ## ---- FULL YEAR ----
+    if (normalise == "total") {
+        unharvested_nut_full <- calc_nutrition_totals(nutrition, sim_0, full_year)
+        harvested_nut_full   <- calc_nutrition_totals(nutrition, harvestedprojection, full_year)
+    } else {
+        u_full <- calc_nutrition_totals(nutrition, sim_0, full_year, return_yield = TRUE)
+        h_full <- calc_nutrition_totals(nutrition, harvestedprojection, full_year, return_yield = TRUE)
+
+        unharvested_nut_full <- u_full$nutrients / u_full$total_yield
+        harvested_nut_full   <- h_full$nutrients / h_full$total_yield
+    }
+
+    percentage_diff_full <- tibble(
+        Nutrient          = nut_cols,
+        unharvested_value = unharvested_nut_full[nut_cols],
+        harvested_value   = harvested_nut_full[nut_cols]
     ) |>
-    dplyr::select(Nutrient, percentage_diff, class) |>
-    dplyr::filter(!is.na(percentage_diff))
+        dplyr::mutate(
+            percentage_diff = ifelse(
+                unharvested_value == 0,
+                ifelse(harvested_value == 0, 0, Inf),
+                ((harvested_value - unharvested_value) / unharvested_value) * 100
+            ),
+            class = "full"
+        ) |>
+        dplyr::select(Nutrient, percentage_diff, class) |>
+        dplyr::filter(!is.na(percentage_diff))
 
-  if (mode == "triple") {
-    # Calculate nutrition totals for quarter year
-    unharvested_nut_quarter <- calc_nutrition_totals(nutrition, sim_0, quarter_year)
-    harvested_nut_quarter <- calc_nutrition_totals(nutrition, harvestedprojection, quarter_year)
+    ## ---- QUARTER & HALF (if triple mode) ----
+    if (mode == "triple") {
 
-    percentage_diff_quarter <- tibble(
-      Nutrient = nut_cols,
-      unharvested_value = unharvested_nut_quarter[nut_cols],
-      harvested_value = harvested_nut_quarter[nut_cols]
-    ) |>
-      dplyr::mutate(
-        percentage_diff = ifelse(unharvested_value == 0,
-                                 ifelse(harvested_value == 0, 0, Inf),
-                                 ((harvested_value - unharvested_value) / unharvested_value) * 100),
-        class = "quarter"
-      ) |>
-      dplyr::select(Nutrient, percentage_diff, class) |>
-      dplyr::filter(!is.na(percentage_diff))
+        # Quarter year
+        if (normalise == "total") {
+            unharvested_nut_quarter <- calc_nutrition_totals(nutrition, sim_0, quarter_year)
+            harvested_nut_quarter   <- calc_nutrition_totals(nutrition, harvestedprojection, quarter_year)
+        } else {
+            u_quarter <- calc_nutrition_totals(nutrition, sim_0, quarter_year, return_yield = TRUE)
+            h_quarter <- calc_nutrition_totals(nutrition, harvestedprojection, quarter_year, return_yield = TRUE)
 
-    # Calculate nutrition totals for half year
-    unharvested_nut_half <- calc_nutrition_totals(nutrition, sim_0, half_year)
-    harvested_nut_half <- calc_nutrition_totals(nutrition, harvestedprojection, half_year)
+            unharvested_nut_quarter <- u_quarter$nutrients / u_quarter$total_yield
+            harvested_nut_quarter   <- h_quarter$nutrients / h_quarter$total_yield
+        }
 
-    percentage_diff_half <- tibble(
-      Nutrient = nut_cols,
-      unharvested_value = unharvested_nut_half[nut_cols],
-      harvested_value = harvested_nut_half[nut_cols]
-    ) |>
-      dplyr::mutate(
-        percentage_diff = ifelse(unharvested_value == 0,
-                                 ifelse(harvested_value == 0, 0, Inf),
-                                 ((harvested_value - unharvested_value) / unharvested_value) * 100),
-        class = "half"
-      ) |>
-      dplyr::select(Nutrient, percentage_diff, class) |>
-      dplyr::filter(!is.na(percentage_diff))
+        percentage_diff_quarter <- tibble(
+            Nutrient          = nut_cols,
+            unharvested_value = unharvested_nut_quarter[nut_cols],
+            harvested_value   = harvested_nut_quarter[nut_cols]
+        ) |>
+            dplyr::mutate(
+                percentage_diff = ifelse(
+                    unharvested_value == 0,
+                    ifelse(harvested_value == 0, 0, Inf),
+                    ((harvested_value - unharvested_value) / unharvested_value) * 100
+                ),
+                class = "quarter"
+            ) |>
+            dplyr::select(Nutrient, percentage_diff, class) |>
+            dplyr::filter(!is.na(percentage_diff))
 
-    plot_data <- dplyr::bind_rows(percentage_diff_quarter, percentage_diff_half, percentage_diff_full)
-  } else {
-    plot_data <- percentage_diff_full
-  }
+        # Half year
+        if (normalise == "total") {
+            unharvested_nut_half <- calc_nutrition_totals(nutrition, sim_0, half_year)
+            harvested_nut_half   <- calc_nutrition_totals(nutrition, harvestedprojection, half_year)
+        } else {
+            u_half <- calc_nutrition_totals(nutrition, sim_0, half_year, return_yield = TRUE)
+            h_half <- calc_nutrition_totals(nutrition, harvestedprojection, half_year, return_yield = TRUE)
 
-  plot_data$class <- factor(plot_data$class, levels = c("quarter", "half", "full"))
-  plot_data$fill_group <- interaction(plot_data$percentage_diff >= 0, plot_data$class)
-  plot_data$fill_group <- factor(
-    plot_data$fill_group,
-    levels = c("FALSE.quarter", "TRUE.quarter",
-               "FALSE.half", "TRUE.half",
-               "FALSE.full", "TRUE.full"),
-    labels = c("Quarter, Negative", "Quarter, Positive",
-               "Half, Negative", "Half, Positive",
-               "Full, Negative", "Full, Positive")
-  )
-  plot_data
+            unharvested_nut_half <- u_half$nutrients / u_half$total_yield
+            harvested_nut_half   <- h_half$nutrients / h_half$total_yield
+        }
+
+        percentage_diff_half <- tibble(
+            Nutrient          = nut_cols,
+            unharvested_value = unharvested_nut_half[nut_cols],
+            harvested_value   = harvested_nut_half[nut_cols]
+        ) |>
+            dplyr::mutate(
+                percentage_diff = ifelse(
+                    unharvested_value == 0,
+                    ifelse(harvested_value == 0, 0, Inf),
+                    ((harvested_value - unharvested_value) / unharvested_value) * 100
+                ),
+                class = "half"
+            ) |>
+            dplyr::select(Nutrient, percentage_diff, class) |>
+            dplyr::filter(!is.na(percentage_diff))
+
+        # Combine all three time slices
+        plot_data <- dplyr::bind_rows(
+            percentage_diff_quarter,
+            percentage_diff_half,
+            percentage_diff_full
+        )
+
+    } else {
+        # Only full-year slice
+        plot_data <- percentage_diff_full
+    }
+
+    # Common factor / fill handling
+    plot_data$class <- factor(plot_data$class, levels = c("quarter", "half", "full"))
+    plot_data$fill_group <- interaction(plot_data$percentage_diff >= 0, plot_data$class)
+    plot_data$fill_group <- factor(
+        plot_data$fill_group,
+        levels = c("FALSE.quarter", "TRUE.quarter",
+                   "FALSE.half",    "TRUE.half",
+                   "FALSE.full",    "TRUE.full"),
+        labels = c("Quarter, Negative", "Quarter, Positive",
+                   "Half, Negative",    "Half, Positive",
+                   "Full, Negative",    "Full, Positive")
+    )
+
+    plot_data
 }
 
 #' Plot nutrition change at selected times
@@ -172,30 +227,46 @@ process_nutrition_change <- function(nutrition,
 #' @inheritParams process_nutrition_change
 #' @return A ggplot object
 #' @keywords internal
-plotNutritionChange <- function(nutrition, harvestedprojection,
-                                sim_0, chosenyear,
-                                 mode = c("triple", "chosen")) {
-  mode <- match.arg(mode)
-  percentage_diff <- process_nutrition_change(nutrition,
-                                              harvestedprojection, sim_0,
-                                              chosenyear, mode)
-  percentage_diff$Percentage <- percentage_diff$percentage_diff
-  percentage_diff$Class      <- percentage_diff$fill_group
+    plotNutritionChange <- function(nutrition, harvestedprojection,
+                                    sim_0, chosenyear,
+                                    mode      = c("triple", "chosen"),
+                                    normalise = c("total", "per_yield")) {
+        mode      <- match.arg(mode)
+        normalise <- match.arg(normalise)
 
-  ggplot2::ggplot(percentage_diff, ggplot2::aes(x = Nutrient, y = Percentage, fill = Class)) +
-    ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
-    ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
-    ggplot2::labs(x = "Nutrient", y = "Nutrition % Change") +
-    ggplot2::scale_fill_manual(values = change_colours()) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(
-      axis.text.x   = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
-      axis.text.y   = ggplot2::element_text(size = 14),
-      legend.position = "none",
-      axis.title.x  = ggplot2::element_text(size = 16),
-      axis.title.y  = ggplot2::element_text(size = 16)
-    )
-}
+        percentage_diff <- process_nutrition_change(
+            nutrition,
+            harvestedprojection, sim_0,
+            chosenyear,
+            mode      = mode,
+            normalise = normalise
+        )
+
+        percentage_diff$Percentage <- percentage_diff$percentage_diff
+        percentage_diff$Class      <- percentage_diff$fill_group
+
+        y_lab <- if (normalise == "total") {
+            "Nutrition % Change (total landed)"
+        } else {
+            "Nutrition % Change (per tonne of yield)"
+        }
+
+        ggplot2::ggplot(percentage_diff,
+                        ggplot2::aes(x = Nutrient, y = Percentage, fill = Class)) +
+            ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
+            ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
+            ggplot2::labs(x = "Nutrient", y = y_lab) +
+            ggplot2::scale_fill_manual(values = change_colours()) +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(
+                axis.text.x   = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
+                axis.text.y   = ggplot2::element_text(size = 14),
+                legend.position = "none",
+                axis.title.x  = ggplot2::element_text(size = 16),
+                axis.title.y  = ggplot2::element_text(size = 16)
+            )
+    }
+
 
 #' Plot nutrition change for two simulations
 #'
@@ -210,34 +281,57 @@ plotNutritionChange <- function(nutrition, harvestedprojection,
 #' @param mode Either "triple" or "chosen"
 #' @return A ggplot object
 #' @keywords internal
-plotNutritionChange2 <- function(nutrition,
-                                 harvestedprojection1, harvestedprojection2,
-                                 sim_0, chosenyear,
-                                 mode = c("triple", "chosen")) {
-  mode <- match.arg(mode)
-  df1 <- process_nutrition_change(nutrition,
-                                  harvestedprojection1, sim_0, chosenyear, mode)
-  df2 <- process_nutrition_change(nutrition,
-                                  harvestedprojection2, sim_0, chosenyear, mode)
+    plotNutritionChange2 <- function(nutrition,
+                                     harvestedprojection1, harvestedprojection2,
+                                     sim_0, chosenyear,
+                                     mode      = c("triple", "chosen"),
+                                     normalise = c("total", "per_yield")) {
+        mode      <- match.arg(mode)
+        normalise <- match.arg(normalise)
 
-  df1$sim <- "Strategy 1"
-  df2$sim <- "Strategy 2"
-  plot_df <- dplyr::bind_rows(df1, df2)
+        df1 <- process_nutrition_change(
+            nutrition,
+            harvestedprojection1, sim_0,
+            chosenyear,
+            mode      = mode,
+            normalise = normalise
+        )
+        df2 <- process_nutrition_change(
+            nutrition,
+            harvestedprojection2, sim_0,
+            chosenyear,
+            mode      = mode,
+            normalise = normalise
+        )
 
-  ggplot2::ggplot(plot_df, ggplot2::aes(x = Nutrient, y = percentage_diff, fill = fill_group)) +
-    ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
-    ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
-    ggplot2::labs(x = "Nutrient", y = "Nutrition % Change") +
-    ggplot2::scale_fill_manual(values = change_colours()) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
-                   axis.text.y = ggplot2::element_text(size = 14),
-                   legend.position = "none",
-                   axis.title.x = ggplot2::element_text(size = 16),
-                   axis.title.y = ggplot2::element_text(size = 16),
-                   panel.spacing.y = grid::unit(2, "lines")) +
-    ggplot2::facet_wrap(~ sim, nrow = 2)
-}
+        df1$sim <- "Strategy 1"
+        df2$sim <- "Strategy 2"
+        plot_df <- dplyr::bind_rows(df1, df2)
+
+        y_lab <- if (normalise == "total") {
+            "Nutrition % Change (total landed)"
+        } else {
+            "Nutrition % Change (per tonne of yield)"
+        }
+
+        ggplot2::ggplot(plot_df,
+                        ggplot2::aes(x = Nutrient, y = percentage_diff, fill = fill_group)) +
+            ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(width = 0.9)) +
+            ggplot2::geom_hline(yintercept = 0, color = "grey", linetype = "dashed", linewidth = 0.5) +
+            ggplot2::labs(x = "Nutrient", y = y_lab) +
+            ggplot2::scale_fill_manual(values = change_colours()) +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(
+                axis.text.x = ggplot2::element_text(size = 13, angle = 45, hjust = 1, vjust = 0.5),
+                axis.text.y = ggplot2::element_text(size = 14),
+                legend.position = "none",
+                axis.title.x = ggplot2::element_text(size = 16),
+                axis.title.y = ggplot2::element_text(size = 16),
+                panel.spacing.y = grid::unit(2, "lines")
+            ) +
+            ggplot2::facet_wrap(~ sim, nrow = 2)
+    }
+
 
 #' Plot relative nutritional output compared to a reference simulation
 #'

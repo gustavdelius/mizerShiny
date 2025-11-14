@@ -377,7 +377,24 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
                   value   = TRUE,
                   status  = "info"
                 )
+              ),
+              conditionalPanel(
+                  condition = paste0("input['", ns("fishy_plots"), "'] == 'Nutrition'"),
+                  div(
+                      style = "display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #fff3e0; border-radius: 5px; border: 1px solid #ffe0b2;",
+                      `data-bs-toggle`  = "popover",
+                      `data-bs-placement` = "top",
+                      `data-bs-html`    = "true",
+                      `data-bs-content` = as.character(legends$fishery_nutrient_per_tonne),
+                      materialSwitch(
+                          inputId = ns("fishery_nutrient_per_tonne"),
+                          label   = HTML("<span style='font-weight:500; color: var(--bs-heading-color); line-height:1.2;'>Per tonne of yield</span>"),
+                          value   = FALSE,
+                          status  = "info"
+                      )
+                  )
               )
+
           )
         ),
         ## Log Toggle for Size Plot ----
@@ -745,6 +762,12 @@ fishery_strategy_server <- function(id, sim_0,
     fish_win1 <- reactive({
       input$fishyear
     })
+
+    # Nutrition per tonne mode (switch between total vs per tonne of yield)
+    nutrient_normalise <- reactive({
+        if (isTRUE(input$fishery_nutrient_per_tonne)) "per_yield" else "total"
+    })
+
 
     # Reactive storage for last successful plots
     lastYieldPlot                <- mizerShiny:::createLastPlotReactive()
@@ -1295,53 +1318,57 @@ fishery_strategy_server <- function(id, sim_0,
     })
 
     # Nutrition plot ----
+    # Nutrition plot ----
     output$nutritionplot <- renderPlotly({
-      req(fishSimData())
-      chosen_year <- fish_win1()
+        req(fishSimData())
+        chosen_year <- fish_win1()
 
-      vis <- mizerShiny:::getSimVisibility(input$sim_choice)
+        vis <- mizerShiny:::getSimVisibility(input$sim_choice)
 
-      mizerShiny:::generatePlotWithErrorHandling(
-        plot_fun = function() {
-          mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
+        mizerShiny:::generatePlotWithErrorHandling(
+            plot_fun = function() {
+                mode <- mizerShiny:::getModeFromToggle(input$triplotToggleFish)
 
-          if (vis$show_sim1 && vis$show_sim2) {
-            ggplotly(
-              mizerShiny:::plotNutritionChange2(
-                nutrition,
-                fishSimData()$sim1,
-                fishSimData()$sim2,
-                fishSimData()$unharv,
-                chosen_year,
-                mode = mode
-              )
-            )
-          } else if (vis$show_sim1) {
-            ggplotly(
-              mizerShiny:::plotNutritionChange(
-                nutrition,
-                fishSimData()$sim1,
-                fishSimData()$unharv,
-                chosen_year,
-                mode = mode
-              )
-            )
-          } else {
-            ggplotly(
-              mizerShiny:::plotNutritionChange(
-                nutrition,
-                fishSimData()$sim2,
-                fishSimData()$unharv,
-                chosen_year,
-                mode = mode
-              )
-            )
-          }
-        },
-        last_plot_reactive = lastNutritionPlot,
-        condition = vis$show_sim1 || vis$show_sim2,
-        context = "nutritionplot"
-      )
+                if (vis$show_sim1 && vis$show_sim2) {
+                    ggplotly(
+                        mizerShiny:::plotNutritionChange2(
+                            nutrition,
+                            fishSimData()$sim1,
+                            fishSimData()$sim2,
+                            fishSimData()$unharv,
+                            chosen_year,
+                            mode      = mode,
+                            normalise = nutrient_normalise()
+                        )
+                    )
+                } else if (vis$show_sim1) {
+                    ggplotly(
+                        mizerShiny:::plotNutritionChange(
+                            nutrition,
+                            fishSimData()$sim1,
+                            fishSimData()$unharv,
+                            chosen_year,
+                            mode      = mode,
+                            normalise = nutrient_normalise()
+                        )
+                    )
+                } else {
+                    ggplotly(
+                        mizerShiny:::plotNutritionChange(
+                            nutrition,
+                            fishSimData()$sim2,
+                            fishSimData()$unharv,
+                            chosen_year,
+                            mode      = mode,
+                            normalise = nutrient_normalise()
+                        )
+                    )
+                }
+            },
+            last_plot_reactive = lastNutritionPlot,
+            condition = vis$show_sim1 || vis$show_sim2,
+            context = "nutritionplot"
+        )
     })
   })
 }

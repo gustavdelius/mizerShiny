@@ -115,3 +115,7 @@ For example, +20 increases the starting biomass by 20%."
 legends$role_mortality_slider <-
     "Sets the % change to natural mortality for the selected species across all sizes. \
 For example, +1 makes mortality 1% higher; −1 makes it 1% lower."
+
+legends$fishery_nutrient_per_tonne <-
+    "Switch between total nutrients landed and nutrients per tonne of yield. Off = total nutrient mass landed; On = nutrient density per tonne of catch."
+
