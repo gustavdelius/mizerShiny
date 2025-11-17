@@ -10,7 +10,8 @@ plotNutritionChange2(
   harvestedprojection2,
   sim_0,
   chosenyear,
-  mode = c("triple", "chosen")
+  mode = c("triple", "chosen"),
+  normalise = c("total", "per_yield")
 )
 }
 \arguments{
