@@ -6,3 +6,6 @@
 ^README\.Rmd$
 ^Meta$
 ^doc$
+^\.positai$
+^\.claude$
+^\.cursor$

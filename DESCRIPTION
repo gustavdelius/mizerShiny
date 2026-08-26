@@ -1,6 +1,6 @@
 Package: mizerShiny
 Title: mizerShiny
-Version: 0.3.0
+Version: 0.3.3
 Authors@R: 
     person("Luca", "Broadbent", , "luke.broadbent@cefas.gov.uk", role = c("aut","cre"))
 Description: Frontend to running mizer models.
@@ -12,22 +12,30 @@ Imports:
     dplyr       (>= 1.1.4),
     ggplot2     (>= 3.5.1),
     gridlayout  (>= 0.2.1),
-    mizer       (>= 2.5.3),
+    methods,
+    mizer       (>= 3.3.0),
     plotly      (>= 4.10.4),
+    purrr,
+    RColorBrewer,
+    reshape2,
     rintrojs    (>= 0.3.4),
+    rlang,
     shiny       (>= 1.9.1),
     shinyjs     (>= 2.1.0),
     shinyWidgets (>= 0.9.0),
-    sortable    (>= 0.5.0)
+    sortable    (>= 0.5.0),
+    tibble,
+    tidyr
 Remotes: rstudio/gridlayout
 Suggests: 
     knitr,
     rmarkdown,
     shinytest2,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    vdiffr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 LazyData: true
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

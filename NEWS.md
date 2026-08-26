@@ -1,3 +1,20 @@
+# mizerShiny 0.3.3
+
+## Upgrade to mizer 3.3.0
+
+* **mizer compatibility**: Upgraded `mizerShiny` to be fully compatible with `mizer (>= 3.3.0)`.
+* **Bundled datasets**: Re-saved and upgraded `default_params.rda` and `default_sim.rda` using `validParams()` and `validSim()` to populate all new mizer 3.3.0 S4 slots (such as `@second_order_w`) and species parameter table columns (`is_background`).
+* **Spectra & guild plots**: Updated `guildplot()`, `guildplot_both()`, `plotSpectraRelative()`, `plotSpectraRelative2()`, and `plotSpectra2()` to handle mizer 3.3.0 density output columns (`Biomass density` / `Number density`) returned by `plotSpectra(..., return_data = TRUE)`.
+* **API modernization**:
+  * Replaced deprecated `setInitialValues()` calls with `mizer::finalParams()`.
+  * Replaced direct S4 slot manipulations (`@species_params`, `@gear_params`, `@initial_n`, `@initial_effort`, `@linecolour`, `@w`, `@dw`) with canonical S3 accessors (`species_params()`, `gear_params()`, `initialN()`, `initial_effort()`, `getColours()`, `w()`, `dw()`, `ext_mort()`).
+* **Bug fixes**:
+  * Fixed diet comparison calculation in `comparedietmatrix()` to evaluate against `harvestedprojection` instead of `sim_0`.
+  * Exported and consolidated `app_path()` helper in `R/ui_helpers.R` for consistent file resolution.
+  * Added documentation for shipped datasets in `R/data.R`.
+  * Updated test suite and visual snapshots for mizer 3.3.0.
+
+
 # mizerShiny 0.3.0
 
 ## Celtic Sea Model & Strategy Enhancements

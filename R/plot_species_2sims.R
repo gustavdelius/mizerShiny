@@ -58,6 +58,10 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
   full_year    <- chosenyear
 
   process_guilds <- function(mizerprojection) {
+    val_col <- intersect(c("Biomass density", "Number density", "value"), names(mizerprojection))[1]
+    if (!is.na(val_col) && val_col != "value") {
+      mizerprojection$value <- mizerprojection[[val_col]]
+    }
     assign_guild <- function(dat, rules) {
       dat <- dat |> dplyr::mutate(Guild = NA_character_)
       for (i in seq_len(nrow(rules))) {
