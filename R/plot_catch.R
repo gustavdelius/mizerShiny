@@ -4,7 +4,7 @@
 #' of either length or weight.
 #' Superimposes a plot of the number density of all individuals of the
 #' species.
-#' @param sim An object of class \linkS4class{MizerSim}
+#' @param sim An object of class \link[mizer:MizerSim-class]{MizerSim} or list of objects
 #' @param species The name of the predator species for which to plot the
 #'   mortality.
 #' @param gear Optional. The name of a gear. If supplied, only the yield from
@@ -15,6 +15,7 @@
 #' @param return_data A boolean value that determines whether the formatted data
 #'   used for the plot is returned instead of the plot itself. Default value is
 #'   FALSE
+#' @param ... Other arguments passed to `plotYieldVsSize`
 #' @return A ggplot2 object, unless `return_data = TRUE`, in which case a
 #' data frame with the four
 #' variables 'w' or 'l' (depending on `x_var`), 'Catch density', 'Type', 'Species
@@ -22,7 +23,7 @@
 #' 'Species', 'y_coord', 'Type' (to plot vertical lines).
 #' @export
 #' @family plotting functions
-#' @seealso [plotting_functions]
+#' @seealso [mizer::plotting_functions]
 plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
                            x_var = c("Weight", "Length"),
                            return_data = FALSE) {
@@ -42,23 +43,23 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
     }
 
     # Baseline parameters from the first sim
-    params_base <- sim_list[[1]]@params
-    params_base <- setInitialValues(params_base, sim_list[[1]])
+    params_base <- finalParams(sim_list[[1]])
 
     x_var = match.arg(x_var)
 
     if (!is.null(gear)) {
-        assert_that(is.character(gear),
-                    length(gear) == 1)
-        if (!(gear %in% params_base@gear_params$gear)) {
+        if (!is.character(gear) || length(gear) != 1) {
+            stop("Argument 'gear' must be a single character string.")
+        }
+        if (!(gear %in% gear_params(params_base)$gear)) {
             stop("The gear ", gear, " does not exist.")
         }
     }
 
-    SpIdx <- factor(params_base@species_params$species,
-                    levels = params_base@species_params$species)
+    SpIdx <- factor(species_params(params_base)$species,
+                    levels = species_params(params_base)$species)
     species <- valid_species_arg(params_base, species)
-    species <- which(params_base@species_params$species %in% species)
+    species <- which(species_params(params_base)$species %in% species)
 
     # Ensure defaults exist on baseline for length-weight conversion; will be re-applied per sim
     params_base <- set_species_param_default(params_base, "a", 0.006)
@@ -66,14 +67,14 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
 
     # Compute baseline totals per species for normalisation
     baseline_total <- numeric(length(species))
-    names(baseline_total) <- params_base@species_params$species[species]
+    names(baseline_total) <- species_params(params_base)$species[species]
     for (idx in seq_along(species)) {
         iSpecies <- species[[idx]]
-        a_b <- params_base@species_params[iSpecies, "a"]
-        b_b <- params_base@species_params[iSpecies, "b"]
+        a_b <- species_params(params_base)[iSpecies, "a"]
+        b_b <- species_params(params_base)[iSpecies, "b"]
 
-        w_min_idx <- sum(params_base@w < (params_base@species_params$w_mat[[iSpecies]] / 100))
-        w_max_idx <- sum(params_base@w <= params_base@species_params$w_max[[iSpecies]])
+        w_min_idx <- sum(w(params_base) < (species_params(params_base)$w_mat[[iSpecies]] / 100))
+        w_max_idx <- sum(w(params_base) <= species_params(params_base)$w_max[[iSpecies]])
         w_sel <- seq(w_min_idx, w_max_idx, by = 1)
 
         if (is.null(gear)) {
@@ -81,38 +82,37 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
         } else {
             f_mort_b <- getFMortGear(params_base)[gear, iSpecies, w_sel]
         }
-        catch_w_b <- f_mort_b * params_base@initial_n[iSpecies, w_sel]
-        baseline_total[[idx]] <- sum(catch_w_b * params_base@dw[w_sel])
+        catch_w_b <- f_mort_b * initialN(params_base)[iSpecies, w_sel]
+        baseline_total[[idx]] <- sum(catch_w_b * dw(params_base)[w_sel])
     }
 
     # Build combined plot data across sims and species, normalised by baseline totals
     plot_dat <- NULL
     for (iSim in seq_along(sim_list)) {
         sim_i <- sim_list[[iSim]]
-        params_i <- sim_i@params
-        params_i <- setInitialValues(params_i, sim_i)
+        params_i <- finalParams(sim_i)
         params_i <- set_species_param_default(params_i, "a", 0.006)
         params_i <- set_species_param_default(params_i, "b", 3)
 
         for (idx in seq_along(species)) {
             iSpecies <- species[[idx]]
-            s_name <- params_base@species_params$species[[iSpecies]]
-            a <- params_i@species_params[iSpecies, "a"]
-            b <- params_i@species_params[iSpecies, "b"]
+            s_name <- species_params(params_base)$species[[iSpecies]]
+            a <- species_params(params_i)[iSpecies, "a"]
+            b <- species_params(params_i)[iSpecies, "b"]
 
-            w_min_idx <- sum(params_i@w < (params_i@species_params$w_mat[[iSpecies]] / 100))
-            w_max_idx <- sum(params_i@w <= params_i@species_params$w_max[[iSpecies]])
+            w_min_idx <- sum(w(params_i) < (species_params(params_i)$w_mat[[iSpecies]] / 100))
+            w_max_idx <- sum(w(params_i) <= species_params(params_i)$w_max[[iSpecies]])
 
             w_sel <- seq(w_min_idx, w_max_idx, by = 1)
-            w <- params_i@w[w_sel]
-            l <- (params_i@w[w_sel] / a) ^ (1 / b)
+            w_vec <- w(params_i)[w_sel]
+            l <- (w_vec / a) ^ (1 / b)
 
             if (is.null(gear)) {
                 f_mort <- getFMort(params_i)[iSpecies, w_sel]
             } else {
                 f_mort <- getFMortGear(params_i)[gear, iSpecies, w_sel]
             }
-            catch_w <- f_mort * params_i@initial_n[iSpecies, w_sel]
+            catch_w <- f_mort * initialN(params_i)[iSpecies, w_sel]
 
             # Normalise by baseline total of the corresponding species
             total_ref <- baseline_total[[idx]]
@@ -123,9 +123,9 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
                 catch_w <- catch_w / total_ref
             }
             # The catch density in l gets an extra factor of dw/dl
-            catch_l <- catch_w * b * w / l
+            catch_l <- catch_w * b * w_vec / l
 
-            df <- data.frame(w = w,
+            df <- data.frame(w = w_vec,
                              l = l,
                              catch_w = catch_w,
                              catch_l = catch_l,
@@ -183,7 +183,7 @@ plotYieldVsSize <- function(sim, species = NULL, gear = NULL,
 
 #' @rdname plotYieldVsSize
 #' @export
-plotlyYieldVsSize <- function(object,
+plotlyYieldVsSize <- function(sim,
                               species = NULL,
                               gear = NULL,
                               x_var = c("Weight", "Length"),

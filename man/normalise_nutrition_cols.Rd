@@ -2,21 +2,17 @@
 % Please edit documentation in R/plot_nutrition.R
 \name{normalise_nutrition_cols}
 \alias{normalise_nutrition_cols}
-\title{Calculate total nutrients from a simulation at given time steps}
+\title{Normalise nutrition column names}
 \usage{
 normalise_nutrition_cols(nutrition)
 }
 \arguments{
 \item{nutrition}{Data frame of per-species nutrient contents}
-
-\item{sim}{Mizer projection object}
-
-\item{steps}{Integer time indices to evaluate (can be a range)}
 }
 \value{
-Named vector of nutrient totals
+Data frame with normalised column names
 }
 \description{
-Helper function to compute nutrient totals from yield data.
+Alter nutrient column names to be more readable and drop unwanted nutrients.
 }
 \keyword{internal}

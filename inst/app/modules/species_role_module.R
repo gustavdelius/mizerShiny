@@ -322,11 +322,11 @@ species_role_server <- function(id, sim_0,
 
       pb$inc(1/total_steps, "Adjusting biomass …")
 
-      changed_params@initial_n[input$species_name_select, ] <-
-        params@initial_n[input$species_name_select, ] * (1 + input$species / 100)
+      initialN(changed_params)[input$species_name_select, ] <-
+        initialN(params)[input$species_name_select, ] * (1 + input$species / 100)
 
       pb$inc(1/total_steps, "Updating mortality …")
-      extmort   <- getExtMort(params)
+      extmort   <- ext_mort(params)
       totalmort <- getMort(params)
 
       extmort[input$species_name_select, ] <-
