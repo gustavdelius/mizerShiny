@@ -10,20 +10,10 @@
 #' @return A ggplot object
 #' @keywords internal
 plotSpectra2 <- function(harvestedprojection, harvestedprojection2, time1, end1, time2, end2) {
-  data1 <- plotSpectra(harvestedprojection, time_range = time1:end1, return_data = TRUE)
-  val_col1 <- intersect(c("Biomass density", "Number density", "value"), names(data1))[1]
-  if (!is.na(val_col1) && val_col1 != "value") {
-    data1$value <- data1[[val_col1]]
-  }
-  data1 <- data1 |> dplyr::mutate(sim = "Strategy 1")
-
-  data2 <- plotSpectra(harvestedprojection2, time_range = time1:end1, return_data = TRUE)
-  val_col2 <- intersect(c("Biomass density", "Number density", "value"), names(data2))[1]
-  if (!is.na(val_col2) && val_col2 != "value") {
-    data2$value <- data2[[val_col2]]
-  }
-  data2 <- data2 |> dplyr::mutate(sim = "Strategy 2")
-
+  data1 <- plotSpectra(harvestedprojection, time_range = time1:end1, return_data = TRUE) |>
+    dplyr::mutate(sim = "Strategy 1")
+  data2 <- plotSpectra(harvestedprojection2, time_range = time1:end1, return_data = TRUE) |>
+    dplyr::mutate(sim = "Strategy 2")
   combined_data <- dplyr::bind_rows(data1, data2)
   ggplot2::ggplot(combined_data, ggplot2::aes(x = w, y = value, color = Species, linetype = sim,
                             group = interaction(Species, sim))) +

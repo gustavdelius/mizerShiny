@@ -1,16 +1,5 @@
 # UI and server helpers used by the Shiny app
 
-#' Locate files in inst/app
-#'
-#' @param ... Path components relative to inst/app
-#' @return File path string
-#' @keywords internal
-app_path <- function(...) {
-  p <- system.file("app", ..., package = "mizerShiny")
-  if (p == "") p <- file.path("inst", "app", ...)
-  p
-}
-
 #' Legend popover button
 #'
 #' Creates a small info-styled button that triggers a Bootstrap popover showing

@@ -192,6 +192,7 @@ process_sim_shared_actual <- function(harvestedprojection, chosenyear, mode = c(
 #' @param harvestedprojection Harvested mizer projection
 #' @param chosenyear Integer defining the full period; quarter/half derived
 #' @param mode Either "triple" or "chosen"
+#' @param species_order Optional character vector defining the display order of species
 #' @return A ggplot object
 #' @keywords internal
 plotSpeciesActualBiomass <- function(harvestedprojection, chosenyear,

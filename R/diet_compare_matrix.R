@@ -19,10 +19,10 @@ comparedietmatrix <- function(sim_0, harvestedprojection, timerange){
     dplyr::group_by(predator, prey)|>
     dplyr::summarise(Proportion=mean(Freq), .groups = "drop")
 
-  dietharv <- getDiet(harvestedprojection@params,
-                      n = apply(harvestedprojection@n[timerange,,], c(2, 3), mean),
-                      n_pp = apply(harvestedprojection@n_pp[timerange,], 2, mean),
-                      n_other = apply(harvestedprojection@n_other[timerange,], 2, mean),
+  dietharv <- getDiet(sim_0@params,
+                      n = apply(sim_0@n[timerange,,], c(2, 3), mean),
+                      n_pp = apply(sim_0@n_pp[timerange,], 2, mean),
+                      n_other = apply(sim_0@n_other[timerange,], 2, mean),
                       proportion = TRUE) |>
     as.table()|>
     as.data.frame()|>

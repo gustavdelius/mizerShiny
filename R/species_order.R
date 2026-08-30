@@ -25,9 +25,9 @@ compute_ordered_species <- function(params, guildparams = NULL,
                                levels = unique(.data$Feeding.guild))) |>
         dplyr::pull(.data$Species) |>
         unique()
-      return(intersect(guild_order, species_params(params)$species))
+      return(intersect(guild_order, params@species_params$species))
     } else {
-      return(as.data.frame(species_params(params)$species) |>
+      return(as.data.frame(params@species_params$species) |>
                stats::setNames("sp") |>
                dplyr::filter(.data$sp != "Resource") |>
                dplyr::pull(.data$sp))
@@ -35,7 +35,7 @@ compute_ordered_species <- function(params, guildparams = NULL,
   }
 
   if (identical(choice, "Size")) {
-    return(species_params(params) |>
+    return(params@species_params |>
              dplyr::filter(.data$species != "Resource") |>
              dplyr::arrange(.data$w_mat) |>
              dplyr::pull(.data$species))
@@ -45,7 +45,7 @@ compute_ordered_species <- function(params, guildparams = NULL,
   if (!is.null(custom_order) && length(custom_order)) {
     return(custom_order)
   }
-  as.data.frame(species_params(params)$species) |>
+  as.data.frame(params@species_params$species) |>
     stats::setNames("sp") |>
     dplyr::filter(.data$sp != "Resource") |>
     dplyr::pull(.data$sp)

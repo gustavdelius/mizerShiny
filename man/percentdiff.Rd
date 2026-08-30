@@ -19,11 +19,8 @@ Joins two data frames by \code{Species} and returns percentage change of
 values in first data frame relative to the second, excluding the \code{Resource} row.
 }
 \examples{
-\dontrun{
-mizerShiny:::percentdiff(
+percentdiff(
   df = data.frame(Species = c("A","B"), value = c(120, 80)),
   df_0 = data.frame(Species = c("A","B"), value = c(100, 100))
 )
 }
-}
-\keyword{internal}

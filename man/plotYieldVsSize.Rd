@@ -14,7 +14,7 @@ plotYieldVsSize(
 )
 
 plotlyYieldVsSize(
-  sim,
+  object,
   species = NULL,
   gear = NULL,
   x_var = c("Weight", "Length"),
@@ -22,7 +22,7 @@ plotlyYieldVsSize(
 )
 }
 \arguments{
-\item{sim}{An object of class \link[mizer:MizerSim-class]{MizerSim} or list of objects}
+\item{sim}{An object of class \linkS4class{MizerSim}}
 
 \item{species}{The name of the predator species for which to plot the
 mortality.}
@@ -37,8 +37,6 @@ Default is "Weight".}
 \item{return_data}{A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is
 FALSE}
-
-\item{...}{Other arguments passed to \code{plotYieldVsSize}}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a

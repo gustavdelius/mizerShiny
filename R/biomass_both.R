@@ -20,7 +20,7 @@ plotbothbiomass <- function(sim, sim2, specie = NULL,
                             start_time2, end_time2,
                             y_ticks = 6, ylim = c(NA, NA), highlight = NULL, ...) {
   if (is.null(specie)) {
-    specie <- species_params(sim)$species
+    specie <- sim@params@species_params$species
   }
   bm1 <- getBiomass(sim)
   bm1 <- bm1[as.numeric(dimnames(bm1)[[1]]) >= start_time & as.numeric(dimnames(bm1)[[1]]) <= end_time, , drop = FALSE]

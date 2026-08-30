@@ -1,12 +1,16 @@
 # Nutrition plot helper and data loading
 
-#' Normalise nutrition column names
+#' Calculate total nutrients from a simulation at given time steps
 #'
-#' Alter nutrient column names to be more readable and drop unwanted nutrients.
+#' Helper function to compute nutrient totals from yield data.
 #'
 #' @param nutrition Data frame of per-species nutrient contents
-#' @return Data frame with normalised column names
+#' @param sim Mizer projection object
+#' @param steps Integer time indices to evaluate (can be a range)
+#' @return Named vector of nutrient totals
 #' @keywords internal
+#'
+# Alter nutrient column names to be more readable and drop unwanted nutrients in csv (e.g., due to 0 content in assemblage - change if required)
 normalise_nutrition_cols <- function(nutrition) {
     upper_names <- toupper(names(nutrition))
 
@@ -46,16 +50,8 @@ normalise_nutrition_cols <- function(nutrition) {
     nutrition
 }
 
-#' Calculate total nutrients from a simulation at given time steps
-#'
-#' Helper function to compute nutrient totals from yield data.
-#'
-#' @param nutrition Data frame of per-species nutrient contents
-#' @param sim Mizer projection object
-#' @param steps Integer time indices to evaluate (can be a range)
-#' @param return_yield Logical; if TRUE returns yield data
-#' @return Named vector of nutrient totals
-#' @keywords internal
+
+
 calc_nutrition_totals <- function(nutrition, sim, steps, return_yield = FALSE) {
     nut_cols <- setdiff(names(nutrition), "species")
     y <- getYield(sim)

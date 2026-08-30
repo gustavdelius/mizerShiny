@@ -34,10 +34,10 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
   if (nrow(plot_dat) == 0) return(NULL)
 
   params      <- objects[[1]]@params
-  col_vec     <- getColours(params)
-  prey_levels <- names(col_vec)
+  prey_levels <- names(params@linecolour)
   plot_dat$Prey <- factor(plot_dat$Prey, levels = prey_levels)
 
+  col_vec <- params@linecolour
   if (any(is.na(col_vec))) {
     extra <- grDevices::rainbow(sum(is.na(col_vec)))
     names(extra) <- prey_levels[is.na(col_vec)]

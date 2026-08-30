@@ -5,7 +5,7 @@ test_that("plotNutrition works with default_sim", {
   sims <- list(default_sim, mizer::project(params, t_max = 10, effort = 1))
   step <- 10
 
-  p <- mizerShiny:::plotNutrition(default_nutrition, sims, ref, step)
+  p <- mizerShiny:::plotNutrition(sims, ref, step)
 
   expect_s3_class(p, "ggplot")
 })
@@ -17,7 +17,7 @@ test_that("plotNutrition snapshot test", {
   sims <- list(default_sim)
   step <- 10
 
-  p <- mizerShiny:::plotNutrition(default_nutrition, sims, ref, step)
+  p <- mizerShiny:::plotNutrition(sims, ref, step)
 
   expect_doppelganger("plotNutrition", p)
 })

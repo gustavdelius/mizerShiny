@@ -1,11 +1,4 @@
-# Helper function to normalize density columns
-normalize_spectra_data <- function(df) {
-  val_col <- intersect(c("Biomass density", "Number density", "value"), names(df))[1]
-  if (!is.na(val_col) && val_col != "value") {
-    df$value <- df[[val_col]]
-  }
-  df
-}
+# Spectra-related plots used in Shiny app
 
 #' Relative community size spectrum (single vs baseline)
 #'
@@ -18,12 +11,12 @@ normalize_spectra_data <- function(df) {
 #' @return A ggplot object
 #' @keywords internal
 plotSpectraRelative <- function(object1, object2, time1, time2) {
-  sf1 <- normalize_spectra_data(mizer::plotSpectra(object1, return_data = TRUE,
-                                                  resource = FALSE, background = FALSE,
-                                                  time_range = time1:time2))
-  sf2 <- normalize_spectra_data(mizer::plotSpectra(object2, return_data = TRUE,
-                                                  resource = FALSE, background = FALSE,
-                                                  time_range = time1:time2))
+  sf1 <- mizer::plotSpectra(object1, return_data = TRUE,
+                            resource = FALSE, background = FALSE,
+                            time_range = time1:time2)
+  sf2 <- mizer::plotSpectra(object2, return_data = TRUE,
+                            resource = FALSE, background = FALSE,
+                            time_range = time1:time2)
 
   sf <- dplyr::left_join(sf2, sf1, by = c("w", "Legend")) |>
     dplyr::group_by(w) |>
@@ -56,15 +49,15 @@ plotSpectraRelative <- function(object1, object2, time1, time2) {
 #' @return A ggplot object
 #' @keywords internal
 plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
-  sf1 <- normalize_spectra_data(mizer::plotSpectra(object1, return_data = TRUE,
-                                                  resource = FALSE, background = FALSE,
-                                                  time_range = time1:time2))
-  sf2 <- normalize_spectra_data(mizer::plotSpectra(object2, return_data = TRUE,
-                                                  resource = FALSE, background = FALSE,
-                                                  time_range = time1:time2))
-  sf3 <- normalize_spectra_data(mizer::plotSpectra(object3, return_data = TRUE,
-                                                  resource = FALSE, background = FALSE,
-                                                  time_range = time1:time2))
+  sf1 <- mizer::plotSpectra(object1, return_data = TRUE,
+                            resource = FALSE, background = FALSE,
+                            time_range = time1:time2)
+  sf2 <- mizer::plotSpectra(object2, return_data = TRUE,
+                            resource = FALSE, background = FALSE,
+                            time_range = time1:time2)
+  sf3 <- mizer::plotSpectra(object3, return_data = TRUE,
+                            resource = FALSE, background = FALSE,
+                            time_range = time1:time2)
 
   df1 <- dplyr::left_join(sf2, sf1, by = c("w", "Legend")) |>
     dplyr::group_by(w) |>

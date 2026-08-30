@@ -462,17 +462,17 @@ fishery_strategy_server <- function(id, sim_0,
       # Effort sliders ----
     # Dynamic fishery effort sliders for Strategy 1
     output$fishery_sliders_ui <- renderUI({
-      effort <- initial_effort(params)
-      gears <- unique(gear_params(params)$gear)
+      effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
       slider_list <- lapply(gears, function(gear) {
         sliderInput(
           inputId = session$ns(paste0("effort_", gear)),
           label = paste("Effort for", gear),
           min = 0,
-          max = if (initial_effort(params)[gear] == 0) {
+          max = if (params@initial_effort[gear] == 0) {
             2
-          } else (initial_effort(params)[gear] * 2),
-          value = initial_effort(params)[gear],
+          } else (params@initial_effort[gear] * 2),
+          value = params@initial_effort[gear],
           step = 0.05,
           width = "100%"
         )
@@ -493,17 +493,17 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Dynamic fishery effort sliders for Strategy 2
     output$fishery_sliders_ui2 <- renderUI({
-      effort <- initial_effort(params)
-      gears <- unique(gear_params(params)$gear)
+      effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
       slider_list <- lapply(gears, function(gear) {
         sliderInput(
           inputId = session$ns(paste0("effort2_", gear)),
           label = paste("Effort for", gear),
           min = 0,
-          max = if(initial_effort(params)[gear]==0){
+          max = if(params@initial_effort[gear]==0){
             2
-          }else(initial_effort(params)[gear]*2),
-          value = initial_effort(params)[gear],
+          }else(params@initial_effort[gear]*2),
+          value = params@initial_effort[gear],
           step = 0.05,
           width = "100%"
         )
@@ -545,9 +545,9 @@ fishery_strategy_server <- function(id, sim_0,
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       pb$set(message = "Running simulation …", value = 0)
 
-      gears <- unique(gear_params(params)$gear)
-      effort_sim1 <- makeEffort("effort_",  gears, initial_effort(params))
-      effort_sim2 <- makeEffort("effort2_", gears, initial_effort(params))
+      gears <- unique(params@gear_params$gear)
+      effort_sim1 <- makeEffort("effort_",  gears, params@initial_effort)
+      effort_sim2 <- makeEffort("effort2_", gears, params@initial_effort)
 
       pb$inc(1 / total_steps, "Projecting Strategy 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
@@ -682,11 +682,11 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Re-run only Strategy 1 when Strategy 1 effort sliders change
     observeEvent({
-      gears <- unique(gear_params(params)$gear)
+      gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) input[[paste0("effort_", gear)]])
     }, {
-      gears <- unique(gear_params(params)$gear)
-      effort1 <- makeEffort("effort_" , gears, initial_effort(params))
+      gears <- unique(params@gear_params$gear)
+      effort1 <- makeEffort("effort_" , gears, params@initial_effort)
       max_year <- isolate(input$fishyear)
 
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
@@ -704,11 +704,11 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Re-run only Strategy 2 when Strategy 2 effort sliders change
     observeEvent({
-      gears <- unique(gear_params(params)$gear)
+      gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) input[[paste0("effort2_", gear)]])
     }, {
-      gears <- unique(gear_params(params)$gear)
-      effort2 <- makeEffort("effort2_", gears, initial_effort(params))
+      gears <- unique(params@gear_params$gear)
+      effort2 <- makeEffort("effort2_", gears, params@initial_effort)
       max_year <- isolate(input$fishyear)
 
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
@@ -726,8 +726,8 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Reset Strategy 1 effort sliders to base effort
     observeEvent(input$reset_effort_sim1, {
-      base_effort <- initial_effort(params)
-      gears <- unique(gear_params(params)$gear)
+      base_effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) {
         updateSliderInput(
           session,
@@ -739,8 +739,8 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Reset Strategy 2 effort sliders to base effort
     observeEvent(input$reset_effort_sim2, {
-      base_effort <- initial_effort(params)
-      gears <- unique(gear_params(params)$gear)
+      base_effort <- params@initial_effort
+      gears <- unique(params@gear_params$gear)
       lapply(gears, function(gear) {
         updateSliderInput(
           session,

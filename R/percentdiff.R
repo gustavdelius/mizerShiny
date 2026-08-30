@@ -6,14 +6,11 @@
 #' @param df Data frame with columns `Species` and `value`
 #' @param df_0 Data frame with columns `Species` and `value` for baseline
 #' @return A data frame with columns `Species` and `percentage_diff`
-#' @keywords internal
 #' @examples
-#' \dontrun{
-#' mizerShiny:::percentdiff(
+#' percentdiff(
 #'   df = data.frame(Species = c("A","B"), value = c(120, 80)),
 #'   df_0 = data.frame(Species = c("A","B"), value = c(100, 100))
 #' )
-#' }
 percentdiff <- function(df, df_0) {
   df |>
     dplyr::left_join(df_0, by = "Species") |>
