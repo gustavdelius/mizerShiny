@@ -21,14 +21,19 @@ guildplot <- function(harvestedprojection, sim_0, chosenyear, guildparams, celti
   half_year    <- max(1, ceiling(chosenyear * 0.5))
   full_year    <- chosenyear
 
-  harvested_full   <- plotSpectra(harvestedprojection,   time_range = full_year,   return_data = TRUE)
-  unharvested_full <- plotSpectra(sim_0, time_range = full_year,   return_data = TRUE)
+  spectra_data <- function(sim, time_range) {
+    mizer::plotSpectra(sim, time_range = time_range, return_data = TRUE) |>
+      standardise_spectra_data()
+  }
+
+  harvested_full   <- spectra_data(harvestedprojection, full_year)
+  unharvested_full <- spectra_data(sim_0, full_year)
 
   if (mode == "triple") {
-    harvested_quarter   <- plotSpectra(harvestedprojection,   time_range = quarter_year, return_data = TRUE)
-    harvested_half      <- plotSpectra(harvestedprojection,   time_range = half_year,    return_data = TRUE)
-    unharvested_quarter <- plotSpectra(sim_0, time_range = quarter_year, return_data = TRUE)
-    unharvested_half    <- plotSpectra(sim_0, time_range = half_year,    return_data = TRUE)
+    harvested_quarter   <- spectra_data(harvestedprojection, quarter_year)
+    harvested_half      <- spectra_data(harvestedprojection, half_year)
+    unharvested_quarter <- spectra_data(sim_0, quarter_year)
+    unharvested_half    <- spectra_data(sim_0, half_year)
   }
 
   process_guilds <- function(mizerprojection) {
@@ -101,5 +106,4 @@ guildplot <- function(harvestedprojection, sim_0, chosenyear, guildparams, celti
       axis.title = ggplot2::element_text(size = 16)
     )
 }
-
 

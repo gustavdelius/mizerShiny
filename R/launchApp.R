@@ -1,6 +1,6 @@
 #' Launch mizerShiny
 #'
-#' @param params A MizerParams object. Defaults to NS_params.
+#' @param params A [mizer::MizerParams] object. Defaults to `default_params`.
 #' @param guildparams An optional data frame defining guilds for the model.
 #'  See the 'Guilds' section of the package vignette for details.
 #' @param nutrition An optional data frame defining nutritional values
@@ -35,6 +35,8 @@ mizerShiny <-
                                        "Nutrition", "Length",
                                        "Guild"),
              species_role_tabs = c("Biomass", "Size", "Guilds", "Diet"), ...) {
+
+  params <- mizer::validParams(params)
 
   ## make the arguments available to the Shiny session
   shiny::shinyOptions("params" = params)

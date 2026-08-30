@@ -34,8 +34,8 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
   }))
 
   species_colors <- NULL
-  if (!is.null(params) && !is.null(params@linecolour)) {
-    species_colors <- params@linecolour[unique(sp_all$sp)]
+  if (!is.null(params)) {
+    species_colors <- mizer::getColours(params)[unique(sp_all$sp)]
     missing_colors <- is.na(species_colors)
     if (any(missing_colors)) {
       extra_colors <- grDevices::rainbow(sum(missing_colors))
@@ -161,5 +161,4 @@ generateYieldDashboard <- function(NS_sim, highlight_times = NULL, params = NULL
   })
   fig |> plotly::layout(annotations = labs)
 }
-
 

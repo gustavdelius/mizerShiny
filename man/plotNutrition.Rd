@@ -4,16 +4,16 @@
 \alias{plotNutrition}
 \title{Plot relative nutritional output compared to a reference simulation}
 \usage{
-plotNutrition(nutrition, sims, ref, step)
+plotNutrition(sims, ref, step, nutrition = default_nutrition)
 }
 \arguments{
-\item{nutrition}{Data frame of per-species nutrient contents}
-
 \item{sims}{List of mizer projection objects to compare}
 
 \item{ref}{Reference mizer projection}
 
 \item{step}{Integer time index to evaluate}
+
+\item{nutrition}{Data frame of per-species nutrient contents}
 }
 \value{
 A ggplot object

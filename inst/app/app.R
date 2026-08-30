@@ -74,7 +74,8 @@ server <- function(input, output, session) {
   })
 
   # Shared species list - used by modules
-  species_list <- setdiff(unique(params@species_params$species), "Resource")
+  species_list <- setdiff(unique(mizer::species_params(params)$species),
+                          "Resource")
 
   # Sharing the same ordering of species between the two modules
   # Map module names to context suffixes

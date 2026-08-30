@@ -1,5 +1,21 @@
 # UI and server helpers used by the Shiny app
 
+#' Locate a file in the bundled Shiny app
+#'
+#' Uses the installed app directory when available and falls back to the source
+#' tree during package development.
+#'
+#' @param ... Path components below `inst/app`.
+#' @return A character path.
+#' @keywords internal
+app_path <- function(...) {
+  path <- system.file("app", ..., package = "mizerShiny")
+  if (path == "") {
+    path <- file.path("inst", "app", ...)
+  }
+  path
+}
+
 #' Legend popover button
 #'
 #' Creates a small info-styled button that triggers a Bootstrap popover showing
@@ -176,50 +192,12 @@ filterSimsByChoice <- function(sim_data, sim_choice) {
 #' @return Logical: TRUE if within bounds, FALSE otherwise
 #' @keywords internal
 checkTimeRangeBounds <- function(sim, time_range) {
-  sim_dims <- dim(sim@n)
-  max_time <- sim_dims[1]
-  
+  available_times <- mizer::getTimes(sim)
   if (is.list(time_range)) {
-    return(time_range$start <= max_time && time_range$end <= max_time)
-  } else {
-    return(time_range <= max_time)
+    time_range <- c(time_range$start, time_range$end)
   }
-}
-
-#' Subset simulation data by time range
-#'
-#' Creates a subset of simulation data for a specific time range.
-#' Handles errors gracefully.
-#'
-#' @param sim MizerSim object
-#' @param time_range Integer or list with start/end times
-#' @return Subsetted MizerSim object
-#' @keywords internal
-subsetSimByTimeRange <- function(sim, time_range) {
-  if (is.list(time_range)) {
-    start <- time_range$start
-    end <- time_range$end
-  } else {
-    start <- time_range
-    end <- time_range
-  }
-  
-  tryCatch({
-    sim@n <- sim@n[start:end, , , drop = FALSE]
-    sim@n_pp <- sim@n_pp[start:end, , drop = FALSE]
-    sim@n_other <- sim@n_other[start:end, , drop = FALSE]
-    sim
-  }, error = function(e) {
-    time_range_str <- if (is.list(time_range)) {
-      paste(time_range$start, time_range$end, sep = "-")
-    } else {
-      as.character(time_range)
-    }
-    details <- paste0("time_range: ", time_range_str, 
-                     ", sim dimensions: ", paste(dim(sim@n), collapse = "x"))
-    logError("subsetSimByTimeRange", e, details)
-    stop(e)
-  })
+  min(time_range) >= min(available_times) &&
+    max(time_range) <= max(available_times)
 }
 
 #' Create a reactive value for storing last successful plot
@@ -264,5 +242,3 @@ runSimulationWithErrorHandling <- function(sim_fun, context = "simulation",
     stop(e)
   })
 }
-
-

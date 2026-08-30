@@ -14,20 +14,21 @@ compute_ordered_species <- function(params, guildparams = NULL,
                                     choice = c("Custom", "Size", "Guild"),
                                     custom_order = NULL) {
   choice <- match.arg(choice)
+  sp <- mizer::species_params(params)
 
   if (identical(choice, "Guild")) {
     if (!is.null(guildparams)) {
+      guild_levels <- unique(guildparams$Feeding.guild)
       guild_order <- guildparams |>
         dplyr::group_by(.data$Species, .data$Feeding.guild) |>
         dplyr::slice_max(.data$maxw, n = 1, with_ties = FALSE) |>
         dplyr::ungroup() |>
-        dplyr::arrange(factor(.data$Feeding.guild,
-                               levels = unique(.data$Feeding.guild))) |>
+        dplyr::arrange(factor(.data$Feeding.guild, levels = guild_levels)) |>
         dplyr::pull(.data$Species) |>
         unique()
-      return(intersect(guild_order, params@species_params$species))
+      return(intersect(guild_order, sp$species))
     } else {
-      return(as.data.frame(params@species_params$species) |>
+      return(as.data.frame(sp$species) |>
                stats::setNames("sp") |>
                dplyr::filter(.data$sp != "Resource") |>
                dplyr::pull(.data$sp))
@@ -35,7 +36,7 @@ compute_ordered_species <- function(params, guildparams = NULL,
   }
 
   if (identical(choice, "Size")) {
-    return(params@species_params |>
+    return(sp |>
              dplyr::filter(.data$species != "Resource") |>
              dplyr::arrange(.data$w_mat) |>
              dplyr::pull(.data$species))
@@ -45,10 +46,8 @@ compute_ordered_species <- function(params, guildparams = NULL,
   if (!is.null(custom_order) && length(custom_order)) {
     return(custom_order)
   }
-  as.data.frame(params@species_params$species) |>
+  as.data.frame(sp$species) |>
     stats::setNames("sp") |>
     dplyr::filter(.data$sp != "Resource") |>
     dplyr::pull(.data$sp)
 }
-
-

@@ -8,15 +8,22 @@
 #' @param objects A list of one or two mizer projection objects
 #' @param species Character vector of species names to include
 #' @param sim_names Optional character vector of labels for simulations
+#' @param time_range Optional simulation time or range over which to average.
 #' @return A plotly object
 #' @keywords internal
-plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
+plotDietCompare <- function(objects, species = NULL, sim_names = NULL,
+                            time_range = NULL) {
 
   diet_long <- function(obj, idx, species) {
-    d <- getDiet(obj@params,
-                 n       = apply(obj@n,      2:3, mean),
-                 n_pp    = apply(obj@n_pp,   2,   mean),
-                 n_other = apply(obj@n_other,2,   mean))
+    selected_times <- time_range
+    if (is.list(selected_times)) {
+      selected_times <- c(selected_times$start, selected_times$end)
+    }
+    if (is.null(selected_times)) {
+      selected_times <- mizer::getTimes(obj)
+    }
+    params <- mizer::getParams(obj, time_range = selected_times)
+    d <- mizer::getDiet(params)
     d <- d[dimnames(d)[[1]] %in% species, , , drop = FALSE]
     names(dimnames(d)) <- c("Predator", "w", "Prey")
 
@@ -33,11 +40,11 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
   )
   if (nrow(plot_dat) == 0) return(NULL)
 
-  params      <- objects[[1]]@params
-  prey_levels <- names(params@linecolour)
+  params <- mizer::getParams(objects[[1]], time_range = mizer::getTimes(objects[[1]])[1])
+  col_vec <- mizer::getColours(params)
+  prey_levels <- names(col_vec)
   plot_dat$Prey <- factor(plot_dat$Prey, levels = prey_levels)
 
-  col_vec <- params@linecolour
   if (any(is.na(col_vec))) {
     extra <- grDevices::rainbow(sum(is.na(col_vec)))
     names(extra) <- prey_levels[is.na(col_vec)]
@@ -156,5 +163,4 @@ plotDietCompare <- function(objects, species = NULL, sim_names = NULL) {
       margin      = list(t = 30)
     )
 }
-
 
