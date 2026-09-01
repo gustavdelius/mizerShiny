@@ -339,13 +339,13 @@ process_nutrition_change <- function(nutrition,
 #' compares each to a reference, returning a grouped bar plot of percentage
 #' differences per nutrient.
 #'
-#' @param nutrition Data frame of per-species nutrient contents
 #' @param sims List of mizer projection objects to compare
 #' @param ref Reference mizer projection
 #' @param step Integer time index to evaluate
+#' @param nutrition Data frame of per-species nutrient contents
 #' @return A ggplot object
 #' @keywords internal
-plotNutrition <- function(nutrition, sims, ref, step) {
+plotNutrition <- function(sims, ref, step, nutrition = default_nutrition) {
     # Normalise labels and drop unused nutrients (e.g. Vitamin D2)
     nutrition <- normalise_nutrition_cols(nutrition)
     nut_cols  <- setdiff(names(nutrition), "species")

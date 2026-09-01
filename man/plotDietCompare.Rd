@@ -4,7 +4,7 @@
 \alias{plotDietCompare}
 \title{Plot diet composition comparison across one or two simulations}
 \usage{
-plotDietCompare(objects, species = NULL, sim_names = NULL)
+plotDietCompare(objects, species = NULL, sim_names = NULL, time_range = NULL)
 }
 \arguments{
 \item{objects}{A list of one or two mizer projection objects}
@@ -12,6 +12,8 @@ plotDietCompare(objects, species = NULL, sim_names = NULL)
 \item{species}{Character vector of species names to include}
 
 \item{sim_names}{Optional character vector of labels for simulations}
+
+\item{time_range}{Optional simulation time or range over which to average.}
 }
 \value{
 A plotly object

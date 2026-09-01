@@ -10,9 +10,13 @@
 #' @return A ggplot object
 #' @keywords internal
 plotSpectra2 <- function(harvestedprojection, harvestedprojection2, time1, end1, time2, end2) {
-  data1 <- plotSpectra(harvestedprojection, time_range = time1:end1, return_data = TRUE) |>
+  data1 <- mizer::plotSpectra(harvestedprojection, time_range = time1:end1,
+                              return_data = TRUE) |>
+    standardise_spectra_data() |>
     dplyr::mutate(sim = "Strategy 1")
-  data2 <- plotSpectra(harvestedprojection2, time_range = time1:end1, return_data = TRUE) |>
+  data2 <- mizer::plotSpectra(harvestedprojection2, time_range = time1:end1,
+                              return_data = TRUE) |>
+    standardise_spectra_data() |>
     dplyr::mutate(sim = "Strategy 2")
   combined_data <- dplyr::bind_rows(data1, data2)
   ggplot2::ggplot(combined_data, ggplot2::aes(x = w, y = value, color = Species, linetype = sim,
@@ -32,5 +36,4 @@ plotSpectra2 <- function(harvestedprojection, harvestedprojection2, time1, end1,
     ggplot2::guides(linetype = ggplot2::guide_legend(title = "Simulation"),
            color = ggplot2::guide_legend(title = "Species"))
 }
-
 

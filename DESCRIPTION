@@ -1,6 +1,6 @@
 Package: mizerShiny
 Title: mizerShiny
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     person("Luca", "Broadbent", , "luke.broadbent@cefas.gov.uk", role = c("aut","cre"))
 Description: Frontend to running mizer models.
@@ -12,7 +12,7 @@ Imports:
     dplyr       (>= 1.1.4),
     ggplot2     (>= 3.5.1),
     gridlayout  (>= 0.2.1),
-    mizer       (>= 2.5.3),
+    mizer       (>= 3.4.0),
     plotly      (>= 4.10.4),
     rintrojs    (>= 0.3.4),
     shiny       (>= 1.9.1),
@@ -27,7 +27,7 @@ Suggests:
     testthat (>= 3.0.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 LazyData: true
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

@@ -8,8 +8,9 @@ test_that("compute_ordered_species returns custom when provided", {
 test_that("compute_ordered_species size ordering excludes Resource", {
   dp <- default_params
   ord <- mizerShiny:::compute_ordered_species(dp, choice = "Size")
-  expect_equal(ord, c("Sandeel", "Sprat", "Dab", "N.pout", "Gurnard", "Whiting",
-                      "Sole", "Herring", "Plaice", "Haddock", "Saithe",  "Cod"))
+  expect_equal(ord, c("Horse mackerel", "Blue whiting", "Megrim", "Herring",
+                      "Sole", "Whiting", "Mackerel", "Plaice", "Haddock",
+                      "Monkfish", "Cod", "Hake"))
 })
 
 test_that("compute_ordered_species guild ordering intersects species", {
@@ -22,5 +23,4 @@ test_that("compute_ordered_species guild ordering intersects species", {
   expect_true(all(ord %in% c("Cod","Haddock")))
   expect_false("Resource" %in% ord)
 })
-
 

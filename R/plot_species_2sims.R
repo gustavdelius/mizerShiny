@@ -57,6 +57,11 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
   half_year    <- max(1, ceiling(chosenyear * 0.5))
   full_year    <- chosenyear
 
+  spectra_data <- function(sim, time_range) {
+    mizer::plotSpectra(sim, time_range = time_range, return_data = TRUE) |>
+      standardise_spectra_data()
+  }
+
   process_guilds <- function(mizerprojection) {
     assign_guild <- function(dat, rules) {
       dat <- dat |> dplyr::mutate(Guild = NA_character_)
@@ -86,9 +91,9 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
   }
 
   if (mode == "chosen") {
-    harvested_full1   <- plotSpectra(harvestedprojection1,   time_range = full_year, return_data = TRUE)
-    harvested_full2   <- plotSpectra(harvestedprojection2,   time_range = full_year, return_data = TRUE)
-    unharvested_full  <- plotSpectra(sim_0, time_range = full_year,  return_data = TRUE)
+    harvested_full1  <- spectra_data(harvestedprojection1, full_year)
+    harvested_full2  <- spectra_data(harvestedprojection2, full_year)
+    unharvested_full <- spectra_data(sim_0, full_year)
 
     sim1_final <- process_guilds(harvested_full1)  |> dplyr::mutate(time = "full") |>
       dplyr::full_join(process_guilds(unharvested_full) |> dplyr::mutate(time = "full"), by = c("Guild", "time")) |>
@@ -105,15 +110,15 @@ guildplot_both <- function(harvestedprojection1, harvestedprojection2,
     joinedguilds <- dplyr::bind_rows(sim1_final, sim2_final)
   } else {
     # triple mode (similar to original)
-    hs_quarter1 <- plotSpectra(harvestedprojection1, time_range = quarter_year, return_data = TRUE)
-    hs_half1    <- plotSpectra(harvestedprojection1, time_range = half_year,    return_data = TRUE)
-    hs_full1    <- plotSpectra(harvestedprojection1, time_range = full_year,    return_data = TRUE)
-    hs_quarter2 <- plotSpectra(harvestedprojection2, time_range = quarter_year, return_data = TRUE)
-    hs_half2    <- plotSpectra(harvestedprojection2, time_range = half_year,    return_data = TRUE)
-    hs_full2    <- plotSpectra(harvestedprojection2, time_range = full_year,    return_data = TRUE)
-    us_quarter  <- plotSpectra(sim_0, time_range = quarter_year, return_data = TRUE)
-    us_half     <- plotSpectra(sim_0, time_range = half_year,    return_data = TRUE)
-    us_full     <- plotSpectra(sim_0, time_range = full_year,    return_data = TRUE)
+    hs_quarter1 <- spectra_data(harvestedprojection1, quarter_year)
+    hs_half1    <- spectra_data(harvestedprojection1, half_year)
+    hs_full1    <- spectra_data(harvestedprojection1, full_year)
+    hs_quarter2 <- spectra_data(harvestedprojection2, quarter_year)
+    hs_half2    <- spectra_data(harvestedprojection2, half_year)
+    hs_full2    <- spectra_data(harvestedprojection2, full_year)
+    us_quarter  <- spectra_data(sim_0, quarter_year)
+    us_half     <- spectra_data(sim_0, half_year)
+    us_full     <- spectra_data(sim_0, full_year)
 
     guilds1 <- dplyr::bind_rows(
       process_guilds(hs_quarter1) |> dplyr::mutate(time = "quarter"),
@@ -359,5 +364,4 @@ plotSpeciesYieldChange2 <- function(harvestedprojection1, harvestedprojection2,
                    panel.spacing.y = grid::unit(2, "lines")) +
     ggplot2::facet_wrap(~ sim, nrow = 2)
 }
-
 

@@ -9,21 +9,19 @@
 #' @return A ggplot heatmap of percentage differences by predator and prey
 #' @keywords internal
 comparedietmatrix <- function(sim_0, harvestedprojection, timerange){
-  dietunharv <- getDiet(sim_0@params,
-                        n = apply(sim_0@n[timerange,,], c(2, 3), mean),
-                        n_pp = apply(sim_0@n_pp[timerange,], 2, mean),
-                        n_other = apply(sim_0@n_other[timerange,], 2, mean),
-                        proportion = TRUE) |>
+  dietunharv <- mizer::getDiet(
+    mizer::getParams(sim_0, time_range = timerange),
+    proportion = TRUE
+  ) |>
     as.table()|>
     as.data.frame()|>
     dplyr::group_by(predator, prey)|>
     dplyr::summarise(Proportion=mean(Freq), .groups = "drop")
 
-  dietharv <- getDiet(sim_0@params,
-                      n = apply(sim_0@n[timerange,,], c(2, 3), mean),
-                      n_pp = apply(sim_0@n_pp[timerange,], 2, mean),
-                      n_other = apply(sim_0@n_other[timerange,], 2, mean),
-                      proportion = TRUE) |>
+  dietharv <- mizer::getDiet(
+    mizer::getParams(harvestedprojection, time_range = timerange),
+    proportion = TRUE
+  ) |>
     as.table()|>
     as.data.frame()|>
     dplyr::group_by(predator, prey)|>
@@ -44,5 +42,4 @@ comparedietmatrix <- function(sim_0, harvestedprojection, timerange){
                    axis.title.x = ggplot2::element_text(size = 16),
                    axis.title.y = ggplot2::element_text(size = 16))
 }
-
 

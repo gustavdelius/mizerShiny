@@ -22,7 +22,7 @@ plotlyYieldVsSize(
 )
 }
 \arguments{
-\item{sim}{An object of class \linkS4class{MizerSim}}
+\item{sim}{A \link[mizer:MizerSim]{mizer::MizerSim} object or a list of such objects.}
 
 \item{species}{The name of the predator species for which to plot the
 mortality.}
@@ -52,6 +52,6 @@ Superimposes a plot of the number density of all individuals of the
 species.
 }
 \seealso{
-\link[mizer:plotting_functions]{mizer::plotting_functions}
+\link[mizer:plotting_functions]{plotting_functions}
 }
 \concept{plotting functions}

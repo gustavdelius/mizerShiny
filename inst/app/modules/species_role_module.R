@@ -229,7 +229,7 @@ species_role_ui <- function(id, config, legends, have_guild_file,
 
 species_role_server <- function(id, sim_0,
                                 guildparams, ordered_species_reactive, species_list) {
-    params <- sim_0@params
+    params <- mizer::initialParams(sim_0)
   moduleServer(id, function(input, output, session) {
 
     # Setup year controls
@@ -271,7 +271,7 @@ species_role_server <- function(id, sim_0,
     # It checks whether the simulation needs to be extended
     observe({
       sims <- isolate(bioSimData())
-      max_year <- dim(sims$harvested@n)[1] - 1
+      max_year <- max(mizer::getTimes(sims$harvested))
       if (input$year <= max_year) return()  # No need to re-run if within bounds
 
       notif_id <- shiny::showNotification(
@@ -322,11 +322,12 @@ species_role_server <- function(id, sim_0,
 
       pb$inc(1/total_steps, "Adjusting biomass …")
 
-      changed_params@initial_n[input$species_name_select, ] <-
-        params@initial_n[input$species_name_select, ] * (1 + input$species / 100)
+      mizer::initialN(changed_params)[input$species_name_select, ] <-
+        mizer::initialN(params)[input$species_name_select, ] *
+        (1 + input$species / 100)
 
       pb$inc(1/total_steps, "Updating mortality …")
-      extmort   <- getExtMort(params)
+      extmort   <- ext_mort(params)
       totalmort <- getMort(params)
 
       extmort[input$species_name_select, ] <-
@@ -436,19 +437,15 @@ species_role_server <- function(id, sim_0,
           # Add bounds checking for time range
           if (!mizerShiny:::checkTimeRangeBounds(bioSimData()$harvested, win)) {
             details <- paste0("win$start = ", win$start, ", win$end = ", win$end,
-                            ", max_time = ", dim(bioSimData()$harvested@n)[1])
+                            ", max_time = ", max(mizer::getTimes(bioSimData()$harvested)))
             stop(paste("Time range out of bounds:", details))
           }
 
-          # Subset simulations by time range
-          harvest_sub <- lapply(sims, function(sim) {
-            mizerShiny:::subsetSimByTimeRange(sim, win)
-          })
-
           mizerShiny:::plotDietCompare(
-            harvest_sub,
+            sims,
             species   = input$diet_species_select,
-            sim_names = c("Your Sim", "Base Sim")
+            sim_names = c("Your Sim", "Base Sim"),
+            time_range = win
           )
         },
         last_plot_reactive = lastDietPlot,
@@ -457,4 +454,3 @@ species_role_server <- function(id, sim_0,
     })
   })
 }
-

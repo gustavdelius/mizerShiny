@@ -12,7 +12,7 @@ mizerShinyAllTabs(
 )
 }
 \arguments{
-\item{params}{A MizerParams object. Defaults to NS_params.}
+\item{params}{A \link[mizer:MizerParams]{mizer::MizerParams} object. Defaults to \code{default_params}.}
 
 \item{guildparams}{An optional data frame defining guilds for the model.
 See the 'Guilds' section of the package vignette for details.}

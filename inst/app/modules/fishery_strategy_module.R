@@ -447,7 +447,7 @@ fishery_strategy_ui <- function(id, config, legends, have_guild_file,
 
 fishery_strategy_server <- function(id, sim_0,
                                    guildparams, ordered_species_reactive, species_list) {
-  params <- sim_0@params
+  params <- mizer::initialParams(sim_0)
   # keep copies for switching between interacting and non-interacting
   params_interacting <- params
   params_noninteracting <- mizerShiny:::make_noninteracting(params)
@@ -462,17 +462,17 @@ fishery_strategy_server <- function(id, sim_0,
       # Effort sliders ----
     # Dynamic fishery effort sliders for Strategy 1
     output$fishery_sliders_ui <- renderUI({
-      effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
+      effort <- mizer::initial_effort(params)
+      gears <- unique(mizer::gear_params(params)$gear)
       slider_list <- lapply(gears, function(gear) {
         sliderInput(
           inputId = session$ns(paste0("effort_", gear)),
           label = paste("Effort for", gear),
           min = 0,
-          max = if (params@initial_effort[gear] == 0) {
+          max = if (effort[gear] == 0) {
             2
-          } else (params@initial_effort[gear] * 2),
-          value = params@initial_effort[gear],
+          } else (effort[gear] * 2),
+          value = effort[gear],
           step = 0.05,
           width = "100%"
         )
@@ -493,17 +493,17 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Dynamic fishery effort sliders for Strategy 2
     output$fishery_sliders_ui2 <- renderUI({
-      effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
+      effort <- mizer::initial_effort(params)
+      gears <- unique(mizer::gear_params(params)$gear)
       slider_list <- lapply(gears, function(gear) {
         sliderInput(
           inputId = session$ns(paste0("effort2_", gear)),
           label = paste("Effort for", gear),
           min = 0,
-          max = if(params@initial_effort[gear]==0){
+          max = if(effort[gear] == 0){
             2
-          }else(params@initial_effort[gear]*2),
-          value = params@initial_effort[gear],
+          } else effort[gear] * 2,
+          value = effort[gear],
           step = 0.05,
           width = "100%"
         )
@@ -545,9 +545,10 @@ fishery_strategy_server <- function(id, sim_0,
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
       pb$set(message = "Running simulation …", value = 0)
 
-      gears <- unique(params@gear_params$gear)
-      effort_sim1 <- makeEffort("effort_",  gears, params@initial_effort)
-      effort_sim2 <- makeEffort("effort2_", gears, params@initial_effort)
+      gears <- unique(mizer::gear_params(params)$gear)
+      base_effort <- mizer::initial_effort(params)
+      effort_sim1 <- makeEffort("effort_",  gears, base_effort)
+      effort_sim2 <- makeEffort("effort2_", gears, base_effort)
 
       pb$inc(1 / total_steps, "Projecting Strategy 1 …")
       sim1 <- mizerShiny:::runSimulationWithErrorHandling(
@@ -599,7 +600,7 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Observer to automatically switch to "Both" when Strategy 2 sliders are changed
     observeEvent({
-      gears <- unique(params@gear_params$gear)
+      gears <- unique(mizer::gear_params(params)$gear)
       lapply(gears, function(gear) {
         input[[paste0("effort2_", gear)]]
       })
@@ -623,9 +624,9 @@ fishery_strategy_server <- function(id, sim_0,
 
       target_year <- input$fishyear
       # Determine current max years for each sim (years start at 0, so subtract 1)
-      max_sim1   <- dim(sims$sim1@n)[1] - 1
-      max_sim2   <- if (!is.null(sims$sim2)) dim(sims$sim2@n)[1] - 1 else NA_integer_
-      max_unharv <- dim(sims$unharv@n)[1] - 1
+      max_sim1   <- max(mizer::getTimes(sims$sim1))
+      max_sim2   <- if (!is.null(sims$sim2)) max(mizer::getTimes(sims$sim2)) else NA_real_
+      max_unharv <- max(mizer::getTimes(sims$unharv))
 
       need_sim1   <- target_year > max_sim1
       need_sim2   <- !is.null(sims$sim2) && target_year > max_sim2
@@ -682,11 +683,11 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Re-run only Strategy 1 when Strategy 1 effort sliders change
     observeEvent({
-      gears <- unique(params@gear_params$gear)
+      gears <- unique(mizer::gear_params(params)$gear)
       lapply(gears, function(gear) input[[paste0("effort_", gear)]])
     }, {
-      gears <- unique(params@gear_params$gear)
-      effort1 <- makeEffort("effort_" , gears, params@initial_effort)
+      gears <- unique(mizer::gear_params(params)$gear)
+      effort1 <- makeEffort("effort_" , gears, mizer::initial_effort(params))
       max_year <- isolate(input$fishyear)
 
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
@@ -704,11 +705,11 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Re-run only Strategy 2 when Strategy 2 effort sliders change
     observeEvent({
-      gears <- unique(params@gear_params$gear)
+      gears <- unique(mizer::gear_params(params)$gear)
       lapply(gears, function(gear) input[[paste0("effort2_", gear)]])
     }, {
-      gears <- unique(params@gear_params$gear)
-      effort2 <- makeEffort("effort2_", gears, params@initial_effort)
+      gears <- unique(mizer::gear_params(params)$gear)
+      effort2 <- makeEffort("effort2_", gears, mizer::initial_effort(params))
       max_year <- isolate(input$fishyear)
 
       pb <- shiny::Progress$new(); on.exit(pb$close(), add = TRUE)
@@ -726,8 +727,8 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Reset Strategy 1 effort sliders to base effort
     observeEvent(input$reset_effort_sim1, {
-      base_effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
+      base_effort <- mizer::initial_effort(params)
+      gears <- unique(mizer::gear_params(params)$gear)
       lapply(gears, function(gear) {
         updateSliderInput(
           session,
@@ -739,8 +740,8 @@ fishery_strategy_server <- function(id, sim_0,
 
     # Reset Strategy 2 effort sliders to base effort
     observeEvent(input$reset_effort_sim2, {
-      base_effort <- params@initial_effort
-      gears <- unique(params@gear_params$gear)
+      base_effort <- mizer::initial_effort(params)
+      gears <- unique(mizer::gear_params(params)$gear)
       lapply(gears, function(gear) {
         updateSliderInput(
           session,
@@ -1283,7 +1284,8 @@ fishery_strategy_server <- function(id, sim_0,
         plot_fun = function() {
           # Check bounds
           if (!mizerShiny:::checkTimeRangeBounds(fishSimData()$sim1, win)) {
-            details <- paste0("win = ", win, ", max_time = ", dim(fishSimData()$sim1@n)[1])
+            details <- paste0("win = ", win, ", max_time = ",
+                              max(mizer::getTimes(fishSimData()$sim1)))
             stop(paste("Time range out of bounds:", details))
           }
 
@@ -1300,15 +1302,11 @@ fishery_strategy_server <- function(id, sim_0,
             names <- c(names, "Strategy 2")
           }
 
-          # Subset simulations by time range
-          harvest_sub <- lapply(sims, function(sim) {
-            mizerShiny:::subsetSimByTimeRange(sim, win)
-          })
-
           mizerShiny:::plotDietCompare(
-            harvest_sub,
+            sims,
             species = input$fish_name_select,
-            sim_names = names
+            sim_names = names,
+            time_range = win
           )
         },
         last_plot_reactive = lastFishDietSinglePlot,
@@ -1372,4 +1370,3 @@ fishery_strategy_server <- function(id, sim_0,
     })
   })
 }
-

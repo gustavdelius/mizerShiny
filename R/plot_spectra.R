@@ -1,5 +1,17 @@
 # Spectra-related plots used in Shiny app
 
+# mizer 3.4 gives the value column a descriptive name. Keep one internal name
+# for the calculations below and for compatibility with development builds.
+standardise_spectra_data <- function(data) {
+  value_col <- intersect(c("Biomass density", "value"), names(data))
+  if (length(value_col) != 1) {
+    stop("Could not identify the biomass density column in spectrum data.",
+         call. = FALSE)
+  }
+  data$value <- data[[value_col]]
+  data
+}
+
 #' Relative community size spectrum (single vs baseline)
 #'
 #' Computes percent change in the community spectrum of one simulation relative
@@ -13,10 +25,12 @@
 plotSpectraRelative <- function(object1, object2, time1, time2) {
   sf1 <- mizer::plotSpectra(object1, return_data = TRUE,
                             resource = FALSE, background = FALSE,
-                            time_range = time1:time2)
+                            time_range = time1:time2) |>
+    standardise_spectra_data()
   sf2 <- mizer::plotSpectra(object2, return_data = TRUE,
                             resource = FALSE, background = FALSE,
-                            time_range = time1:time2)
+                            time_range = time1:time2) |>
+    standardise_spectra_data()
 
   sf <- dplyr::left_join(sf2, sf1, by = c("w", "Legend")) |>
     dplyr::group_by(w) |>
@@ -51,13 +65,16 @@ plotSpectraRelative <- function(object1, object2, time1, time2) {
 plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
   sf1 <- mizer::plotSpectra(object1, return_data = TRUE,
                             resource = FALSE, background = FALSE,
-                            time_range = time1:time2)
+                            time_range = time1:time2) |>
+    standardise_spectra_data()
   sf2 <- mizer::plotSpectra(object2, return_data = TRUE,
                             resource = FALSE, background = FALSE,
-                            time_range = time1:time2)
+                            time_range = time1:time2) |>
+    standardise_spectra_data()
   sf3 <- mizer::plotSpectra(object3, return_data = TRUE,
                             resource = FALSE, background = FALSE,
-                            time_range = time1:time2)
+                            time_range = time1:time2) |>
+    standardise_spectra_data()
 
   df1 <- dplyr::left_join(sf2, sf1, by = c("w", "Legend")) |>
     dplyr::group_by(w) |>
@@ -82,5 +99,4 @@ plotSpectraRelative2 <- function(object1, object2, object3, time1, time2) {
                    axis.title.y = ggplot2::element_text(size = 16)) +
     ggplot2::scale_x_log10()
 }
-
 
